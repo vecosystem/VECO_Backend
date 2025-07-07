@@ -1,0 +1,36 @@
+package com.example.Veco.domain.notification.entity;
+
+import com.example.Veco.global.enums.Category;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "notification")
+@Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class Notification {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "content")
+    private String content;
+
+    @Column(name = "type")
+    @Enumerated(EnumType.STRING)
+    private Category type;
+
+    @Column(name = "type_id")
+    private Long typeId;
+
+    @Column(name = "is_read")
+    private Boolean isRead;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt = null;
+}
