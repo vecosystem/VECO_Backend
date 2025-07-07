@@ -1,23 +1,28 @@
 package com.example.Veco.domain.comment.entity;
 
 import com.example.Veco.domain.common.BaseEntity;
-import com.example.Veco.global.enums.Category;
+import com.example.Veco.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "comment_room")
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class CommentRoom extends BaseEntity {
+public class Comment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "room_type")
-    @Enumerated(EnumType.STRING)
-    private Category roomType;
+    private String content;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "comment_room_id")
+    private CommentRoom commentRoom;
 }

@@ -1,5 +1,6 @@
 package com.example.Veco.domain.assignee.entity;
 
+import com.example.Veco.domain.common.BaseEntity;
 import com.example.Veco.global.enums.Category;
 import jakarta.persistence.*;
 import lombok.*;
@@ -10,7 +11,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Assignee {
+public class Assignee extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

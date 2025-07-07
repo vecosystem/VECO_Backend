@@ -1,5 +1,7 @@
 package com.example.Veco.domain.team.entity;
 
+import com.example.Veco.domain.common.BaseEntity;
+import com.example.Veco.domain.workspace.entity.WorkSpace;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,7 +11,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Team {
+public class Team extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,5 +23,7 @@ public class Team {
     @Column(name = "profile_url")
     private String profileUrl;
 
-
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "workspace_id")
+    private WorkSpace workSpace;
 }

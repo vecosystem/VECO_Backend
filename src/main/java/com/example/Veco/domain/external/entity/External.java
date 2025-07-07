@@ -1,5 +1,6 @@
 package com.example.Veco.domain.external.entity;
 
+import com.example.Veco.domain.common.BaseEntity;
 import com.example.Veco.global.enums.ExtServiceType;
 import com.example.Veco.global.enums.Priority;
 import com.example.Veco.global.enums.State;
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class External {
+public class External extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

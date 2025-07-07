@@ -1,0 +1,36 @@
+package com.example.Veco.domain.workspace.entity;
+
+import com.example.Veco.domain.common.BaseEntity;
+import com.example.Veco.domain.member.entity.Member;
+import com.example.Veco.domain.team.entity.Team;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class WorkSpace extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+
+    private String profile_url;
+
+    private String workspace_url;
+
+    private String cert_pwd;
+
+    @OneToMany(mappedBy = "workspace")
+    private List<Member> members = new ArrayList<>();
+
+    @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL)
+    private List<Team> teams = new ArrayList<>();
+}

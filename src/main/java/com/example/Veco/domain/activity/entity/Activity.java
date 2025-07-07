@@ -1,5 +1,6 @@
 package com.example.Veco.domain.activity.entity;
 
+import com.example.Veco.domain.common.BaseEntity;
 import com.example.Veco.global.enums.Category;
 import jakarta.persistence.*;
 import lombok.*;
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @EntityListeners(AuditingEntityListener.class)
-public class Activity {
+public class Activity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

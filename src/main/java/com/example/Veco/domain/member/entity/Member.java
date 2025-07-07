@@ -1,6 +1,8 @@
 package com.example.Veco.domain.member.entity;
 
+import com.example.Veco.domain.common.BaseEntity;
 import com.example.Veco.domain.member.enums.Provider;
+import com.example.Veco.domain.workspace.entity.WorkSpace;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,7 +12,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Member {
+public class Member extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,7 +21,15 @@ public class Member {
     @Column(name = "name")
     private String name;
 
+    private String nickname;
+
+    private String email;
+
     @Column(name = "provider")
     @Enumerated(EnumType.STRING)
     private Provider provider;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "workspace_id")
+    private WorkSpace workSpace;
 }

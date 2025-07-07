@@ -1,5 +1,6 @@
 package com.example.Veco.domain.issue.entity;
 
+import com.example.Veco.domain.common.BaseEntity;
 import com.example.Veco.global.enums.Priority;
 import com.example.Veco.global.enums.State;
 import jakarta.persistence.*;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Issue {
+public class Issue extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
