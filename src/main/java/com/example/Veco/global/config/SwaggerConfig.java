@@ -14,7 +14,7 @@ public class SwaggerConfig {
 
     @Bean
     public OpenAPI swagger() {
-        Info info = new Info().title("Project").description("Project Swagger").version("0.0.1");
+        Info info = new Info().title("Veco").description("Veco Swagger").version("0.0.1");
 
         // JWT 토큰 헤더 방식
         String securityScheme = "JWT TOKEN";
