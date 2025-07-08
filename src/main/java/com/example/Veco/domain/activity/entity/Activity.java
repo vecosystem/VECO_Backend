@@ -1,13 +1,15 @@
 package com.example.Veco.domain.activity.entity;
 
+
 import com.example.Veco.domain.common.BaseEntity;
+import com.example.Veco.domain.external.entity.External;
+import com.example.Veco.domain.goal.entity.Goal;
+import com.example.Veco.domain.issue.entity.Issue;
+import com.example.Veco.domain.mapping.MemberTeam;
 import com.example.Veco.global.enums.Category;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "activity")
@@ -29,7 +31,21 @@ public class Activity extends BaseEntity {
     @Column(name = "content")
     private String content;
 
-    @Column(name = "created_at")
-    @CreatedDate
-    private LocalDateTime createdAt;
+    // 연관 관계
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "issue_id")
+    private Issue issue;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "goal_id")
+    private Goal goal;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "external_id")
+    private External external;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_team_id")
+    private MemberTeam memberTeam;
+
 }

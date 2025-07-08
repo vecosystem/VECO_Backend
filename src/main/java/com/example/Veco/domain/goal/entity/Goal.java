@@ -1,6 +1,8 @@
 package com.example.Veco.domain.goal.entity;
 
+
 import com.example.Veco.domain.common.BaseEntity;
+import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.global.enums.Priority;
 import com.example.Veco.global.enums.State;
 import jakarta.persistence.*;
@@ -48,4 +50,8 @@ public class Goal extends BaseEntity {
     @Column(name = "goal_number", nullable = false)
     private Integer goal_number;
 
+    // 연관 관계
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    private Team team;
 }
