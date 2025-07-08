@@ -1,6 +1,11 @@
 package com.example.Veco.domain.assignee.entity;
 
+
 import com.example.Veco.domain.common.BaseEntity;
+import com.example.Veco.domain.external.entity.External;
+import com.example.Veco.domain.goal.entity.Goal;
+import com.example.Veco.domain.issue.entity.Issue;
+import com.example.Veco.domain.mapping.MemberTeam;
 import com.example.Veco.global.enums.Category;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,4 +26,21 @@ public class Assignee extends BaseEntity {
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
     private Category type;
+
+    // 연관 관계
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "issue_id")
+    private Issue issue;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "goal_id")
+    private Goal goal;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "external_id")
+    private External external;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_team_id")
+    private MemberTeam memberTeam;
 }

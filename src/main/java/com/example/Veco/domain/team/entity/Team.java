@@ -1,5 +1,6 @@
 package com.example.Veco.domain.team.entity;
 
+
 import com.example.Veco.domain.common.BaseEntity;
 import com.example.Veco.domain.workspace.entity.WorkSpace;
 import jakarta.persistence.*;

@@ -2,6 +2,7 @@ package com.example.Veco.domain.comment.entity;
 
 import com.example.Veco.domain.common.BaseEntity;
 import com.example.Veco.domain.member.entity.Member;
+
 import jakarta.persistence.*;
 import lombok.*;
 
