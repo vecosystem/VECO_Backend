@@ -24,6 +24,10 @@ public class Team extends BaseEntity {
     @Column(name = "profile_url")
     private String profileUrl;
 
+    @Column(name = "goal_number")
+    private Long goalNumber;
+
+    // 연관 관계
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "workspace_id")
     private WorkSpace workSpace;
