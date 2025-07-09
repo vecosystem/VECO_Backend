@@ -9,6 +9,8 @@ import com.example.Veco.domain.goal.dto.response.GoalResDTO.FullGoal;
 import com.example.Veco.domain.goal.dto.response.GoalResDTO.Pageable;
 import com.example.Veco.domain.goal.dto.response.GoalResDTO.SimpleGoal;
 import com.example.Veco.domain.goal.dto.response.GoalResDTO.Teammate;
+import com.example.Veco.domain.goal.service.command.GoalCommandService;
+import com.example.Veco.domain.goal.service.query.GoalQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Min;
@@ -23,6 +25,9 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api")
 @Tag(name = "목표 API")
 public class GoalController {
+
+    private final GoalCommandService goalCommandService;
+    private final GoalQueryService goalQueryService;
 
     // GET
     // 팀 내 모든 목표 조회
@@ -91,7 +96,7 @@ public class GoalController {
 
     // 목표 사진 첨부: 변경 가능성 O
     @Operation(
-            summary = "목표 사진 첨부 API By 김주헌 (개발 중)",
+            summary = "목표 사진 첨부 API By 김주헌",
             description = "단일 사진, 파일을 업로드합니다. " +
                     "목표 작성할때 사진을 업로드하기 위해 만들어진 API입니다. "
     )
@@ -99,7 +104,7 @@ public class GoalController {
     public String uploadFile(
             @RequestParam MultipartFile file
     ){
-        return null;
+        return goalCommandService.uploadFile(file);
     }
 
     // PATCH

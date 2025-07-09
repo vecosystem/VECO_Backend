@@ -1,4 +1,7 @@
 package com.example.Veco.domain.goal.repository;
 
-public class GoalRepository {
+import com.example.Veco.domain.goal.entity.Goal;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface GoalRepository extends JpaRepository<Goal, Long>, GoalQueryDsl {
 }
