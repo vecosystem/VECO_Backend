@@ -9,6 +9,7 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -45,12 +46,13 @@ public class Goal extends BaseEntity {
     @Builder.Default
     private Priority priority =  Priority.NONE;
 
-    @Column(name = "deadline")
+    @Column(name = "deadline_start")
     @Builder.Default
-    private LocalDateTime deadline = null;
+    private LocalDate deadlineStart = null;
 
-    @Column(name = "goal_number", nullable = false)
-    private Integer goal_number;
+    @Column(name = "deadline_end")
+    @Builder.Default
+    private LocalDate deadlineEnd = null;
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;

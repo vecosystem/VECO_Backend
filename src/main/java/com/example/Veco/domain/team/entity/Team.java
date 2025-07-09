@@ -31,4 +31,7 @@ public class Team extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "workspace_id")
     private WorkSpace workSpace;
+
+    // update
+    public void updateGoalNumber(Long goalNumber){ this.goalNumber = goalNumber; }
 }

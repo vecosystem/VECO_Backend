@@ -91,7 +91,7 @@ public class GoalController {
             @RequestParam Long teamId,
             @RequestBody GoalReqDTO.CreateGoal dto
     ){
-        return null;
+        return goalCommandService.createGoal(teamId, dto);
     }
 
     // 목표 사진 첨부: 변경 가능성 O
