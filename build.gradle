@@ -58,21 +58,21 @@ dependencies {
 		annotationProcessor "jakarta.annotation:jakarta.annotation-api"
 
 		// Security
-		implementation 'org.springframework.boot:spring-boot-starter-security'
+//		implementation 'org.springframework.boot:spring-boot-starter-security'
 
 		// Jwt
-		implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
-		implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
-		implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
-		implementation 'org.springframework.boot:spring-boot-configuration-processor'
+//		implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
+//		implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
+//		implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+//		implementation 'org.springframework.boot:spring-boot-configuration-processor'
 
 		// Redis
 		implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 		// AWS (S3)
-		implementation platform('io.awspring.cloud:spring-cloud-aws-dependencies:3.3.0')
-		implementation 'io.awspring.cloud:spring-cloud-aws-starter'
-		implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
+//		implementation platform('io.awspring.cloud:spring-cloud-aws-dependencies:3.3.0')
+//		implementation 'io.awspring.cloud:spring-cloud-aws-starter'
+//		implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
 	}
 }
 
