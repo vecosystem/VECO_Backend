@@ -3,9 +3,11 @@ package com.example.Veco.domain.goal.converter;
 import com.example.Veco.domain.goal.dto.request.GoalReqDTO;
 import com.example.Veco.domain.goal.dto.response.GoalResDTO;
 import com.example.Veco.domain.goal.entity.Goal;
+import com.example.Veco.domain.mapping.MemberTeam;
 import com.example.Veco.domain.team.entity.Team;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class GoalConverter {
 
@@ -35,6 +37,37 @@ public class GoalConverter {
         return GoalResDTO.CreateGoal.builder()
                 .goalId(goalId)
                 .createdAt(now)
+                .build();
+    }
+
+    // goalId, Time -> UpdateGoal
+    public static GoalResDTO.UpdateGoal toUpdateGoal(
+            Long goalId,
+            LocalDateTime now
+    ){
+        return GoalResDTO.UpdateGoal.builder()
+                .goalId(goalId)
+                .updatedAt(now)
+                .build();
+    }
+
+    // Data -> DataDTO
+    public static <T> GoalResDTO.Data<T> toData (
+            List<T> info
+    ){
+        return GoalResDTO.Data.<T>builder()
+                .cnt(info.size())
+                .info(info)
+                .build();
+    }
+
+    // MemberTeam -> Teammate
+    public static GoalResDTO.Teammate toTeammate (
+            MemberTeam memberTeam
+    ){
+        return GoalResDTO.Teammate.builder()
+                .id(memberTeam.getMember().getId())
+                .nickname(memberTeam.getMember().getNickname())
                 .build();
     }
 }

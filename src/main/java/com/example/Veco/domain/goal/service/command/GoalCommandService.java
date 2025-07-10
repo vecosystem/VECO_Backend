@@ -1,14 +1,14 @@
 package com.example.Veco.domain.goal.service.command;
 
-import com.example.Veco.domain.assignee.entity.Assignee;
-import com.example.Veco.domain.assignee.entity.AssigneeConverter;
-import com.example.Veco.domain.assignee.entity.AssigneeRepository;
 import com.example.Veco.domain.common.entity.Image;
 import com.example.Veco.domain.common.repository.ImageRepository;
 import com.example.Veco.domain.goal.converter.GoalConverter;
 import com.example.Veco.domain.goal.dto.request.GoalReqDTO;
+import com.example.Veco.domain.goal.dto.response.GoalResDTO;
 import com.example.Veco.domain.goal.dto.response.GoalResDTO.CreateGoal;
 import com.example.Veco.domain.goal.entity.Goal;
+import com.example.Veco.domain.goal.exception.GoalException;
+import com.example.Veco.domain.goal.exception.code.GoalErrorCode;
 import com.example.Veco.domain.goal.repository.GoalRepository;
 import com.example.Veco.domain.issue.entity.Issue;
 import com.example.Veco.domain.issue.entity.IssueException;
@@ -18,18 +18,15 @@ import com.example.Veco.domain.mapping.MemberTeamRepository;
 import com.example.Veco.domain.member.MemberException;
 import com.example.Veco.domain.member.MemberRepository;
 import com.example.Veco.domain.member.entity.Member;
-import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.domain.team.entity.TeamException;
 import com.example.Veco.domain.team.entity.TeamRepository;
 import com.example.Veco.global.aws.util.S3Util;
-import com.example.Veco.global.enums.Category;
-import com.example.Veco.global.redis.util.RedisUtil;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
@@ -46,6 +43,7 @@ public class GoalCommandService {
     private final S3Util s3Util;
 
     // 리포지토리
+    private final GoalRepository goalRepository;
     private final ImageRepository imageRepository;
     private final MemberRepository memberRepository;
     private final MemberTeamRepository memberTeamRepository;
@@ -80,7 +78,7 @@ public class GoalCommandService {
         }
 
         // 같은 팀원 여부 검증
-        List<MemberTeam> memberTeamList = memberTeamRepository.findAllByMemberIdAndTeamId(memberIds, teamId);
+        List<MemberTeam> memberTeamList = memberTeamRepository.findAllByMemberIdInAndTeamId(memberIds, teamId);
         if (memberTeamList.size() != memberIds.size()) {
             throw new MemberException("담당자 중 같은 팀원이 아닌 사용자가 있습니다.");
         }
@@ -100,6 +98,7 @@ public class GoalCommandService {
             if (!available) {
                 throw new RuntimeException("redis Timeout");
             }
+            // 파사드 기법으로 @Transactional 진행 후 락 해제
             goalId = goalTransactionalService.createGoal(teamId, dto, memberTeamList, issueList);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -123,7 +122,59 @@ public class GoalCommandService {
 
         return url;
     }
+
     // 목표 수정
+    public GoalResDTO.UpdateGoal updateGoal(
+            GoalReqDTO.UpdateGoal dto,
+            Long teamId,
+            Long goalId
+    ){
+        // 사용자 - 목표 검증: 존재 여부, 같은 팀 여부 (임시)
+        validMemberAndGoal(teamId, goalId);
+
+        // 업데이트 실시: @Transactional
+        boolean isRestore = goalTransactionalService.updateGoal(dto, goalId, teamId);
+        if (!isRestore) {
+            return null;
+        } else {
+            LocalDateTime now = LocalDateTime.now();
+            return GoalConverter.toUpdateGoal(goalId, now);
+        }
+    }
 
     // 목표 삭제
+    @Transactional
+    public void deleteGoal(
+            Long teamId,
+            Long goalId
+    ){
+
+        // 사용자 - 목표 검증: 존재 여부, 같은 팀 여부
+        validMemberAndGoal(teamId, goalId);
+
+        // 삭제: 목표, 이슈, 담당자 / @Transactional
+        goalTransactionalService.deleteGoal(goalId);
+    }
+
+    // 사용자 - 목표 검증: 존재 여부, 같은 팀 여부
+    private void validMemberAndGoal(Long teamId, Long goalId) {
+
+        // 삭제할 목표 존재 여부 검증
+        Goal goal = goalRepository.findById(goalId).orElseThrow(() ->
+                new GoalException(GoalErrorCode.NOT_FOUND.name()));
+
+        // 팀 존재 여부 검증
+        if (!teamRepository.existsById(teamId)) {
+            throw new TeamException("해당 팀이 존재하지 않습니다.");
+        }
+
+        // 팀원 여부 확인: 인증 객체 추출 (임시)
+        MemberTeam member = memberTeamRepository.findByMemberIdAndTeamId(1L, teamId).orElseThrow(() ->
+                new MemberException("해당 사용자가 팀에 존재하지 않습니다."));
+
+        // 목표와 사용자가 같은 팀에 속하는지 검증
+        if (!goal.getTeam().equals(member.getTeam())) {
+            throw new GoalException(GoalErrorCode.FORBIDDEN.name());
+        }
+    }
 }

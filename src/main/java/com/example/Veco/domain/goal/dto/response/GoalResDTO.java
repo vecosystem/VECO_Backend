@@ -65,7 +65,7 @@ public class GoalResDTO {
 
     // 목표 수정
     @Builder
-    public record ChangeGoal (
+    public record UpdateGoal(
             Long goalId,
             LocalDateTime updatedAt
     ){}

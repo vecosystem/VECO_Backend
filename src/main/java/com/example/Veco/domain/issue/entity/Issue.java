@@ -54,4 +54,7 @@ public class Issue extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "goal_id")
     private Goal goal;
+
+    // update
+    public void updateGoal(Goal goal) { this.goal = goal; }
 }

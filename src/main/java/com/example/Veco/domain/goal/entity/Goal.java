@@ -61,4 +61,12 @@ public class Goal extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
     private Team team;
+
+    // update
+    public void updateTitle(String title) { this.title = title; }
+    public void updateContent(String content) { this.content = content; }
+    public void updateState(State state) { this.state = state; }
+    public void updatePriority(Priority priority) { this.priority = priority; }
+    public void updateDeadlineStart(LocalDate deadlineStart) { this.deadlineStart = deadlineStart; }
+    public void updateDeadlineEnd(LocalDate deadlineEnd) { this.deadlineEnd = deadlineEnd; }
 }

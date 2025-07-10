@@ -2,6 +2,7 @@ package com.example.Veco.domain.goal.dto.request;
 
 import com.example.Veco.global.enums.Priority;
 import com.example.Veco.global.enums.State;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,7 +22,7 @@ public class GoalReqDTO {
     ){}
 
     // 목표 수정
-    public record ChangeGoal (
+    public record UpdateGoal(
             String title,
             String content,
             State state,

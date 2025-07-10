@@ -1,7 +1,7 @@
 package com.example.Veco.domain.goal.controller;
 
 import com.example.Veco.domain.goal.dto.request.GoalReqDTO;
-import com.example.Veco.domain.goal.dto.response.GoalResDTO.ChangeGoal;
+import com.example.Veco.domain.goal.dto.response.GoalResDTO.UpdateGoal;
 import com.example.Veco.domain.goal.dto.response.GoalResDTO.CreateGoal;
 import com.example.Veco.domain.goal.dto.response.GoalResDTO.Data;
 import com.example.Veco.domain.goal.dto.response.GoalResDTO.FilteringGoal;
@@ -66,16 +66,16 @@ public class GoalController {
 
     // 팀원 조회 (담당자): 변경 가능성 O
     @Operation(
-            summary = "팀원 조회 (담당자) API By 김주헌 (개발 중)",
+            summary = "팀원 조회 (담당자) API By 김주헌",
             description = "팀원 목록을 조회합니다." +
                     "담당자를 선택하기 위한 API입니다."
     )
     @GetMapping("/teams/{teamId}/teammate")
     public Data<Teammate> getTeammate(
-            @RequestParam @NotBlank(message = "팀 ID는 필수 입력입니다.")
+            @RequestParam
             Long teamId
     ){
-        return null;
+        return goalQueryService.getTeammate(teamId);
     }
 
     // POST
@@ -116,12 +116,12 @@ public class GoalController {
                     "변경 사항이 없는 속성은 Null로 두시면 됩니다."
     )
     @PatchMapping("/teams/{teamId}/goals/{goalId}")
-    public ChangeGoal changeGoal(
+    public UpdateGoal updateGoal(
             @RequestParam Long teamId,
             @RequestParam Long goalId,
-            @RequestBody GoalReqDTO.ChangeGoal dto
+            @RequestBody GoalReqDTO.UpdateGoal dto
     ){
-        return null;
+        return goalCommandService.updateGoal(dto, teamId, goalId);
     }
 
     // DELETE
@@ -131,10 +131,10 @@ public class GoalController {
             description = "목표를 삭제합니다. (Soft Delete)"
     )
     @DeleteMapping("/teams/{teamId}/goals/{goalId}")
-    public String deleteGoal(
+    public void deleteGoal(
             @RequestParam Long teamId,
             @RequestParam Long goalId
     ){
-        return null;
+        goalCommandService.deleteGoal(teamId, goalId);
     }
 }
