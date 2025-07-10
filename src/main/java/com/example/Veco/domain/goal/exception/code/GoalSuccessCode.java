@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 
 @AllArgsConstructor
 @Getter
-public enum GoalSuccessCode {
+public enum GoalSuccessCode{
 
     OK(HttpStatus.OK,
             "GOAL200",
@@ -22,7 +22,7 @@ public enum GoalSuccessCode {
             "반영할 콘텐츠가 없습니다.")
     ;
 
-    // 응답 통일 시 변경
-    GoalSuccessCode(HttpStatus httpStatus, String code, String message) {
-    }
+    private final HttpStatus httpStatus;
+    private final String code;
+    private final String message;
 }

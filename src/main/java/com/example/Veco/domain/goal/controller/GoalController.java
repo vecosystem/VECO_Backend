@@ -11,6 +11,7 @@ import com.example.Veco.domain.goal.dto.response.GoalResDTO.SimpleGoal;
 import com.example.Veco.domain.goal.dto.response.GoalResDTO.Teammate;
 import com.example.Veco.domain.goal.service.command.GoalCommandService;
 import com.example.Veco.domain.goal.service.query.GoalQueryService;
+import com.example.Veco.global.apiPayload.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Min;
@@ -38,7 +39,7 @@ public class GoalController {
                     "커서 기반 페이지네이션, 최신 순으로 정렬합니다."
     )
     @GetMapping("/teams/{teamId}/goals")
-    public Pageable<FilteringGoal<SimpleGoal>> getTeamGoals(
+    public ApiResponse<Pageable<FilteringGoal<SimpleGoal>>> getTeamGoals(
             @RequestParam @NotBlank(message = "팀 ID는 필수 입력입니다.")
             Long teamId,
             @RequestParam(defaultValue = "-1") @Min(value = -1, message = "커서는 -1보다 큰 정수여야 합니다.")
@@ -57,7 +58,7 @@ public class GoalController {
             description = "목표 상세 정보를 조회합니다. 댓글 데이터는 최신순으로 정렬되어 있습니다."
     )
     @GetMapping("/goals/{goalId}")
-    public FullGoal getGoalDetails(
+    public ApiResponse<FullGoal> getGoalDetails(
             @RequestParam @NotBlank(message = "목표 ID는 필수 입력입니다.")
             Long goalId
     ){
@@ -71,11 +72,11 @@ public class GoalController {
                     "담당자를 선택하기 위한 API입니다."
     )
     @GetMapping("/teams/{teamId}/teammate")
-    public Data<Teammate> getTeammate(
+    public ApiResponse<Data<Teammate>> getTeammate(
             @RequestParam
             Long teamId
     ){
-        return goalQueryService.getTeammate(teamId);
+        return ApiResponse.onSuccess(goalQueryService.getTeammate(teamId));
     }
 
     // POST
@@ -87,11 +88,11 @@ public class GoalController {
                     "플로우: 내용 작성 -> 사진 업로드 & URL 반환 -> 마크다운 적용 -> 다른 내용들과 함께 목표 업로드"
     )
     @PostMapping("/teams/{teamId}/goals")
-    public CreateGoal createGoal(
+    public ApiResponse<CreateGoal> createGoal(
             @RequestParam Long teamId,
             @RequestBody GoalReqDTO.CreateGoal dto
     ){
-        return goalCommandService.createGoal(teamId, dto);
+        return ApiResponse.onSuccess(goalCommandService.createGoal(teamId, dto));
     }
 
     // 목표 사진 첨부: 변경 가능성 O
@@ -101,10 +102,10 @@ public class GoalController {
                     "목표 작성할때 사진을 업로드하기 위해 만들어진 API입니다. "
     )
     @PostMapping(value = "/upload-file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public String uploadFile(
+    public ApiResponse<String> uploadFile(
             @RequestParam MultipartFile file
     ){
-        return goalCommandService.uploadFile(file);
+        return ApiResponse.onSuccess(goalCommandService.uploadFile(file));
     }
 
     // PATCH
@@ -116,12 +117,12 @@ public class GoalController {
                     "변경 사항이 없는 속성은 Null로 두시면 됩니다."
     )
     @PatchMapping("/teams/{teamId}/goals/{goalId}")
-    public UpdateGoal updateGoal(
+    public ApiResponse<UpdateGoal> updateGoal(
             @RequestParam Long teamId,
             @RequestParam Long goalId,
             @RequestBody GoalReqDTO.UpdateGoal dto
     ){
-        return goalCommandService.updateGoal(dto, teamId, goalId);
+        return ApiResponse.onSuccess(goalCommandService.updateGoal(dto, teamId, goalId));
     }
 
     // DELETE
@@ -131,10 +132,11 @@ public class GoalController {
             description = "목표를 삭제합니다. (Soft Delete)"
     )
     @DeleteMapping("/teams/{teamId}/goals/{goalId}")
-    public void deleteGoal(
+    public ApiResponse<Void> deleteGoal(
             @RequestParam Long teamId,
             @RequestParam Long goalId
     ){
         goalCommandService.deleteGoal(teamId, goalId);
+        return ApiResponse.onSuccess(null);
     }
 }

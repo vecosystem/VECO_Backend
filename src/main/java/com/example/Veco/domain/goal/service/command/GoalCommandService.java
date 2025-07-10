@@ -11,21 +11,28 @@ import com.example.Veco.domain.goal.exception.GoalException;
 import com.example.Veco.domain.goal.exception.code.GoalErrorCode;
 import com.example.Veco.domain.goal.repository.GoalRepository;
 import com.example.Veco.domain.issue.entity.Issue;
+import com.example.Veco.domain.issue.entity.IssueErrorCode;
 import com.example.Veco.domain.issue.entity.IssueException;
 import com.example.Veco.domain.issue.entity.IssueRepository;
 import com.example.Veco.domain.mapping.MemberTeam;
 import com.example.Veco.domain.mapping.MemberTeamRepository;
+import com.example.Veco.domain.member.MemberErrorCode;
 import com.example.Veco.domain.member.MemberException;
 import com.example.Veco.domain.member.MemberRepository;
 import com.example.Veco.domain.member.entity.Member;
+import com.example.Veco.domain.team.entity.Team;
+import com.example.Veco.domain.team.entity.TeamErrorCode;
 import com.example.Veco.domain.team.entity.TeamException;
 import com.example.Veco.domain.team.entity.TeamRepository;
 import com.example.Veco.global.aws.util.S3Util;
+import com.example.Veco.global.redis.exception.RedisException;
+import com.example.Veco.global.redis.exception.code.RedisErrorCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.redisson.client.RedisBusyException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -69,24 +76,25 @@ public class GoalCommandService {
         // 사용자 존재 여부 검증
         List<Member> memberList = memberRepository.findAllById(memberIds);
         if (memberList.size() != memberIds.size()) {
-            throw new MemberException("사용자 중 존재하지 않은 사용자가 있습니다.");
+            throw new MemberException(MemberErrorCode.NOT_FOUND.getMessage());
         }
 
         // 팀 존재 여부 검증
         if (!teamRepository.existsById(teamId)) {
-            throw new TeamException("해당 팀이 존재하지 않습니다.");
+            // 임시
+            throw new TeamException(TeamErrorCode.NOT_FOUND.getMessage());
         }
 
         // 같은 팀원 여부 검증
         List<MemberTeam> memberTeamList = memberTeamRepository.findAllByMemberIdInAndTeamId(memberIds, teamId);
         if (memberTeamList.size() != memberIds.size()) {
-            throw new MemberException("담당자 중 같은 팀원이 아닌 사용자가 있습니다.");
+            throw new MemberException(TeamErrorCode.FORBIDDEN.getMessage());
         }
 
         // 이슈 존재 여부 검증
         List<Issue> issueList = issueRepository.findAllById(dto.issueId());
         if (issueList.size() != dto.issueId().size()) {
-            throw new IssueException("존재하지 않은 이슈가 있습니다.");
+            throw new IssueException(IssueErrorCode.NOT_FOUND.getMessage());
         }
 
         // 목표 생성: DTO, Team, Name 필요, @Transactional
@@ -96,7 +104,7 @@ public class GoalCommandService {
         try {
             boolean available = lock.tryLock(10, 1, TimeUnit.SECONDS);
             if (!available) {
-                throw new RuntimeException("redis Timeout");
+                throw new RedisException(RedisErrorCode.LOCK_TIMEOUT.getMessage());
             }
             // 파사드 기법으로 @Transactional 진행 후 락 해제
             goalId = goalTransactionalService.createGoal(teamId, dto, memberTeamList, issueList);
@@ -161,20 +169,20 @@ public class GoalCommandService {
 
         // 삭제할 목표 존재 여부 검증
         Goal goal = goalRepository.findById(goalId).orElseThrow(() ->
-                new GoalException(GoalErrorCode.NOT_FOUND.name()));
+                new GoalException(GoalErrorCode.NOT_FOUND.getMessage()));
 
         // 팀 존재 여부 검증
         if (!teamRepository.existsById(teamId)) {
-            throw new TeamException("해당 팀이 존재하지 않습니다.");
+            throw new TeamException(TeamErrorCode.NOT_FOUND.getMessage());
         }
 
         // 팀원 여부 확인: 인증 객체 추출 (임시)
         MemberTeam member = memberTeamRepository.findByMemberIdAndTeamId(1L, teamId).orElseThrow(() ->
-                new MemberException("해당 사용자가 팀에 존재하지 않습니다."));
+                new MemberException(MemberErrorCode.FORBIDDEN.getMessage()));
 
         // 목표와 사용자가 같은 팀에 속하는지 검증
         if (!goal.getTeam().equals(member.getTeam())) {
-            throw new GoalException(GoalErrorCode.FORBIDDEN.name());
+            throw new GoalException(GoalErrorCode.FORBIDDEN.getMessage());
         }
     }
 }
