@@ -1,12 +1,15 @@
 package com.example.Veco.domain.external.entity;
 
 import com.example.Veco.domain.common.BaseEntity;
+import com.example.Veco.domain.goal.entity.Goal;
+import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.global.enums.ExtServiceType;
 import com.example.Veco.global.enums.Priority;
 import com.example.Veco.global.enums.State;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -21,37 +24,43 @@ public class External extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     @Column(name = "name", nullable = false)
     private String name;
 
     @Column(name = "title", nullable = false)
-    private  String title;
+    private String title;
 
-    @Column(name = "content")
+    @Column(name = "description")
     @Builder.Default
-    private  String content = "";
+    private String description = "";
 
     @Column(name = "state", nullable = false)
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private State state = State.NONE;
 
-    @Column(name = "priority",  nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
+    @Column(name = "priority", nullable = false)
     @Enumerated(EnumType.STRING)
     @Builder.Default
-    private Priority priority =  Priority.NONE;
+    private Priority priority = Priority.NONE;
 
     @Column(name = "deadline")
     @Builder.Default
-    private LocalDateTime deadline = null;
+    private LocalDate deadline = null;
 
     @Column(name = "service_type", nullable = false)
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private ExtServiceType type = ExtServiceType.NONE;
 
-    @Column(name = "external_number", nullable = false)
-    private Integer external_number;
+    @Column(name = "external_code", nullable = false)
+    private String external_code;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "goal_id")
+    private Goal goal;
 }

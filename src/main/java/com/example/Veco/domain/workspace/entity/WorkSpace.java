@@ -29,8 +29,10 @@ public class WorkSpace extends BaseEntity {
     private String cert_pwd;
 
     @OneToMany(mappedBy = "workSpace")
+    @Builder.Default
     private List<Member> members = new ArrayList<>();
 
     @OneToMany(mappedBy = "workSpace", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<Team> teams = new ArrayList<>();
 }
