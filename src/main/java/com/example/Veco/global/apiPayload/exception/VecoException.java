@@ -1,11 +1,11 @@
 package com.example.Veco.global.apiPayload.exception;
 
 import com.example.Veco.global.apiPayload.ErrorReasonDTO;
-import com.example.Veco.global.apiPayload.code.ErrorStatus;
+import com.example.Veco.global.apiPayload.code.BaseErrorStatus;
 
 public class VecoException extends RuntimeException {
 
-    private ErrorStatus errorStatus;
+    private BaseErrorStatus errorStatus;
 
     public VecoException(String message) {
         super(message);
