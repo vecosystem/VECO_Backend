@@ -11,7 +11,7 @@ public class MemberResponseDTO {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class  MemberProfileResponseDTO {
+    public static class MemberProfileResponseDto {
         private Long memberId;
         private String name;
         private String nickname;

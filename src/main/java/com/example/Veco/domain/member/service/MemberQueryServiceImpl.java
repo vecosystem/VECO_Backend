@@ -15,6 +15,6 @@ public class MemberQueryServiceImpl implements MemberQueryService {
     @Override
     public Member findById(Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(VecoException::new); // 에러 처리 나중에 추가 예정
+                .orElseThrow(() -> new VecoException("멤버 에러")); // 에러 처리 나중에 구현 예정
     }
 }
