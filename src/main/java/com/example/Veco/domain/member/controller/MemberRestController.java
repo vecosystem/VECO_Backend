@@ -26,15 +26,16 @@ public class MemberRestController {
     @Operation(summary = "유저의 프로필을 조회합니다.")
     public ApiResponse<MemberResponseDTO.MemberProfileResponseDto> getProfile(@PathVariable Long memberId) {
         Member member = memberQueryService.findById(memberId);
-        return ApiResponse.onSuccess(MemberConverter.toMemberResponseDTO(member));
+        return ApiResponse.onSuccess(MemberConverter.toMemberProfileResponseDTO(member));
     }
 
-    @PatchMapping("/{members/{memberId}/nickname}")
+    @PatchMapping("/{memberId}/nickname")
     @Operation(summary = "유저의 닉네임을 변경합니다.")
-    public ApiResponse<MemberResponseDTO.MemberProfileResponseDto> updateNickname(
+    public ApiResponse<MemberResponseDTO.MemberNicknameResponseDto> updateNickname(
             @PathVariable Long memberId,
             @Valid @RequestBody MemberRequestDTO.updateNicknameRequestDto request) {
         Member member = memberQueryService.findById(memberId);
-        String updateMemberId = memberCommandService.updateNickname(request.getNickname());
+        memberCommandService.updateNickname(memberId, request.getNickname());
+        return ApiResponse.onSuccess(MemberConverter.toMemberResponseDTO(member));
     }
 }

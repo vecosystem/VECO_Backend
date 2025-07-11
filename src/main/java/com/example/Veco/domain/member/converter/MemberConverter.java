@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class MemberConverter {
 
-    public static MemberResponseDTO.MemberProfileResponseDto toMemberResponseDTO(Member member) {
+    public static MemberResponseDTO.MemberProfileResponseDto toMemberProfileResponseDTO(Member member) {
         return MemberResponseDTO.MemberProfileResponseDto.builder()
                 .memberId(member.getId())
                 .name(member.getName())
@@ -18,15 +18,9 @@ public class MemberConverter {
                 .build();
     }
 
-    public static MemberResponseDTO.MemberProfileResponseDto toMemberResponseDTO(Long memberId) {
-        return MemberResponseDTO.MemberProfileResponseDto.builder()
-                .memberId(memberId)
-                .build();
-    }
-
-    public static MemberRequestDTO.updateNicknameRequestDto toUpdateNicknameRequestDto(Member member) {
-        return MemberRequestDTO.updateNicknameRequestDto.builder()
-                .nickname(member.getNickname())
+    public static MemberResponseDTO.MemberNicknameResponseDto toMemberResponseDTO(Member member) {
+        return MemberResponseDTO.MemberNicknameResponseDto.builder()
+                .memberId(member.getId())
                 .build();
     }
 }
