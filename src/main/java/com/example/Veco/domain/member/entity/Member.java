@@ -25,6 +25,8 @@ public class Member extends BaseEntity {
 
     private String email;
 
+    private String profileImageUrl;
+
     @Column(name = "provider")
     @Enumerated(EnumType.STRING)
     private Provider provider;
