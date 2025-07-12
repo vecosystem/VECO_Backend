@@ -1,11 +1,10 @@
 package com.example.Veco.domain.notification.entity;
 
 import com.example.Veco.domain.common.BaseEntity;
+import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.global.enums.Category;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "notification")
@@ -19,19 +18,18 @@ public class Notification extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "content")
-    private String content;
+    /* @Column(name = "content")
+    private String content; */
 
-    @Column(name = "type")
+    @Column(name = "type" , nullable = false)
     @Enumerated(EnumType.STRING)
     private Category type;
 
-    @Column(name = "type_id")
+    @Column(name = "type_id" , nullable = false)
     private Long typeId;
 
-    @Column(name = "is_read")
-    private Boolean isRead;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "team_id")
+    private Team team;
 
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt = null;
 }
