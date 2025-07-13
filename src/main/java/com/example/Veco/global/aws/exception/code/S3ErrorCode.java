@@ -1,12 +1,14 @@
 package com.example.Veco.global.aws.exception.code;
 
+import com.example.Veco.global.apiPayload.ErrorReasonDTO;
+import com.example.Veco.global.apiPayload.code.BaseErrorStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor
-public enum S3ErrorCode {
+public enum S3ErrorCode implements BaseErrorStatus {
 
     FILE_SIZE_OVER(HttpStatus.BAD_REQUEST,
             "S3400_0",
@@ -27,4 +29,14 @@ public enum S3ErrorCode {
     private final HttpStatus httpStatus;
     private final String code;
     private final String message;
+
+    @Override
+    public ErrorReasonDTO getReasonHttpStatus() {
+        return ErrorReasonDTO.builder()
+                .isSuccess(false)
+                .httpStatus(httpStatus)
+                .code(code)
+                .message(message)
+                .build();
+    }
 }
