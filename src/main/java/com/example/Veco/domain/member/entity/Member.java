@@ -2,6 +2,7 @@ package com.example.Veco.domain.member.entity;
 
 import com.example.Veco.domain.common.BaseEntity;
 import com.example.Veco.domain.member.enums.Provider;
+import com.example.Veco.domain.profile.entity.Profile;
 import com.example.Veco.domain.workspace.entity.WorkSpace;
 import jakarta.persistence.*;
 import lombok.*;
@@ -22,11 +23,7 @@ public class Member extends BaseEntity {
     @Column(name = "name")
     private String name;
 
-    private String nickname;
-
     private String email;
-
-    private String profileImageUrl;
 
     @Column(name = "provider")
     @Enumerated(EnumType.STRING)
@@ -36,7 +33,7 @@ public class Member extends BaseEntity {
     @JoinColumn(name = "workspace_id")
     private WorkSpace workSpace;
 
-    public void updateNickname(String nickname) {
-        this.nickname = nickname;
-    }
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "profile_id")
+    private Profile profile;
 }

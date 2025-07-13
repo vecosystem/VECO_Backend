@@ -11,10 +11,9 @@ public class MemberResponseDTO {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class MemberProfileResponseDto {
+    public static class ProfileResponseDto {
         private Long memberId;
         private String name;
-        private String nickname;
         private String email;
         private String profileImage; //url 반환, 실제 요청은 form-data
     }
@@ -25,5 +24,24 @@ public class MemberResponseDTO {
     @AllArgsConstructor
     public static class MemberNicknameResponseDto {
         private Long memberId;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MemberProfileImageResponseDto {
+        private Long memberId;
+        private String imageUrl;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class NotificationToggleResponseDto {
+        private Long memberId;
+        private String notificationType;
+        private boolean isEnabled;
     }
 }

@@ -16,6 +16,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
 
     private final MemberRepository memberRepository;
 
+    /*
     @Override
     public String updateNickname(Long memberId, String nickname) {
         Member member = memberRepository.findById(memberId)
@@ -23,5 +24,5 @@ public class MemberCommandServiceImpl implements MemberCommandService {
 
         member.updateNickname(nickname);
         return member.getNickname();
-    }
+    }*/
 }

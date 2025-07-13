@@ -1,6 +1,5 @@
 package com.example.Veco.domain.member.converter;
 
-import com.example.Veco.domain.member.dto.MemberRequestDTO;
 import com.example.Veco.domain.member.dto.MemberResponseDTO;
 import com.example.Veco.domain.member.entity.Member;
 import org.springframework.stereotype.Component;
@@ -8,19 +7,35 @@ import org.springframework.stereotype.Component;
 @Component
 public class MemberConverter {
 
-    public static MemberResponseDTO.MemberProfileResponseDto toMemberProfileResponseDTO(Member member) {
-        return MemberResponseDTO.MemberProfileResponseDto.builder()
+    public static MemberResponseDTO.ProfileResponseDto toProfileResponseDTO(Member member) {
+        return MemberResponseDTO.ProfileResponseDto.builder()
                 .memberId(member.getId())
                 .name(member.getName())
-                .nickname(member.getNickname())
                 .email(member.getEmail())
-                .profileImage(member.getProfileImageUrl())
+                .profileImage(member.getProfile().getProfileImageUrl())
                 .build();
     }
 
+    /*
     public static MemberResponseDTO.MemberNicknameResponseDto toMemberResponseDTO(Member member) {
         return MemberResponseDTO.MemberNicknameResponseDto.builder()
                 .memberId(member.getId())
                 .build();
+    }*/
+
+    public static MemberResponseDTO.MemberProfileImageResponseDto toMemberProfileImageResponseDTO(Member member) {
+        return MemberResponseDTO.MemberProfileImageResponseDto.builder()
+                .memberId(member.getId())
+                .imageUrl(member.getProfile().getProfileImageUrl())
+                .build();
     }
+
+    /*
+    public static MemberResponseDTO.NotificationToggleResponseDto toNotificationToggleResponseDTO(Member member) {
+        return MemberResponseDTO.NotificationToggleResponseDto.builder()
+                .memberId(member.getId())
+                .notificationType(notification)
+                .build();
+    }
+     */
 }

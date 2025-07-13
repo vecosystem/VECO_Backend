@@ -10,8 +10,11 @@ import com.example.Veco.global.apiPayload.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.awt.*;
 
 @Validated
 @RestController
@@ -24,11 +27,12 @@ public class MemberRestController {
 
     @GetMapping("/{memberId}")
     @Operation(summary = "유저의 프로필을 조회합니다.")
-    public ApiResponse<MemberResponseDTO.MemberProfileResponseDto> getProfile(@PathVariable Long memberId) {
+    public ApiResponse<MemberResponseDTO.ProfileResponseDto> getProfile(@PathVariable Long memberId) {
         Member member = memberQueryService.findById(memberId);
-        return ApiResponse.onSuccess(MemberConverter.toMemberProfileResponseDTO(member));
+        return ApiResponse.onSuccess(MemberConverter.toProfileResponseDTO(member));
     }
 
+    /*
     @PatchMapping("/{memberId}/nickname")
     @Operation(summary = "유저의 닉네임을 변경합니다.")
     public ApiResponse<MemberResponseDTO.MemberNicknameResponseDto> updateNickname(
@@ -38,4 +42,7 @@ public class MemberRestController {
         memberCommandService.updateNickname(memberId, request.getNickname());
         return ApiResponse.onSuccess(MemberConverter.toMemberResponseDTO(member));
     }
+    */
+
+    //@PatchMapping(value = "/{memberId}/profileImage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 }
