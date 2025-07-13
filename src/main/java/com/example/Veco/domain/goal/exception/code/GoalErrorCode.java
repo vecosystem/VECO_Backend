@@ -1,12 +1,14 @@
 package com.example.Veco.domain.goal.exception.code;
 
+import com.example.Veco.global.apiPayload.ErrorReasonDTO;
+import com.example.Veco.global.apiPayload.code.BaseErrorStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @AllArgsConstructor
 @Getter
-public enum GoalErrorCode{
+public enum GoalErrorCode implements BaseErrorStatus {
 
     FORBIDDEN(HttpStatus.FORBIDDEN,
             "GOAL403_0",
@@ -22,4 +24,14 @@ public enum GoalErrorCode{
     private final HttpStatus httpStatus;
     private final String code;
     private final String message;
+
+    @Override
+    public ErrorReasonDTO getReasonHttpStatus() {
+        return ErrorReasonDTO.builder()
+                .isSuccess(false)
+                .httpStatus(httpStatus)
+                .code(code)
+                .message(message)
+                .build();
+    }
 }
