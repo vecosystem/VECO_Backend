@@ -7,13 +7,16 @@ import com.example.Veco.domain.goal.converter.GoalConverter;
 import com.example.Veco.domain.goal.dto.request.GoalReqDTO;
 import com.example.Veco.domain.goal.entity.Goal;
 import com.example.Veco.domain.goal.exception.GoalException;
+import com.example.Veco.domain.goal.exception.code.GoalErrorCode;
 import com.example.Veco.domain.goal.repository.GoalRepository;
 import com.example.Veco.domain.issue.entity.Issue;
+import com.example.Veco.domain.issue.entity.IssueErrorCode;
 import com.example.Veco.domain.issue.entity.IssueException;
 import com.example.Veco.domain.issue.entity.IssueRepository;
 import com.example.Veco.domain.mapping.MemberTeam;
 import com.example.Veco.domain.mapping.MemberTeamRepository;
 import com.example.Veco.domain.team.entity.Team;
+import com.example.Veco.domain.team.entity.TeamErrorCode;
 import com.example.Veco.domain.team.entity.TeamException;
 import com.example.Veco.domain.team.entity.TeamRepository;
 import com.example.Veco.global.enums.Category;
@@ -45,7 +48,7 @@ public class GoalTransactionalService {
     ){
         // Team 조회
         Team team = teamRepository.findTeamById(teamId).orElseThrow(() ->
-                new TeamException("해당 팀을 찾을 수 없습니다."));
+                new TeamException(TeamErrorCode.NOT_FOUND));
 
         // 목표 생성
         String name = team.getWorkSpace().getName()+"-g"+team.getGoalNumber();
@@ -81,7 +84,7 @@ public class GoalTransactionalService {
 
         // 객체 조회
         Goal goal = goalRepository.findById(goalId).orElseThrow(() ->
-                new GoalException("해당 목표가 존재하지 않습니다."));
+                new GoalException(GoalErrorCode.NOT_FOUND));
 
         // 목표 삭제
         goalRepository.delete(goal);
@@ -98,7 +101,7 @@ public class GoalTransactionalService {
             Long teamId
     ){
         Goal goal = goalRepository.findById(goalId).orElseThrow(() ->
-                new GoalException("해당 목표가 존재하지 않습니다."));
+                new GoalException(GoalErrorCode.NOT_FOUND));
 
         boolean isRestore = false;
         // title 변경
@@ -145,7 +148,7 @@ public class GoalTransactionalService {
         if (dto.issuesId() != null){
 
             // 기존 이슈 조회, 목표 해제
-            List<Issue> oldIssueList = issueRepository.findAllByGoal(goal);
+            List<Issue> oldIssueList = issueRepository.findAllByGoal(goal).orElse(new ArrayList<>());
             oldIssueList.forEach(
                     value -> value.updateGoal(null)
             );
@@ -153,7 +156,7 @@ public class GoalTransactionalService {
             // 새로운 이슈 존재 여부 검증
             List<Issue> issueList = issueRepository.findAllById(dto.issuesId());
             if (issueList.size() != dto.issuesId().size()){
-                throw new IssueException("이슈 중 존재하지 않은 이슈가 있습니다.");
+                throw new IssueException(IssueErrorCode.NOT_FOUND);
             }
 
             // 이슈 목표 변경

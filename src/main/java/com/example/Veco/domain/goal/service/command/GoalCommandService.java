@@ -76,25 +76,25 @@ public class GoalCommandService {
         // 사용자 존재 여부 검증
         List<Member> memberList = memberRepository.findAllById(memberIds);
         if (memberList.size() != memberIds.size()) {
-            throw new MemberException(MemberErrorCode.NOT_FOUND.getMessage());
+            throw new MemberException(MemberErrorCode.NOT_FOUND);
         }
 
         // 팀 존재 여부 검증
         if (!teamRepository.existsById(teamId)) {
             // 임시
-            throw new TeamException(TeamErrorCode.NOT_FOUND.getMessage());
+            throw new TeamException(TeamErrorCode.NOT_FOUND);
         }
 
         // 같은 팀원 여부 검증
         List<MemberTeam> memberTeamList = memberTeamRepository.findAllByMemberIdInAndTeamId(memberIds, teamId);
         if (memberTeamList.size() != memberIds.size()) {
-            throw new MemberException(TeamErrorCode.FORBIDDEN.getMessage());
+            throw new MemberException(TeamErrorCode.FORBIDDEN);
         }
 
         // 이슈 존재 여부 검증
         List<Issue> issueList = issueRepository.findAllById(dto.issueId());
         if (issueList.size() != dto.issueId().size()) {
-            throw new IssueException(IssueErrorCode.NOT_FOUND.getMessage());
+            throw new IssueException(IssueErrorCode.NOT_FOUND);
         }
 
         // 목표 생성: DTO, Team, Name 필요, @Transactional
@@ -104,7 +104,7 @@ public class GoalCommandService {
         try {
             boolean available = lock.tryLock(10, 1, TimeUnit.SECONDS);
             if (!available) {
-                throw new RedisException(RedisErrorCode.LOCK_TIMEOUT.getMessage());
+                throw new RedisException(RedisErrorCode.LOCK_TIMEOUT);
             }
             // 파사드 기법으로 @Transactional 진행 후 락 해제
             goalId = goalTransactionalService.createGoal(teamId, dto, memberTeamList, issueList);
@@ -169,20 +169,20 @@ public class GoalCommandService {
 
         // 삭제할 목표 존재 여부 검증
         Goal goal = goalRepository.findById(goalId).orElseThrow(() ->
-                new GoalException(GoalErrorCode.NOT_FOUND.getMessage()));
+                new GoalException(GoalErrorCode.NOT_FOUND));
 
         // 팀 존재 여부 검증
         if (!teamRepository.existsById(teamId)) {
-            throw new TeamException(TeamErrorCode.NOT_FOUND.getMessage());
+            throw new TeamException(TeamErrorCode.NOT_FOUND);
         }
 
         // 팀원 여부 확인: 인증 객체 추출 (임시)
         MemberTeam member = memberTeamRepository.findByMemberIdAndTeamId(1L, teamId).orElseThrow(() ->
-                new MemberException(MemberErrorCode.FORBIDDEN.getMessage()));
+                new MemberException(MemberErrorCode.FORBIDDEN));
 
         // 목표와 사용자가 같은 팀에 속하는지 검증
         if (!goal.getTeam().equals(member.getTeam())) {
-            throw new GoalException(GoalErrorCode.FORBIDDEN.getMessage());
+            throw new GoalException(GoalErrorCode.FORBIDDEN);
         }
     }
 }

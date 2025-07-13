@@ -1,6 +1,8 @@
 package com.example.Veco.domain.goal.controller;
 
 import com.example.Veco.domain.goal.dto.request.GoalReqDTO;
+import com.example.Veco.domain.goal.dto.response.GoalResDTO;
+import com.example.Veco.domain.goal.dto.response.GoalResDTO.GoalInfo;
 import com.example.Veco.domain.goal.dto.response.GoalResDTO.UpdateGoal;
 import com.example.Veco.domain.goal.dto.response.GoalResDTO.CreateGoal;
 import com.example.Veco.domain.goal.dto.response.GoalResDTO.Data;
@@ -15,7 +17,6 @@ import com.example.Veco.global.apiPayload.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -40,7 +41,7 @@ public class GoalController {
     )
     @GetMapping("/teams/{teamId}/goals")
     public ApiResponse<Pageable<FilteringGoal<SimpleGoal>>> getTeamGoals(
-            @RequestParam @NotBlank(message = "팀 ID는 필수 입력입니다.")
+            @PathVariable
             Long teamId,
             @RequestParam(defaultValue = "-1") @Min(value = -1, message = "커서는 -1보다 큰 정수여야 합니다.")
             String cursor,
@@ -49,7 +50,21 @@ public class GoalController {
             @RequestParam(required = false, defaultValue = "state")
             String query
     ){
-        return null;
+        return ApiResponse.onSuccess(goalQueryService.getGoals(teamId, cursor, size, query));
+    }
+
+    // 목표 간단 조회 (이슈-목표 연결용)
+    @Operation(
+            summary = "팀 내 목표 간단 조회 API By 김주헌 (개발 중)",
+            description = "팀의 모든 목표를 간단히 조회합니다. " +
+                    "이슈에서 목표를 연결하기 위해 만들어진 API입니다. "
+    )
+    @GetMapping("/teams/{teamId}/goals-simple")
+    public ApiResponse<Data<GoalInfo>> getSimpleGoal(
+            @PathVariable
+            Long teamId
+    ){
+        return ApiResponse.onSuccess(goalQueryService.getSimpleGoal(teamId));
     }
 
     // 목표 상세 조회
@@ -58,11 +73,11 @@ public class GoalController {
             description = "목표 상세 정보를 조회합니다. 댓글 데이터는 최신순으로 정렬되어 있습니다."
     )
     @GetMapping("/goals/{goalId}")
-    public ApiResponse<FullGoal> getGoalDetails(
-            @RequestParam @NotBlank(message = "목표 ID는 필수 입력입니다.")
+    public ApiResponse<FullGoal> getGoalDetail(
+            @PathVariable
             Long goalId
     ){
-        return null;
+        return ApiResponse.onSuccess(goalQueryService.getGoalDetail(goalId));
     }
 
     // 팀원 조회 (담당자): 변경 가능성 O
@@ -73,7 +88,7 @@ public class GoalController {
     )
     @GetMapping("/teams/{teamId}/teammate")
     public ApiResponse<Data<Teammate>> getTeammate(
-            @RequestParam
+            @PathVariable
             Long teamId
     ){
         return ApiResponse.onSuccess(goalQueryService.getTeammate(teamId));
@@ -89,7 +104,7 @@ public class GoalController {
     )
     @PostMapping("/teams/{teamId}/goals")
     public ApiResponse<CreateGoal> createGoal(
-            @RequestParam Long teamId,
+            @PathVariable Long teamId,
             @RequestBody GoalReqDTO.CreateGoal dto
     ){
         return ApiResponse.onSuccess(goalCommandService.createGoal(teamId, dto));
@@ -114,12 +129,12 @@ public class GoalController {
             summary = "목표 수정 API By 김주헌 (개발 중)",
             description = "목표를 수정합니다. " +
                     "수정할 내용을 추가하면 됩니다. 담당자, 이슈를 수정할 경우 수정된 리스트를 업로드하시면 됩니다. " +
-                    "변경 사항이 없는 속성은 Null로 두시면 됩니다."
+                    "변경 사항이 없는 속성은 빈칸(\"\", [])으로 두시면 됩니다."
     )
     @PatchMapping("/teams/{teamId}/goals/{goalId}")
     public ApiResponse<UpdateGoal> updateGoal(
-            @RequestParam Long teamId,
-            @RequestParam Long goalId,
+            @PathVariable Long teamId,
+            @PathVariable Long goalId,
             @RequestBody GoalReqDTO.UpdateGoal dto
     ){
         return ApiResponse.onSuccess(goalCommandService.updateGoal(dto, teamId, goalId));
@@ -133,8 +148,8 @@ public class GoalController {
     )
     @DeleteMapping("/teams/{teamId}/goals/{goalId}")
     public ApiResponse<Void> deleteGoal(
-            @RequestParam Long teamId,
-            @RequestParam Long goalId
+            @PathVariable Long teamId,
+            @PathVariable Long goalId
     ){
         goalCommandService.deleteGoal(teamId, goalId);
         return ApiResponse.onSuccess(null);

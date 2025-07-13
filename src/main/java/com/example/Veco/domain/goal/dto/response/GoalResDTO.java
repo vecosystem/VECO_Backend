@@ -107,4 +107,11 @@ public class GoalResDTO {
             String profileUrl,
             String name
     ){}
+
+    // 목표 정보
+    @Builder
+    public record GoalInfo (
+            Long id,
+            String title
+    ){}
 }
