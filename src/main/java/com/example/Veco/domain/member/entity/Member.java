@@ -33,4 +33,8 @@ public class Member extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workspace_id")
     private WorkSpace workSpace;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "profile_id")
+    private Profile profile;
 }

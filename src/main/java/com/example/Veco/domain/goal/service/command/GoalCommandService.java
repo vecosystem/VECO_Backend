@@ -20,7 +20,6 @@ import com.example.Veco.domain.member.MemberErrorCode;
 import com.example.Veco.domain.member.MemberException;
 import com.example.Veco.domain.member.MemberRepository;
 import com.example.Veco.domain.member.entity.Member;
-import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.domain.team.entity.TeamErrorCode;
 import com.example.Veco.domain.team.entity.TeamException;
 import com.example.Veco.domain.team.entity.TeamRepository;
@@ -32,7 +31,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import org.redisson.client.RedisBusyException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -69,7 +67,7 @@ public class GoalCommandService {
         // 담당자 존재 여부, 같은 팀 여부 검증 + 본인 포함 여부 확인 후 업데이트
         List<Long> memberIds = new ArrayList<>(dto.managersId());
         if (dto.isIncludeMe()) {
-            // 인증 객체에서 가져오기
+            // 임시 조치: 추후 인증 객체에서 가져오기
             memberIds.add(1L);
         }
 
@@ -81,7 +79,6 @@ public class GoalCommandService {
 
         // 팀 존재 여부 검증
         if (!teamRepository.existsById(teamId)) {
-            // 임시
             throw new TeamException(TeamErrorCode.NOT_FOUND);
         }
 
