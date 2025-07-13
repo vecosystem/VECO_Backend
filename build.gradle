@@ -70,9 +70,9 @@ dependencies {
 		implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 		// AWS (S3)
-//		implementation platform('io.awspring.cloud:spring-cloud-aws-dependencies:3.3.0')
-//		implementation 'io.awspring.cloud:spring-cloud-aws-starter'
-//		implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
+		implementation platform('io.awspring.cloud:spring-cloud-aws-dependencies:3.3.0')
+		implementation 'io.awspring.cloud:spring-cloud-aws-starter'
+		implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
 	}
 }
 
