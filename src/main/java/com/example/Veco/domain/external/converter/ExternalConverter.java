@@ -2,8 +2,10 @@ package com.example.Veco.domain.external.converter;
 
 import com.example.Veco.domain.external.dto.ExternalRequestDTO;
 import com.example.Veco.domain.external.dto.ExternalResponseDTO;
+import com.example.Veco.domain.external.dto.GitHubWebhookPayload;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.team.dto.AssigneeResponseDTO;
+import com.example.Veco.global.enums.ExtServiceType;
 
 import java.util.List;
 
@@ -30,6 +32,14 @@ public class ExternalConverter {
                 .title(external.getTitle())
                 .state(external.getState())
                 .assignees(assignees)
+                .build();
+    }
+
+    public static External byGitHubIssue(GitHubWebhookPayload payload){
+        return External.builder()
+                .title(payload.getIssue().getTitle())
+                .description(payload.getIssue().getBody())
+                .type(ExtServiceType.GITHUB)
                 .build();
     }
 }

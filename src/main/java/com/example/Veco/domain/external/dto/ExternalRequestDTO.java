@@ -22,4 +22,21 @@ public class ExternalRequestDTO {
         private LocalDate deadline;
         private ExtServiceType extServiceType;
     }
+
+    @Getter
+    public static class ExternalDeleteRequestDTO{
+        private List<Long> externalIds;
+    }
+
+    @Getter
+    public static class ExternalUpdateRequestDTO{
+        private String title;
+        private String description;
+        private State state;
+        private Priority priority;
+        private List<Long> assigneeIds;
+        private LocalDate deadline;
+        private Long goalId;
+        private ExtServiceType extServiceType;
+    }
 }

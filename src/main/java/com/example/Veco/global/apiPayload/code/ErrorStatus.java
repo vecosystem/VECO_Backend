@@ -13,6 +13,8 @@ public enum ErrorStatus implements BaseErrorStatus{
     _BAD_REQUEST(HttpStatus.BAD_REQUEST,"COMMON400","잘못된 요청입니다."),
     _UNAUTHORIZED(HttpStatus.UNAUTHORIZED,"COMMON401","인증이 필요합니다."),
     _FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON403", "금지된 요청입니다."),
+
+    EXTERNAL_NOT_FOUND(HttpStatus.NOT_FOUND, "EXTERNAL400", "해당하는 외부 이슈가 존재하지 않습니다."),
     ;
 
     private HttpStatus httpStatus;
