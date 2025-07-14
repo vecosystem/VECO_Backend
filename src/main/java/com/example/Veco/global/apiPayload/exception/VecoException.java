@@ -1,8 +1,13 @@
 package com.example.Veco.global.apiPayload.exception;
 
 import com.example.Veco.global.apiPayload.ErrorReasonDTO;
+import com.example.Veco.global.apiPayload.code.ErrorStatus;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import com.example.Veco.global.apiPayload.code.BaseErrorStatus;
 
+@Getter
+@AllArgsConstructor
 public class VecoException extends RuntimeException {
 
     private final BaseErrorStatus errorStatus;

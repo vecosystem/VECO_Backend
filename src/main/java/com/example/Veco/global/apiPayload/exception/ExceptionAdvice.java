@@ -32,9 +32,9 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(value = VecoException.class)
-    public ResponseEntity<Object> onThrowException(VecoException generalException, HttpServletRequest request) {
-        ErrorReasonDTO errorReasonHttpStatus = generalException.getErrorReasonHttpStatus();
-        return handleExceptionInternal(generalException, errorReasonHttpStatus, null, request);
+    public ResponseEntity<Object> onThrowException(VecoException vecoException, HttpServletRequest request) {
+        ErrorReasonDTO errorReasonHttpStatus = vecoException.getErrorReasonHttpStatus();
+        return handleExceptionInternal(vecoException, errorReasonHttpStatus, null, request);
     }
 
     @ExceptionHandler(value = Exception.class)
