@@ -16,26 +16,10 @@ public class MemberConverter {
                 .build();
     }
 
-    /*
-    public static MemberResponseDTO.MemberNicknameResponseDto toMemberResponseDTO(Member member) {
-        return MemberResponseDTO.MemberNicknameResponseDto.builder()
-                .memberId(member.getId())
-                .build();
-    }*/
-
     public static MemberResponseDTO.MemberProfileImageResponseDto toMemberProfileImageResponseDTO(Member member) {
         return MemberResponseDTO.MemberProfileImageResponseDto.builder()
                 .memberId(member.getId())
                 .imageUrl(member.getProfile().getProfileImageUrl())
                 .build();
     }
-
-    /*
-    public static MemberResponseDTO.NotificationToggleResponseDto toNotificationToggleResponseDTO(Member member) {
-        return MemberResponseDTO.NotificationToggleResponseDto.builder()
-                .memberId(member.getId())
-                .notificationType(notification)
-                .build();
-    }
-     */
 }
