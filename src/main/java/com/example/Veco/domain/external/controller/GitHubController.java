@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequiredArgsConstructor
 @RequestMapping("/github")
 public class GitHubController {
+
     private final GitHubService gitHubService;
     private final GitHubConfig gitHubConfig;
 

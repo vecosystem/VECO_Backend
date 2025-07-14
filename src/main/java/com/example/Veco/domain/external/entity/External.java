@@ -1,8 +1,11 @@
 package com.example.Veco.domain.external.entity;
 
 import com.example.Veco.domain.common.BaseEntity;
+import com.example.Veco.domain.external.dto.ExternalRequestDTO;
 import com.example.Veco.domain.goal.entity.Goal;
+import com.example.Veco.domain.mapping.Assignment;
 import com.example.Veco.domain.member.entity.Member;
+import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.global.enums.ExtServiceType;
 import com.example.Veco.global.enums.Priority;
 import com.example.Veco.global.enums.State;
@@ -10,7 +13,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "external")
@@ -61,6 +65,32 @@ public class External extends BaseEntity {
     private String external_code;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    private Team team;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "goal_id")
     private Goal goal;
+
+    @OneToMany(mappedBy = "external")
+    @Builder.Default
+    private List<Assignment> assignments = new ArrayList<>();
+
+    public void updateExternal(ExternalRequestDTO.ExternalUpdateRequestDTO requestDTO) {
+        if(requestDTO.getTitle() != null) {
+            this.title = requestDTO.getTitle();
+        }
+        if(requestDTO.getDescription() != null) {
+            this.description = requestDTO.getDescription();
+        }
+        if(requestDTO.getState() != null) {
+            this.state = requestDTO.getState();
+        }
+        if(requestDTO.getDeadline() != null) {
+            this.deadline = requestDTO.getDeadline();
+        }
+        if(requestDTO.getPriority() != null) {
+            this.priority = requestDTO.getPriority();
+        }
+    }
 }

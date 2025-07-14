@@ -1,8 +1,13 @@
 package com.example.Veco.domain.external.service;
 
+import com.example.Veco.domain.external.converter.ExternalConverter;
+import com.example.Veco.domain.external.dto.ExternalCursor;
 import com.example.Veco.domain.external.dto.GitHubWebhookPayload;
+import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.external.entity.GitHubIssue;
+import com.example.Veco.domain.external.repository.ExternalRepository;
 import com.example.Veco.domain.external.repository.GitHubIssueRepository;
+import com.example.Veco.domain.team.service.NumberSequenceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,6 +24,8 @@ import java.util.stream.Collectors;
 public class GitHubIssueService {
 
     private final GitHubIssueRepository gitHubIssueRepository;
+    private final ExternalRepository externalRepository;
+    private final NumberSequenceService numberSequenceService;
 
     public void processIssueWebhook(GitHubWebhookPayload payload) {
 
@@ -74,6 +81,12 @@ public class GitHubIssueService {
 
         gitHubIssueRepository.save(issue);
         log.info("Created new issue: #{} - {}", issue.getNumber(), issue.getTitle());
+    }
+
+    private void createVecoExternal(GitHubWebhookPayload payload) {
+        External external = ExternalConverter.byGitHubIssue(payload);
+
+//        numberSequenceService.allocateNextNumber();
     }
 
     private List<String> extractLabelNames(List<GitHubWebhookPayload.Label> labels) {
