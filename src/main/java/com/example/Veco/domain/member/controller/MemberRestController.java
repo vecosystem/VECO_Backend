@@ -13,8 +13,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.*;
+import java.util.Map;
 
 @Validated
 @RestController
@@ -32,17 +34,20 @@ public class MemberRestController {
         return ApiResponse.onSuccess(MemberConverter.toProfileResponseDTO(member));
     }
 
-    /*
-    @PatchMapping("/{memberId}/nickname")
-    @Operation(summary = "유저의 닉네임을 변경합니다.")
-    public ApiResponse<MemberResponseDTO.MemberNicknameResponseDto> updateNickname(
+    @PatchMapping(value = "/{memberId}/profileImage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "유저의 프로필 이미지를 수정합니다.")
+    public ApiResponse<MemberResponseDTO.MemberProfileImageResponseDto> patchProfileImage(
             @PathVariable Long memberId,
-            @Valid @RequestBody MemberRequestDTO.updateNicknameRequestDto request) {
-        Member member = memberQueryService.findById(memberId);
-        memberCommandService.updateNickname(memberId, request.getNickname());
-        return ApiResponse.onSuccess(MemberConverter.toMemberResponseDTO(member));
+            @RequestParam MultipartFile image
+    ) {
+        Member member = memberCommandService.updateProfileImage(image, memberId);
+        return ApiResponse.onSuccess(MemberConverter.toMemberProfileImageResponseDTO(member));
     }
-    */
 
-    //@PatchMapping(value = "/{memberId}/profileImage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @DeleteMapping("/{memberId}/profileImage")
+    @Operation(summary = "유저의 프로필 이미지를 삭제합니다.")
+    public ApiResponse<Void> deleteProfileImage(@PathVariable Long memberId) {
+        memberCommandService.deleteProfileImage(memberId);
+        return ApiResponse.onSuccess(null);
+    }
 }

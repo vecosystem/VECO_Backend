@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
+
 public class MemberResponseDTO {
 
     @Builder
@@ -33,15 +35,5 @@ public class MemberResponseDTO {
     public static class MemberProfileImageResponseDto {
         private Long memberId;
         private String imageUrl;
-    }
-
-    @Builder
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class NotificationToggleResponseDto {
-        private Long memberId;
-        private String notificationType;
-        private boolean isEnabled;
     }
 }
