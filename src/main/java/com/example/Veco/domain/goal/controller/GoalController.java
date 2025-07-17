@@ -129,7 +129,7 @@ public class GoalController {
             summary = "목표 수정 API By 김주헌 (개발 중)",
             description = "목표를 수정합니다. " +
                     "수정할 내용을 추가하면 됩니다. 담당자, 이슈를 수정할 경우 수정된 리스트를 업로드하시면 됩니다. " +
-                    "변경 사항이 없는 속성은 빈칸(\"\", [])으로 두시면 됩니다."
+                    "변경 사항이 없는 속성은 RequestBody에서 제거 후 요청하면 됩니다."
     )
     @PatchMapping("/teams/{teamId}/goals/{goalId}")
     public ApiResponse<UpdateGoal> updateGoal(

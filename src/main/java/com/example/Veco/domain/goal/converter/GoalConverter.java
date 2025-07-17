@@ -32,6 +32,21 @@ public class GoalConverter {
                 .build();
     }
 
+    // 팀 내 목표 모두 조회: FilteringData -> Pageable
+    public static <T> GoalResDTO.Pageable<T> toPageable (
+            List<T> data,
+            boolean hasNext,
+            String nextCursor,
+            Integer pageSize
+    ){
+        return GoalResDTO.Pageable.<T>builder()
+                .data(data)
+                .hasNext(hasNext)
+                .nextCursor(nextCursor)
+                .pageSize(pageSize)
+                .build();
+    }
+
     // 목표 상세 조회: 목표, 담당자, 이슈, 댓글 -> DTO
     public static GoalResDTO.FullGoal toFullGoal (
             Goal goal,
@@ -48,6 +63,19 @@ public class GoalConverter {
                 .deadline(toDeadline(goal))
                 .issues(toData(issue))
                 .comments(toData(comment))
+                .build();
+    }
+
+    // 팀 내 목표 모두 조회: List<T>, filterName, dataCnt -> FilteringGoal
+    public static <T> GoalResDTO.FilteringGoal<T> toFilteringGoal (
+            List<T> simpleGoals,
+            String filterName,
+            Integer dataCnt
+    ){
+        return GoalResDTO.FilteringGoal.<T>builder()
+                .filterName(filterName)
+                .dataCnt(dataCnt)
+                .goals(simpleGoals)
                 .build();
     }
 

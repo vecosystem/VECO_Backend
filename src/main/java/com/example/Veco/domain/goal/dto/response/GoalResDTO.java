@@ -1,6 +1,8 @@
 package com.example.Veco.domain.goal.dto.response;
 
-import lombok.Builder;
+import com.example.Veco.global.enums.Priority;
+import com.example.Veco.global.enums.State;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,9 +33,10 @@ public class GoalResDTO {
             Long id,
             String name,
             String title,
-            String priority,
+            State state,
+            Priority priority,
             Deadline deadline,
-            Data<ManagerInfo> managers
+            QData managers
     ){}
 
     // 자세한 조회: 목표 상세 조회
@@ -84,6 +87,19 @@ public class GoalResDTO {
             Integer cnt,
             List<T> info
     ){}
+
+    // QueryDSL용 담당자 정보
+    @Builder
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class QData {
+        private Long cnt;
+        private List<ManagerInfo> info;
+
+    }
+
 
     // 이슈 정보
     @Builder
