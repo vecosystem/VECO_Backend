@@ -12,9 +12,11 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface ExternalRepository extends JpaRepository<External, Long> {
+public interface ExternalRepository extends JpaRepository<External, Long>{
 
     @Modifying
     @Query("update External e set e.state = 'DELETED' where e.id in :externalIds")
     void deleteByExternalId(@Param("externalIds") List<Long> externalIds);
+
+    Optional<External> findByGithubDataId(Long githubDataId);
 }
