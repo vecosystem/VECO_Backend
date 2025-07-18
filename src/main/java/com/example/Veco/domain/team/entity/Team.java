@@ -1,6 +1,7 @@
 package com.example.Veco.domain.team.entity;
 
 import com.example.Veco.domain.common.BaseEntity;
+import com.example.Veco.domain.mapping.GithubInstallation;
 import com.example.Veco.domain.workspace.entity.WorkSpace;
 import jakarta.persistence.*;
 import lombok.*;
@@ -26,4 +27,7 @@ public class Team extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "workspace_id")
     private WorkSpace workSpace;
+
+    @OneToOne(mappedBy = "team")
+    private GithubInstallation githubInstallation;
 }

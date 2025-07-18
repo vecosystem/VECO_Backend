@@ -10,6 +10,6 @@ import java.util.Optional;
 
 public interface NumberSequenceRepository extends JpaRepository<NumberSequence, Long> {
 
-    @Query("select n from NumberSequence n where n.team.id =: teamId and n.category =: category")
+    @Query("select n from NumberSequence n where n.team.id = :teamId and n.category = :category")
     Optional<NumberSequence> findByTeamIdAndNumberType(@Param("teamId") Long teamId, @Param("category") Category category);
 }

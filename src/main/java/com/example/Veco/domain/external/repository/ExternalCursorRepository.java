@@ -1,10 +1,15 @@
 package com.example.Veco.domain.external.repository;
 
+import com.example.Veco.domain.external.converter.ExternalConverter;
 import com.example.Veco.domain.external.dto.ExternalCursor;
+import com.example.Veco.domain.external.dto.ExternalResponseDTO;
 import com.example.Veco.domain.external.dto.ExternalSearchCriteria;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.external.entity.QExternal;
 import com.example.Veco.domain.mapping.QAssignment;
+import com.example.Veco.domain.mapping.repository.AssigneeRepository;
+import com.example.Veco.domain.team.converter.AssigneeConverter;
+import com.example.Veco.domain.team.dto.AssigneeResponseDTO;
 import com.example.Veco.global.apiPayload.page.CursorPage;
 import com.example.Veco.global.enums.State;
 import com.querydsl.core.types.OrderSpecifier;
@@ -26,13 +31,16 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
     private final JPAQueryFactory queryFactory;
     private final QExternal external = QExternal.external;
     private final QAssignment assignment = QAssignment.assignment;
+    private final AssigneeRepository assigneeRepository;
 
-    public ExternalCursorRepository(EntityManager entityManager) {
+    public ExternalCursorRepository(EntityManager entityManager, AssigneeRepository assigneeRepository) {
         this.queryFactory = new JPAQueryFactory(entityManager);
+        this.assigneeRepository = assigneeRepository;
     }
 
+    // TODO : 메서드 테스트 필요
     @Override
-    public CursorPage<External> findExternalWithCursor(ExternalSearchCriteria criteria, String cursor, int size) {
+    public CursorPage<ExternalResponseDTO.ExternalDTO> findExternalWithCursor(ExternalSearchCriteria criteria, String cursor, int size) {
         JPAQuery<External> query = queryFactory.selectFrom(external)
                 .where(
                         buildWhereClause(criteria),
@@ -70,11 +78,7 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
                                     .and(external.id.gt(decodedCursor.getId()))
                     );
         }else{
-            NumberExpression<Integer> statusPriorityExpr = new CaseBuilder()
-                    .when(external.state.eq(State.IN_PROGRESS)).then(1)
-                    .when(external.state.eq(State.TODO)).then(2)
-                    .when(external.state.eq(State.DONE)).then(3)
-                    .otherwise(4);
+            NumberExpression<Integer> statusPriorityExpr = getStatusPriorityExpression();
 
             return statusPriorityExpr.gt(decodedCursor.getStatusPriority())
                     .or(
@@ -90,7 +94,7 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
 
     }
 
-    private CursorPage<External> buildCursorPage(List<External> externals, int size, ExternalSearchCriteria criteria) {
+    private CursorPage<ExternalResponseDTO.ExternalDTO> buildCursorPage(List<External> externals, int size, ExternalSearchCriteria criteria) {
 
         boolean hasNext = externals.size() > size;
 
@@ -106,7 +110,15 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
             nextCursor = cursor.encode();
         }
 
-        return CursorPage.of(externals, nextCursor, hasNext);
+
+        List<ExternalResponseDTO.ExternalDTO> result = externals.stream().map(e -> {
+            List<AssigneeResponseDTO.AssigneeDTO> assigneeDTOS =
+                    e.getAssignments().stream().map(AssigneeConverter::toAssigneeResponseDTO).toList();
+
+            return ExternalConverter.toExternalDTO(e, assigneeDTOS);
+        }).toList();
+
+        return CursorPage.of(result, nextCursor, hasNext);
     }
 
     private ExternalCursor createCursorFromExternal(External last, ExternalSearchCriteria criteria) {
@@ -117,10 +129,11 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
 
         if (criteria.getState() == null) {
             Integer statePriority = switch (last.getState()) {
-                case IN_PROGRESS -> 1;
+                case NONE -> 1;
                 case TODO -> 2;
-                case DONE -> 3;
-                case REVIEW -> 4;
+                case IN_PROGRESS -> 3;
+                case DONE -> 4;
+                case REVIEW -> 5;
                 default -> null;
             };
             externalCursor.setStatusPriority(statePriority);
@@ -129,7 +142,32 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
     }
 
     private OrderSpecifier<?>[] buildOrderClause(ExternalSearchCriteria criteria) {
-        return null;
+        if (criteria.getState() != null) {
+            // 상태 필터링이 있는 경우: 생성일 내림차순, ID 오름차순
+            return new OrderSpecifier[]{
+                    external.createdAt.desc(),
+                    external.id.asc()
+            };
+        } else {
+            // 상태 필터링이 없는 경우: 상태 우선순위, 생성일 내림차순, ID 오름차순
+            NumberExpression<Integer> statusPriorityExpr = getStatusPriorityExpression();
+            
+            return new OrderSpecifier[]{
+                    statusPriorityExpr.asc(),
+                    external.createdAt.desc(),
+                    external.id.asc()
+            };
+        }
+    }
+
+    private NumberExpression<Integer> getStatusPriorityExpression() {
+        return new CaseBuilder()
+                .when(external.state.eq(State.NONE)).then(1)
+                .when(external.state.eq(State.TODO)).then(2)
+                .when(external.state.eq(State.IN_PROGRESS)).then(3)
+                .when(external.state.eq(State.DONE)).then(4)
+                .when(external.state.eq(State.REVIEW)).then(5)
+                .otherwise(6);
     }
 
 }
