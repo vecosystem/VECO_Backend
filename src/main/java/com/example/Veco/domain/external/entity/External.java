@@ -3,6 +3,7 @@ package com.example.Veco.domain.external.entity;
 
 import com.example.Veco.domain.common.BaseEntity;
 import com.example.Veco.domain.external.dto.ExternalRequestDTO;
+import com.example.Veco.domain.external.dto.GitHubWebhookPayload;
 import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.domain.goal.entity.Goal;
 import com.example.Veco.domain.mapping.Assignment;
@@ -31,6 +32,8 @@ public class External extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private Long githubDataId;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -96,6 +99,27 @@ public class External extends BaseEntity {
         if(requestDTO.getPriority() != null) {
             this.priority = requestDTO.getPriority();
         }
+    }
+
+    public void closeIssue(){
+        this.state = State.DONE;
+    }
+
+    public void updateExternalByGithubIssue(GitHubWebhookPayload.Issue issue ){
+
+        System.out.println("issue change start");
+
+        if(issue.getTitle() != null) {
+            this.title = issue.getTitle();
+        }
+        if(issue.getBody() != null) {
+            this.description = issue.getBody();
+        }
+
+        System.out.println(" title = " + this.getTitle());
+        System.out.println(" description = " + this.getDescription());
+
+        System.out.println("issue change end");
     }
     // 연관 관계
     @ManyToOne(fetch = FetchType.LAZY)

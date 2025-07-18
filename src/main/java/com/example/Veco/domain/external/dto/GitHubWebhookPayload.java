@@ -2,6 +2,7 @@ package com.example.Veco.domain.external.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,6 +14,7 @@ public class GitHubWebhookPayload {
     private Issue issue;
     private Repository repository;
     private User sender;
+    private Installation installation;
 
     @Data
     public static class Issue {
@@ -167,4 +169,14 @@ public class GitHubWebhookPayload {
         @JsonProperty("due_on")
         private LocalDateTime dueOn;
     }
+
+    @Data
+    public static class Installation {
+        @JsonProperty("id")
+        private Long id;
+
+        @JsonProperty("node_id")
+        private String nodeId;
+    }
+
 }

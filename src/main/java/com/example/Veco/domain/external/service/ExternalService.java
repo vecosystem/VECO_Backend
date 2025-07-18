@@ -5,6 +5,7 @@ import com.example.Veco.domain.external.dto.ExternalRequestDTO;
 import com.example.Veco.domain.external.dto.ExternalResponseDTO;
 import com.example.Veco.domain.external.dto.ExternalSearchCriteria;
 import com.example.Veco.domain.external.entity.External;
+import com.example.Veco.domain.external.repository.ExternalCustomRepository;
 import com.example.Veco.domain.external.repository.ExternalRepository;
 import com.example.Veco.domain.mapping.Assignment;
 import com.example.Veco.domain.mapping.repository.AssigneeRepository;
@@ -30,6 +31,7 @@ public class ExternalService {
     private final ExternalRepository externalRepository;
     private final NumberSequenceService numberSequenceService;
     private final AssigneeRepository assigneeRepository;
+    private final ExternalCustomRepository externalCustomRepository;
 
     @Transactional
     public Long createExternal(ExternalRequestDTO.ExternalCreateRequestDTO request){
@@ -55,10 +57,10 @@ public class ExternalService {
         return ExternalConverter.toExternalDTO(external, assigneeDTOS);
     }
 
-//    public CursorPage<External> getExternalsWithPagenation(ExternalSearchCriteria criteria, String cursor, int size){
-//        CursorPage<External> externalWithCursor = externalRepository.findExternalWithCursor(criteria, cursor, size);
-//        return externalWithCursor;
-//    }
+    public CursorPage<ExternalResponseDTO.ExternalDTO> getExternalsWithPagenation(ExternalSearchCriteria criteria, String cursor, int size){
+        CursorPage<ExternalResponseDTO.ExternalDTO> externalWithCursor = externalCustomRepository.findExternalWithCursor(criteria, cursor, size);
+        return externalWithCursor;
+    }
 
     @Transactional
     public void deleteExternals(ExternalRequestDTO.ExternalDeleteRequestDTO request) {
@@ -71,7 +73,6 @@ public class ExternalService {
                 .orElseThrow(() -> new VecoException(ErrorStatus.EXTERNAL_NOT_FOUND));
 
         external.updateExternal(request);
-
 
     }
 }
