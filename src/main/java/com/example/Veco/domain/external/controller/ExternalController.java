@@ -28,11 +28,11 @@ public class ExternalController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<ApiResponse<CursorPage<ExternalResponseDTO.ExternalDTO>>> getExternals(@PathVariable("state")State state,
-                                                                                     @PathVariable("priority")Priority priority,
-                                                                                     @PathVariable("assigneeId") Long assigneeId,
-                                                                                     @PathVariable("cursor") String cursor,
-                                                                                     @PathVariable("size") Integer size) {
+    public ResponseEntity<ApiResponse<CursorPage<ExternalResponseDTO.ExternalDTO>>> getExternals(@RequestParam("state")State state,
+                                                                                     @RequestParam("priority")Priority priority,
+                                                                                     @RequestParam("assigneeId") Long assigneeId,
+                                                                                     @RequestParam("cursor") String cursor,
+                                                                                     @RequestParam("size") Integer size) {
 
         ExternalSearchCriteria searchCriteria = ExternalSearchCriteria.builder()
                 .state(state)
