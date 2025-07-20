@@ -8,4 +8,5 @@ import java.util.List;
 public interface MemberNotiQueryDsl {
     boolean existsByNotificationIdAndMemberId(Long notificationId, Long memberId);
     List<MemberNotification> findByMemberIdAndType(Long memberId, Category alarmType);
+    void deleteByNotificationId(Long notiId);
 }

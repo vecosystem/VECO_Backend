@@ -8,6 +8,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -29,5 +31,13 @@ public class NotiQueryDslImpl implements NotiQueryDsl{
                 .fetchOne();
 
         return Optional.ofNullable(result);
+    }
+
+    @Override
+    public List<Notification> findByExpireAt(LocalDate today) {
+        return queryFactory
+                .selectFrom(notification)
+                .where(notification.expireAt.eq(today))
+                .fetch();
     }
 }

@@ -1,9 +1,7 @@
 package com.example.Veco.domain.memberNotification.repository;
 
-import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.memberNotification.entity.MemberNotification;
 import com.example.Veco.domain.memberNotification.entity.QMemberNotification;
-import com.example.Veco.domain.notification.entity.Notification;
 import com.example.Veco.domain.notification.entity.QNotification;
 import com.example.Veco.global.enums.Category;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -48,5 +46,14 @@ public class MemberNotiQueryDslImpl implements MemberNotiQueryDsl {
                 .orderBy(memberNotification.id.desc())
                 .fetch();
     }
+
+    @Override
+    public void deleteByNotificationId(Long notiId) {
+        queryFactory
+                .delete(memberNotification)
+                .where(memberNotification.notification.id.eq(notiId))
+                .execute();
+    }
+
 }
 

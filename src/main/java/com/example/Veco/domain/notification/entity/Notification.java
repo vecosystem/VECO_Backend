@@ -31,7 +31,7 @@ public class Notification extends BaseEntity {
     @Column(name = "expire_at", nullable = false)
     private LocalDate expireAt;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
     private Team team;
 
