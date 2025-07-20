@@ -6,6 +6,8 @@ import com.example.Veco.global.enums.Category;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "notification")
 @Getter
@@ -18,15 +20,16 @@ public class Notification extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /* @Column(name = "content")
-    private String content; */
-
-    @Column(name = "type" , nullable = false)
+    @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
     private Category type;
 
-    @Column(name = "type_id" , nullable = false)
+    @Column(name = "type_id", nullable = false)
     private Long typeId;
+
+    // 마감일 기준 1일 뒤 만료
+    @Column(name = "expire_at", nullable = false)
+    private LocalDate expireAt;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "team_id")
