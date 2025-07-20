@@ -19,6 +19,7 @@ public class MemberNotification extends BaseEntity {
 
     @Column(name = "is_read", nullable = false)
     @Builder.Default
+    @Setter(AccessLevel.PRIVATE)
     private Boolean isRead = Boolean.FALSE;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -28,5 +29,9 @@ public class MemberNotification extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "notification_id")
     private Notification notification;
+
+    public void markAsRead() {
+        this.isRead = true;
+    }
 
 }
