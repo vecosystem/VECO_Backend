@@ -19,7 +19,7 @@ public class NotiConverter {
     // 이슈
     public NotiResDTO.IssuePreViewDTO toIssuePreViewDTO(Issue issue, MemberNotification memberNoti) {
         return NotiResDTO.IssuePreViewDTO.builder()
-                .notificationId(memberNoti.getNotification().getId())
+                .alarmId(memberNoti.getId())
                 .name(issue.getName())
                 .typeId(issue.getId())
                 .title(issue.getTitle())
@@ -85,16 +85,16 @@ public class NotiConverter {
     }
 
 
-    public NotiResDTO.GoalPreViewDTO toGoalPreViewDTO(Goal goal, MemberNotification mn) {
+    public NotiResDTO.GoalPreViewDTO toGoalPreViewDTO(Goal goal, MemberNotification memberNoti) {
 
         return NotiResDTO.GoalPreViewDTO.builder()
-                .notificationId(mn.getNotification().getId())
+                .alarmId(memberNoti.getId())
                 .name(goal.getName())
                 .typeId(goal.getId())
                 .title(goal.getTitle())
                 .state(goal.getState())
                 .priority(goal.getPriority())
-                .isRead(mn.getIsRead())
+                .isRead(memberNoti.getIsRead())
                 .build();
     }
 }

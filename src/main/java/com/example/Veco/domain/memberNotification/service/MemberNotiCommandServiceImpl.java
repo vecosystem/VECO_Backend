@@ -16,8 +16,9 @@ public class MemberNotiCommandServiceImpl implements MemberNotiCommandService {
     @Transactional
     public void markAsRead(Long memberId, Long alarmId) {
         MemberNotification memberNotification = memberNotiRepository
-                .findByNotificationIdAndMemberId(alarmId, memberId)
+                .findById(alarmId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 알림이 존재하지 않습니다.")); // FIXME
+        // TODO : 사용자 검증
         memberNotification.markAsRead();
     }
 }

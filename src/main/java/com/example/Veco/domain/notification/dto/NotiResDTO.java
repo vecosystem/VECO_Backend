@@ -30,7 +30,7 @@ public class NotiResDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class IssuePreViewDTO {
-        private Long notificationId;
+        private Long alarmId;  //memberNotificationId
         private String name;
         private Long typeId;
         private String title;
@@ -57,7 +57,7 @@ public class NotiResDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class GoalPreViewDTO {
-        private Long notificationId;
+        private Long alarmId; //memberNotificationId
         private String name;
         private Long typeId;
         private String title;
