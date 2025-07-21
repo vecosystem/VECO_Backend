@@ -1,5 +1,6 @@
 package com.example.Veco.domain.workspace.entity;
 
+
 import com.example.Veco.domain.common.BaseEntity;
 import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.team.entity.Team;
@@ -20,13 +21,17 @@ public class WorkSpace extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "name")
     private String name;
 
-    private String profile_url;
+    @Column(name = "profile_url")
+    private String profileUrl;
 
-    private String workspace_url;
+    @Column(name = "workspace_url")
+    private String workspaceUrl;
 
-    private String cert_pwd;
+    @Column(name = "cert_pwd")
+    private String certPwd;
 
     @OneToMany(mappedBy = "workSpace")
     private List<Member> members = new ArrayList<>();
