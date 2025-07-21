@@ -45,4 +45,13 @@ public class MemberCommandServiceImpl implements MemberCommandService {
 
         member.getProfile().updateProfileImageUrl(null);
     }
+
+    @Override
+    @Transactional
+    public Member saveMember(Member member) {
+        Member savedMember = memberRepository.save(member);
+
+        // DTO로 변환하여 반환
+        return savedMember;
+    }
 }

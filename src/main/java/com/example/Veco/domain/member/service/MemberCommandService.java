@@ -7,6 +7,8 @@ public interface MemberCommandService {
 
     //String updateNickname(Long memberId, String nickname);
 
+    Member saveMember(Member member);
+    
     Member updateProfileImage(MultipartFile file, Long memberId);
 
     void deleteProfileImage(Long memberId);

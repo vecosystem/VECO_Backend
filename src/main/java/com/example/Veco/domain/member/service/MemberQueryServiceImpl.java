@@ -6,6 +6,7 @@ import com.example.Veco.domain.member.error.MemberHandler;
 import com.example.Veco.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.example.Veco.global.apiPayload.code.ErrorStatus;
 
 @Service
 @RequiredArgsConstructor
