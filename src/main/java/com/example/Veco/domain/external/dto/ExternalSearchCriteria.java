@@ -15,6 +15,7 @@ public class ExternalSearchCriteria {
     private State state;
     private Priority priority;
     private Long assigneeId;
+    private Long teamId;
 
     public FilterType getActiveFilterType() {
         if(state != null) return FilterType.STATE;

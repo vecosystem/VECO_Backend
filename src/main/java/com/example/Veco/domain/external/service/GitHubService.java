@@ -4,6 +4,8 @@ import com.example.Veco.domain.mapping.GithubInstallation;
 import com.example.Veco.domain.mapping.repository.GitHubInstallationRepository;
 import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.team.entity.Team;
+import com.example.Veco.domain.team.exception.TeamException;
+import com.example.Veco.domain.team.exception.code.TeamErrorCode;
 import com.example.Veco.domain.team.repository.TeamRepository;
 import com.example.Veco.global.apiPayload.exception.VecoException;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +23,7 @@ public class GitHubService {
     public void saveInstallationInfo(Long teamId, Long installationId) {
 
         Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new VecoException("Team with id " + teamId + " not found"));
+                .orElseThrow(() -> new TeamException(TeamErrorCode.TEAM_NOT_EXIST));
 
 
         GithubInstallation info = GithubInstallation.builder()
@@ -31,8 +33,6 @@ public class GitHubService {
 
         gitHubInstallationRepository.save(info);
     }
-
-
 
 
 }

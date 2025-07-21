@@ -7,13 +7,12 @@ import com.example.Veco.domain.external.dto.ExternalSearchCriteria;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.external.entity.QExternal;
 import com.example.Veco.domain.mapping.QAssignment;
-import com.example.Veco.domain.mapping.repository.AssigneeRepository;
+import com.example.Veco.domain.mapping.repository.AssigmentRepository;
 import com.example.Veco.domain.team.converter.AssigneeConverter;
 import com.example.Veco.domain.team.dto.AssigneeResponseDTO;
 import com.example.Veco.global.apiPayload.page.CursorPage;
 import com.example.Veco.global.enums.State;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.NumberExpression;
@@ -22,7 +21,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -31,11 +29,11 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
     private final JPAQueryFactory queryFactory;
     private final QExternal external = QExternal.external;
     private final QAssignment assignment = QAssignment.assignment;
-    private final AssigneeRepository assigneeRepository;
+    private final AssigmentRepository assigmentRepository;
 
-    public ExternalCursorRepository(EntityManager entityManager, AssigneeRepository assigneeRepository) {
+    public ExternalCursorRepository(EntityManager entityManager, AssigmentRepository assigmentRepository) {
         this.queryFactory = new JPAQueryFactory(entityManager);
-        this.assigneeRepository = assigneeRepository;
+        this.assigmentRepository = assigmentRepository;
     }
 
     // TODO : 메서드 테스트 필요
@@ -43,7 +41,7 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
     public CursorPage<ExternalResponseDTO.ExternalDTO> findExternalWithCursor(ExternalSearchCriteria criteria, String cursor, int size) {
         JPAQuery<External> query = queryFactory.selectFrom(external)
                 .where(
-                        buildWhereClause(criteria),
+                        buildFilterConditions(criteria),
                         buildCursorCondition(criteria, cursor)
                 )
                 .orderBy(buildOrderClause(criteria))
@@ -53,15 +51,17 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
         return buildCursorPage(externals, size, criteria);
     }
 
-    private BooleanExpression buildWhereClause(ExternalSearchCriteria criteria) {
-
-        return switch (criteria.getActiveFilterType()){
+    private BooleanExpression buildFilterConditions(ExternalSearchCriteria criteria) {
+        BooleanExpression teamCondition = external.team.id.eq(criteria.getTeamId());
+        
+        BooleanExpression filterCondition = switch (criteria.getActiveFilterType()){
             case STATE -> external.state.eq(criteria.getState());
             case PRIORITY -> external.priority.eq(criteria.getPriority());
             case ASSIGNEE -> external.assignments.any().assignee.id.eq(criteria.getAssigneeId());
             case NONE -> null;
         };
-
+        
+        return filterCondition != null ? teamCondition.and(filterCondition) : teamCondition;
     }
 
     private BooleanExpression buildCursorCondition(ExternalSearchCriteria criteria, String cursor) {
