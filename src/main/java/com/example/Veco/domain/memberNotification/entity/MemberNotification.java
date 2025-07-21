@@ -19,8 +19,11 @@ public class MemberNotification extends BaseEntity {
 
     @Column(name = "is_read", nullable = false)
     @Builder.Default
-    @Setter(AccessLevel.PRIVATE)
     private Boolean isRead = Boolean.FALSE;
+
+    @Column(name = "is_deleted", nullable = false)
+    @Builder.Default
+    private Boolean isDeleted = Boolean.FALSE;   // 삭제한 알림 재생성 방지
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "member_id")
@@ -32,6 +35,10 @@ public class MemberNotification extends BaseEntity {
 
     public void markAsRead() {
         this.isRead = true;
+    }
+
+    public void markAsDeleted() {
+        this.isDeleted = true;
     }
 
 }

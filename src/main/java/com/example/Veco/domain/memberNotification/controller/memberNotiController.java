@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/alarms")
@@ -28,4 +30,19 @@ public class memberNotiController {
         memberNotiCommandService.markAsRead(memberId, alarmId);
         return ApiResponse.onSuccess(null);
     }
+
+    @Operation(
+            summary = " 알림 삭제 API ",
+            description = "해당 알림을 삭제하는 API 입니다." +
+                    "Request Body로 삭제할 알림ID 목록들을 주시면 됩니다."
+    )
+    @DeleteMapping
+    public ApiResponse<Void> deleteAlarms(
+            @PathVariable Long memberId,   // HACK
+            @RequestBody List<Long> alarmIds
+    ) {
+        memberNotiCommandService.deleteMemberNotifications(memberId, alarmIds);
+        return ApiResponse.onSuccess(null);
+    }
+
 }

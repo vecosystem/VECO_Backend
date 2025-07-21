@@ -39,7 +39,7 @@ public class NotiQueryServiceImpl implements NotiQueryService {
 
         LocalDate deadline = LocalDate.now();
 
-        List<MemberNotification> memberNotis = memberNotiRepository.findByMemberIdAndType(memberId, alarmType);
+        List<MemberNotification> memberNotis = memberNotiRepository.findByMemberIdAndTypeAndNotDeleted(memberId, alarmType);
 
         List<Long> typeIds = memberNotis.stream()
                 .map(memberNoti -> memberNoti.getNotification().getTypeId())
@@ -64,6 +64,5 @@ public class NotiQueryServiceImpl implements NotiQueryService {
             throw new IllegalArgumentException("지원하지 않는 알림 타입입니다.");
         }
 
-        // 상세 조회 API
     }
 }

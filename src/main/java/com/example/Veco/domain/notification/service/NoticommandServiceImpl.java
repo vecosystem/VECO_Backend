@@ -21,7 +21,6 @@ public class NoticommandServiceImpl implements NotiCommandService{
     private final MemberNotiRepository memberNotiRepo;
 
     // 알림 동적 생성
-    // FIXME : 사용자가 삭제한 membernotification 재생성 X
     @Transactional
     public void createNotification(Category type, Long typeId, Team team, Member member) {
 
