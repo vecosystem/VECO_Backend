@@ -9,6 +9,9 @@ import com.example.Veco.global.enums.Category;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "comment_room")
 @Getter
@@ -40,4 +43,8 @@ public class CommentRoom extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "external_id")
     private External external;
+
+    @OneToMany(mappedBy = "commentRoom", cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<Comment> comments = new ArrayList<>();
 }
