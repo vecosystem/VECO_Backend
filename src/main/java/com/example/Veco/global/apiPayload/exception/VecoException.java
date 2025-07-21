@@ -8,16 +8,14 @@ import lombok.Getter;
 import com.example.Veco.global.apiPayload.code.BaseErrorStatus;
 
 @Getter
-@AllArgsConstructor
 public class VecoException extends RuntimeException {
 
     private final BaseErrorStatus errorStatus;
 
-    private BaseErrorStatus errorStatus;
-
     public VecoException(BaseErrorStatus errorStatus) {
         this.errorStatus = errorStatus;
     }
+
     public ErrorReasonDTO getErrorReasonHttpStatus() {
         return errorStatus.getReasonHttpStatus();
     }

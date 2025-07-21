@@ -129,10 +129,6 @@ public class External extends BaseEntity {
         if(issue.getBody() != null) {
             this.description = issue.getBody();
         }
-
     }
-    // 연관 관계
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "team_id")
-    private Team team;
+
 }
