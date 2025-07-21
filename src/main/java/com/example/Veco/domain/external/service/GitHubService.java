@@ -23,7 +23,7 @@ public class GitHubService {
     public void saveInstallationInfo(Long teamId, Long installationId) {
 
         Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new TeamException(TeamErrorCode.TEAM_NOT_EXIST));
+                .orElseThrow(() -> new TeamException(TeamErrorCode._NOT_FOUND));
 
 
         GithubInstallation info = GithubInstallation.builder()

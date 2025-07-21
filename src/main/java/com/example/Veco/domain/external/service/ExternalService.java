@@ -8,7 +8,7 @@ import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.external.repository.ExternalCustomRepository;
 import com.example.Veco.domain.external.repository.ExternalRepository;
 import com.example.Veco.domain.goal.entity.Goal;
-import com.example.Veco.domain.goal.entity.repository.GoalRepository;
+import com.example.Veco.domain.goal.repository.GoalRepository;
 import com.example.Veco.domain.mapping.Assignment;
 import com.example.Veco.domain.mapping.repository.AssigmentRepository;
 import com.example.Veco.domain.member.entity.Member;
@@ -52,7 +52,7 @@ public class ExternalService {
                 .allocateNextNumber(request.getWorkSpaceName(), teamId, Category.EXTERNAL);
 
         Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new TeamException(TeamErrorCode.TEAM_NOT_EXIST));
+                .orElseThrow(() -> new TeamException(TeamErrorCode._NOT_FOUND));
 
         Goal goal = findGoalById(request.getGoalId());
 
