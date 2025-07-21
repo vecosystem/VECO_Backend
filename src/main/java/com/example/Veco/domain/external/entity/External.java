@@ -59,9 +59,12 @@ public class External extends BaseEntity {
     @Builder.Default
     private Priority priority = Priority.NONE;
 
-    @Column(name = "deadline")
+    @Column(name = "start_date")
     @Builder.Default
-    private LocalDate deadline = null;
+    private LocalDate startDate = null;
+
+    @Builder.Default
+    private LocalDate endDate = null;
 
     @Column(name = "service_type", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -83,6 +86,16 @@ public class External extends BaseEntity {
     @Builder.Default
     private List<Assignment> assignments = new ArrayList<>();
 
+    public void setTeam(Team team) {
+        this.team = team;
+        team.getExternals().add(this);
+    }
+
+    public void setGoal(Goal goal) {
+        this.goal = goal;
+        goal.getExternals().add(this);
+    }
+
     public void updateExternal(ExternalRequestDTO.ExternalUpdateRequestDTO requestDTO) {
         if(requestDTO.getTitle() != null) {
             this.title = requestDTO.getTitle();
@@ -93,8 +106,11 @@ public class External extends BaseEntity {
         if(requestDTO.getState() != null) {
             this.state = requestDTO.getState();
         }
-        if(requestDTO.getDeadline() != null) {
-            this.deadline = requestDTO.getDeadline();
+        if (requestDTO.getStartDate() != null) {
+            this.startDate = requestDTO.getStartDate();
+        }
+        if (requestDTO.getEndDate() != null) {
+            this.endDate = requestDTO.getEndDate();
         }
         if(requestDTO.getPriority() != null) {
             this.priority = requestDTO.getPriority();
@@ -107,8 +123,6 @@ public class External extends BaseEntity {
 
     public void updateExternalByGithubIssue(GitHubWebhookPayload.Issue issue ){
 
-        System.out.println("issue change start");
-
         if(issue.getTitle() != null) {
             this.title = issue.getTitle();
         }
@@ -116,10 +130,6 @@ public class External extends BaseEntity {
             this.description = issue.getBody();
         }
 
-        System.out.println(" title = " + this.getTitle());
-        System.out.println(" description = " + this.getDescription());
-
-        System.out.println("issue change end");
     }
     // 연관 관계
     @ManyToOne(fetch = FetchType.LAZY)

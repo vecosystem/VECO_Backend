@@ -2,10 +2,14 @@ package com.example.Veco.domain.team.entity;
 
 
 import com.example.Veco.domain.common.BaseEntity;
+import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.mapping.GithubInstallation;
 import com.example.Veco.domain.workspace.entity.WorkSpace;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "team")
@@ -35,6 +39,11 @@ public class Team extends BaseEntity {
 
     @OneToOne(mappedBy = "team")
     private GithubInstallation githubInstallation;
+
+    @OneToMany(mappedBy = "team")
+    @Builder.Default
+    private List<External> externals = new ArrayList<>();
+
 
     // update
     public void updateGoalNumber(Long goalNumber){ this.goalNumber = goalNumber; }

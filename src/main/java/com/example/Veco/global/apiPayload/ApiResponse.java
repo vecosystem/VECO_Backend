@@ -4,21 +4,27 @@ import com.example.Veco.global.apiPayload.code.BaseSuccessStatus;
 import com.example.Veco.global.apiPayload.code.SuccessStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
 @JsonPropertyOrder({"isSuccess", "code", "message", "result"})
+@Schema(description = "API 응답 래퍼")
 public class ApiResponse<T> {
 
     @JsonProperty("isSuccess")
+    @Schema(description = "성공 여부", example = "true")
     private boolean success;
 
+    @Schema(description = "응답 코드", example = "SUCCESS")
     private String code;
 
+    @Schema(description = "응답 메시지", example = "요청이 성공했습니다.")
     private String message;
 
+    @Schema(description = "응답 데이터")
     private T result;
 
     // 커스텀 성공 응답

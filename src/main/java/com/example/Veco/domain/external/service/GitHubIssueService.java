@@ -5,6 +5,10 @@ import com.example.Veco.domain.external.dto.ExternalCursor;
 import com.example.Veco.domain.external.dto.GitHubWebhookPayload;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.external.entity.GitHubIssue;
+import com.example.Veco.domain.external.exception.ExternalException;
+import com.example.Veco.domain.external.exception.GitHubException;
+import com.example.Veco.domain.external.exception.code.ExternalErrorCode;
+import com.example.Veco.domain.external.exception.code.GitHubErrorCode;
 import com.example.Veco.domain.external.repository.ExternalRepository;
 import com.example.Veco.domain.external.repository.GitHubIssueRepository;
 import com.example.Veco.domain.mapping.GithubInstallation;
@@ -65,7 +69,7 @@ public class GitHubIssueService {
 
     private void closeIssue(GitHubWebhookPayload payload) {
         External external = externalRepository.findByGithubDataId(payload.getIssue().getId())
-                .orElseThrow(() -> new VecoException("Issue not found"));
+                .orElseThrow(() -> new ExternalException(ExternalErrorCode.EXTERNAL_NOT_FOUND));
 
         external.closeIssue();
         externalRepository.save(external);
@@ -117,7 +121,7 @@ public class GitHubIssueService {
         Long installationId = payload.getInstallation().getId();
 
         GithubInstallation installInfo = gitHubInstallationRepository.findByInstallationId(installationId)
-                .orElseThrow(() -> new VecoException("Installation not found"));
+                .orElseThrow(() -> new GitHubException(GitHubErrorCode.INSTALLATION_INFO_NOT_FOUND));
 
         Team team = installInfo.getTeam();
 
@@ -144,32 +148,11 @@ public class GitHubIssueService {
 
         Optional<GitHubIssue> existingIssue = gitHubIssueRepository.findById(issueData.getId());
         External external = externalRepository.findByGithubDataId(issueData.getId())
-                .orElseThrow(() -> new VecoException("Issue not found"));
+                .orElseThrow(() -> new ExternalException(ExternalErrorCode.EXTERNAL_NOT_FOUND));
 
         external.updateExternalByGithubIssue(issueData);
 
         externalRepository.save(external);
 
-//        if (existingIssue.isEmpty()) {
-//            log.warn("Issue not found for update: {}", issueData.getId());
-//            createIssue(payload);
-//            return;
-//        }
-
-//        GitHubIssue issue = existingIssue.get();
-//        issue.setTitle(issueData.getTitle());
-//        issue.setBody(issueData.getBody());
-//        issue.setState(GitHubIssue.IssueState.valueOf(issueData.getState().toUpperCase()));
-//        issue.setAssigneeLogin(issueData.getAssignee() != null ? issueData.getAssignee().getLogin() : null);
-//        issue.setAssigneeId(issueData.getAssignee() != null ? issueData.getAssignee().getId() : null);
-//        issue.setLabels(extractLabelNames(issueData.getLabels()));
-//        issue.setGithubUpdatedAt(issueData.getUpdatedAt());
-//        issue.setGithubClosedAt(issueData.getClosedAt());
-//        issue.setCommentsCount(issueData.getComments());
-//        issue.setLocked(issueData.getLocked());
-//        issue.setLockReason(issueData.getActiveLockReason());
-//
-//        gitHubIssueRepository.save(issue);
-//        log.info("Updated issue: #{} - {}", issue.getNumber(), issue.getTitle());
     }
 }

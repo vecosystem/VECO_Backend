@@ -15,6 +15,7 @@ public enum ErrorStatus implements BaseErrorStatus{
     _FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON403", "금지된 요청입니다."),
 
     EXTERNAL_NOT_FOUND(HttpStatus.NOT_FOUND, "EXTERNAL400", "해당하는 외부 이슈가 존재하지 않습니다."),
+    GOAL_NOT_FOUND(HttpStatus.NOT_FOUND, "GOAL400", "해당하는 목표가 존재하지 않습니다."),
     ;
 
     private HttpStatus httpStatus;
