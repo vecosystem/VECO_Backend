@@ -12,5 +12,4 @@ public class CommentServiceImpl {
 
     private final CommentRoomRepository commentRoomRepository;
 
-    public
 }
