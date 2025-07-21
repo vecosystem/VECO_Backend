@@ -1,17 +1,12 @@
 package com.example.Veco.domain.member.service;
 
-import com.example.Veco.domain.member.converter.MemberConverter;
-import com.example.Veco.domain.member.dto.MemberRequestDTO;
-import com.example.Veco.domain.member.dto.MemberResponseDTO;
 import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.member.repository.MemberRepository;
-import com.example.Veco.global.apiPayload.exception.VecoException;
 import com.example.Veco.global.aws.util.S3Util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.services.s3.S3Client;
 
 import java.util.List;
 
@@ -43,7 +38,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     public void deleteProfileImage(Long memberId) {
         Member member = memberQueryService.findById(memberId);
 
-        String imageUrl =member.getProfile().getProfileImageUrl();
+        String imageUrl = member.getProfile().getProfileImageUrl();
         if (imageUrl != null && !imageUrl.isEmpty()) {
             s3Util.deleteFile(imageUrl);
         }

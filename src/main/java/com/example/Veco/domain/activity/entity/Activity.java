@@ -5,7 +5,7 @@ import com.example.Veco.domain.common.BaseEntity;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.goal.entity.Goal;
 import com.example.Veco.domain.issue.entity.Issue;
-import com.example.Veco.domain.mapping.MemberTeam;
+import com.example.Veco.domain.mapping.entity.MemberTeam;
 import com.example.Veco.global.enums.Category;
 import jakarta.persistence.*;
 import lombok.*;

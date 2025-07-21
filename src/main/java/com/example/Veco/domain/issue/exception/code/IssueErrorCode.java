@@ -1,16 +1,18 @@
-package com.example.Veco.domain.member.error;
+package com.example.Veco.domain.issue.exception.code;
 
 import com.example.Veco.global.apiPayload.ErrorReasonDTO;
 import com.example.Veco.global.apiPayload.code.BaseErrorStatus;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 @Getter
-@RequiredArgsConstructor
-public enum MemberErrorStatus implements BaseErrorStatus {
-    _MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER4001", "해당 멤버가 없습니다."),
-    _FORBIDDEN(HttpStatus.FORBIDDEN, "MEMBER403_0", "접근이 금지되었습니다."),
+@AllArgsConstructor
+public enum IssueErrorCode implements BaseErrorStatus {
+
+    NOT_FOUND(HttpStatus.NOT_FOUND,
+            "ISSUE404_0",
+            "해당 이슈는 존재하지 않습니다.")
     ;
 
     private final HttpStatus httpStatus;
@@ -21,9 +23,9 @@ public enum MemberErrorStatus implements BaseErrorStatus {
     public ErrorReasonDTO getReasonHttpStatus() {
         return ErrorReasonDTO.builder()
                 .isSuccess(false)
+                .httpStatus(httpStatus)
                 .code(code)
                 .message(message)
-                .httpStatus(httpStatus)
                 .build();
     }
 }

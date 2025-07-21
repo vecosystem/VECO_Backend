@@ -20,6 +20,7 @@ public class Profile extends BaseEntity {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "profile_image_url")
     private String profileImageUrl;
 
     public void updateProfileImageUrl(String profileImageUrl) {

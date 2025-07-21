@@ -11,19 +11,18 @@ import com.example.Veco.domain.goal.exception.GoalException;
 import com.example.Veco.domain.goal.exception.code.GoalErrorCode;
 import com.example.Veco.domain.goal.repository.GoalRepository;
 import com.example.Veco.domain.issue.entity.Issue;
-import com.example.Veco.domain.issue.entity.IssueErrorCode;
-import com.example.Veco.domain.issue.entity.IssueException;
-import com.example.Veco.domain.issue.entity.IssueRepository;
-import com.example.Veco.domain.mapping.MemberTeam;
-import com.example.Veco.domain.mapping.MemberTeamRepository;
-import com.example.Veco.domain.member.MemberErrorCode;
-import com.example.Veco.domain.member.MemberException;
-import com.example.Veco.domain.member.MemberRepository;
+import com.example.Veco.domain.issue.exception.IssueException;
+import com.example.Veco.domain.issue.exception.code.IssueErrorCode;
+import com.example.Veco.domain.issue.repository.IssueRepository;
+import com.example.Veco.domain.mapping.entity.MemberTeam;
+import com.example.Veco.domain.mapping.repository.MemberTeamRepository;
 import com.example.Veco.domain.member.entity.Member;
-import com.example.Veco.domain.team.entity.Team;
-import com.example.Veco.domain.team.entity.TeamErrorCode;
-import com.example.Veco.domain.team.entity.TeamException;
-import com.example.Veco.domain.team.entity.TeamRepository;
+import com.example.Veco.domain.member.error.MemberErrorStatus;
+import com.example.Veco.domain.member.error.MemberHandler;
+import com.example.Veco.domain.member.repository.MemberRepository;
+import com.example.Veco.domain.team.exception.TeamExcepiton;
+import com.example.Veco.domain.team.exception.code.TeamErrorCode;
+import com.example.Veco.domain.team.repository.TeamRepository;
 import com.example.Veco.global.aws.util.S3Util;
 import com.example.Veco.global.redis.exception.RedisException;
 import com.example.Veco.global.redis.exception.code.RedisErrorCode;
@@ -32,7 +31,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import org.redisson.client.RedisBusyException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -76,19 +74,19 @@ public class GoalCommandService {
         // 사용자 존재 여부 검증
         List<Member> memberList = memberRepository.findAllById(memberIds);
         if (memberList.size() != memberIds.size()) {
-            throw new MemberException(MemberErrorCode.NOT_FOUND);
+            throw new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND);
         }
 
         // 팀 존재 여부 검증
         if (!teamRepository.existsById(teamId)) {
-            // 임시
-            throw new TeamException(TeamErrorCode.NOT_FOUND);
+
+            throw new TeamExcepiton(TeamErrorCode._NOT_FOUND);
         }
 
         // 같은 팀원 여부 검증
         List<MemberTeam> memberTeamList = memberTeamRepository.findAllByMemberIdInAndTeamId(memberIds, teamId);
         if (memberTeamList.size() != memberIds.size()) {
-            throw new MemberException(TeamErrorCode.FORBIDDEN);
+            throw new MemberHandler(MemberErrorStatus._FORBIDDEN);
         }
 
         // 이슈 존재 여부 검증
@@ -173,12 +171,12 @@ public class GoalCommandService {
 
         // 팀 존재 여부 검증
         if (!teamRepository.existsById(teamId)) {
-            throw new TeamException(TeamErrorCode.NOT_FOUND);
+            throw new TeamExcepiton(TeamErrorCode._NOT_FOUND);
         }
 
         // 팀원 여부 확인: 인증 객체 추출 (임시)
         MemberTeam member = memberTeamRepository.findByMemberIdAndTeamId(1L, teamId).orElseThrow(() ->
-                new MemberException(MemberErrorCode.FORBIDDEN));
+                new MemberHandler(MemberErrorStatus._FORBIDDEN));
 
         // 목표와 사용자가 같은 팀에 속하는지 검증
         if (!goal.getTeam().equals(member.getTeam())) {

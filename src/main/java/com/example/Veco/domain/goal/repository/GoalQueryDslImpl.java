@@ -61,7 +61,7 @@ public class GoalQueryDslImpl implements GoalQueryDsl {
                                         GroupBy.list(
                                                 Projections.constructor(
                                                         GoalResDTO.ManagerInfo.class,
-                                                        member.profile.profileUrl,
+                                                        member.profile.profileImageUrl,
                                                         member.name
                                                 )
                                         ).as("info")

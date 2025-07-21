@@ -1,11 +1,12 @@
 package com.example.Veco.domain.goal.service.query;
 
 import com.example.Veco.domain.assignee.entity.Assignee;
-import com.example.Veco.domain.assignee.entity.AssigneeRepository;
+import com.example.Veco.domain.assignee.repository.AssigneeRepository;
 import com.example.Veco.domain.comment.entity.Comment;
-import com.example.Veco.domain.comment.entity.CommentRepository;
+import com.example.Veco.domain.comment.repository.CommentRepository;
 import com.example.Veco.domain.comment.entity.CommentRoom;
-import com.example.Veco.domain.comment.entity.CommentRoomRepository;
+import com.example.Veco.domain.goal.entity.QGoal;
+import com.example.Veco.domain.mapping.repository.CommentRoomRepository;
 import com.example.Veco.domain.goal.converter.GoalConverter;
 import com.example.Veco.domain.goal.dto.response.GoalResDTO;
 import com.example.Veco.domain.goal.dto.response.GoalResDTO.Data;
@@ -19,18 +20,21 @@ import com.example.Veco.domain.goal.exception.GoalException;
 import com.example.Veco.domain.goal.exception.code.GoalErrorCode;
 import com.example.Veco.domain.goal.repository.GoalRepository;
 import com.example.Veco.domain.issue.entity.Issue;
-import com.example.Veco.domain.issue.entity.IssueRepository;
-import com.example.Veco.domain.mapping.MemberTeam;
-import com.example.Veco.domain.mapping.MemberTeamRepository;
-import com.example.Veco.global.apiPayload.ApiResponse;
+import com.example.Veco.domain.issue.repository.IssueRepository;
+import com.example.Veco.domain.mapping.entity.MemberTeam;
+import com.example.Veco.domain.mapping.repository.MemberTeamRepository;
 import com.example.Veco.global.enums.Category;
-import jakarta.validation.constraints.Min;
+import com.example.Veco.global.enums.Priority;
+import com.example.Veco.global.enums.State;
+import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j

@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "member")
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -26,6 +25,8 @@ public class Member extends BaseEntity {
 
     @Column(name = "name")
     private String name;
+
+    private String nickname;
 
     private String email;
 
@@ -47,7 +48,7 @@ public class Member extends BaseEntity {
     @JoinColumn(name = "workspace_id")
     private WorkSpace workSpace;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "profile_id")
     private Profile profile;
 }

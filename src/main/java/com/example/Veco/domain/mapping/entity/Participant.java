@@ -1,6 +1,6 @@
-package com.example.Veco.domain.mapping;
+package com.example.Veco.domain.mapping.entity;
 
-import com.example.Veco.domain.comment.entity.Comment;
+import com.example.Veco.domain.comment.entity.CommentRoom;
 import com.example.Veco.domain.common.BaseEntity;
 import com.example.Veco.domain.member.entity.Member;
 import jakarta.persistence.*;
@@ -11,7 +11,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class CommentMember extends BaseEntity {
+public class Participant extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,6 +22,6 @@ public class CommentMember extends BaseEntity {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "comment_id")
-    private Comment comment;
+    @JoinColumn(name = "comment_room_id")
+    private CommentRoom commentRoom;
 }
