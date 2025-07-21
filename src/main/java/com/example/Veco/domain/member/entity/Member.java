@@ -1,5 +1,6 @@
 package com.example.Veco.domain.member.entity;
 
+
 import com.example.Veco.domain.common.BaseEntity;
 import com.example.Veco.domain.member.enums.MemberRole;
 import com.example.Veco.domain.member.enums.Provider;

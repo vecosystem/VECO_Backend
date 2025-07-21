@@ -1,6 +1,8 @@
 package com.example.Veco.domain.notification.entity;
 
+
 import com.example.Veco.domain.common.BaseEntity;
+import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.global.enums.Category;
 import jakarta.persistence.*;
 import lombok.*;
@@ -34,4 +36,9 @@ public class Notification extends BaseEntity {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt = null;
+
+    // 연관 관계
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    private Team team;
 }

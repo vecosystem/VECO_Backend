@@ -1,10 +1,11 @@
-package com.example.Veco.global.aws.exception;
+package com.example.Veco.domain.goal.exception;
 
 import com.example.Veco.global.apiPayload.code.BaseErrorStatus;
 import com.example.Veco.global.apiPayload.exception.VecoException;
 
-public class S3Exception extends VecoException {
-    public S3Exception(BaseErrorStatus code) {
+public class GoalException extends VecoException {
+
+    public GoalException(BaseErrorStatus code) {
         super(code);
     }
 }

@@ -69,6 +69,8 @@ dependencies {
 
 		// Redis
 		implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+		// Redisson: 분산 락
+		implementation 'org.redisson:redisson-spring-boot-starter:3.50.0'
 
 		// AWS (S3)
 		implementation platform('io.awspring.cloud:spring-cloud-aws-dependencies:3.3.0')
