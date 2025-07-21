@@ -28,5 +28,4 @@ public enum ErrorStatus implements BaseErrorStatus{
                 .build()
                 ;
     }
-
 }

@@ -7,8 +7,8 @@ public class VecoException extends RuntimeException {
 
     private BaseErrorStatus errorStatus;
 
-    public VecoException(String message) {
-        super(message);
+    public VecoException(BaseErrorStatus errorStatus) {
+        this.errorStatus = errorStatus;
     }
     public ErrorReasonDTO getErrorReasonHttpStatus() {
         return errorStatus.getReasonHttpStatus();
