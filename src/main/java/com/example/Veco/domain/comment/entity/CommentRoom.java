@@ -25,6 +25,9 @@ public class CommentRoom extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Category roomType;
 
+    @Column(name = "target_id")
+    private Long targetId;
+
     // 연관 관계
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "issue_id")

@@ -1,8 +1,8 @@
 package com.example.Veco.domain.goal.service.command;
 
 import com.example.Veco.domain.assignee.entity.Assignee;
-import com.example.Veco.domain.assignee.entity.AssigneeConverter;
-import com.example.Veco.domain.assignee.entity.AssigneeRepository;
+import com.example.Veco.domain.assignee.converter.AssigneeConverter;
+import com.example.Veco.domain.assignee.repository.AssigneeRepository;
 import com.example.Veco.domain.goal.converter.GoalConverter;
 import com.example.Veco.domain.goal.dto.request.GoalReqDTO;
 import com.example.Veco.domain.goal.entity.Goal;
@@ -10,15 +10,15 @@ import com.example.Veco.domain.goal.exception.GoalException;
 import com.example.Veco.domain.goal.exception.code.GoalErrorCode;
 import com.example.Veco.domain.goal.repository.GoalRepository;
 import com.example.Veco.domain.issue.entity.Issue;
-import com.example.Veco.domain.issue.entity.IssueErrorCode;
-import com.example.Veco.domain.issue.entity.IssueException;
-import com.example.Veco.domain.issue.entity.IssueRepository;
-import com.example.Veco.domain.mapping.MemberTeam;
-import com.example.Veco.domain.mapping.MemberTeamRepository;
+import com.example.Veco.domain.issue.exception.IssueException;
+import com.example.Veco.domain.issue.exception.code.IssueErrorCode;
+import com.example.Veco.domain.issue.repository.IssueRepository;
+import com.example.Veco.domain.mapping.entity.MemberTeam;
+import com.example.Veco.domain.mapping.repository.MemberTeamRepository;
 import com.example.Veco.domain.team.entity.Team;
-import com.example.Veco.domain.team.entity.TeamErrorCode;
-import com.example.Veco.domain.team.entity.TeamException;
-import com.example.Veco.domain.team.entity.TeamRepository;
+import com.example.Veco.domain.team.exception.TeamExcepiton;
+import com.example.Veco.domain.team.exception.code.TeamErrorCode;
+import com.example.Veco.domain.team.repository.TeamRepository;
 import com.example.Veco.global.enums.Category;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -48,7 +48,7 @@ public class GoalTransactionalService {
     ){
         // Team 조회
         Team team = teamRepository.findTeamById(teamId).orElseThrow(() ->
-                new TeamException(TeamErrorCode.NOT_FOUND));
+                new TeamExcepiton(TeamErrorCode._NOT_FOUND));
 
         // 목표 생성
         String name = team.getWorkSpace().getName()+"-g"+team.getGoalNumber();

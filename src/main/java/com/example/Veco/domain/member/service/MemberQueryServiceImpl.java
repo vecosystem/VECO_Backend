@@ -1,13 +1,11 @@
 package com.example.Veco.domain.member.service;
 
 import com.example.Veco.domain.member.entity.Member;
+import com.example.Veco.domain.member.error.MemberErrorStatus;
+import com.example.Veco.domain.member.error.MemberHandler;
 import com.example.Veco.domain.member.repository.MemberRepository;
-import com.example.Veco.global.apiPayload.exception.VecoException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +16,6 @@ public class MemberQueryServiceImpl implements MemberQueryService {
     @Override
     public Member findById(Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new VecoException("멤버 에러")); // 에러 처리 나중에 구현 예정
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND)); // 에러 처리 나중에 구현 예정
     }
 }

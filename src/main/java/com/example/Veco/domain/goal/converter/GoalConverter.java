@@ -6,7 +6,7 @@ import com.example.Veco.domain.goal.dto.request.GoalReqDTO;
 import com.example.Veco.domain.goal.dto.response.GoalResDTO;
 import com.example.Veco.domain.goal.entity.Goal;
 import com.example.Veco.domain.issue.entity.Issue;
-import com.example.Veco.domain.mapping.MemberTeam;
+import com.example.Veco.domain.mapping.entity.MemberTeam;
 import com.example.Veco.domain.team.entity.Team;
 
 import java.time.LocalDateTime;
@@ -137,7 +137,7 @@ public class GoalConverter {
     ){
         return GoalResDTO.ManagerInfo.builder()
                 .name(assignee.getMemberTeam().getMember().getName())
-                .profileUrl(assignee.getMemberTeam().getMember().getProfile().getProfileUrl())
+                .profileUrl(assignee.getMemberTeam().getMember().getProfile().getProfileImageUrl())
                 .build();
     }
 
@@ -156,7 +156,7 @@ public class GoalConverter {
             Comment comment
     ){
         return GoalResDTO.CommentInfo.builder()
-                .profileUrl(comment.getMember().getProfile().getProfileUrl())
+                .profileUrl(comment.getMember().getProfile().getProfileImageUrl())
                 .nickname(comment.getMember().getNickname())
                 .createdAt(comment.getCreatedAt())
                 .content(comment.getContent())
