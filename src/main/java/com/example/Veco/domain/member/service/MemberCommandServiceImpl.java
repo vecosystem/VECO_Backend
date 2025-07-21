@@ -25,4 +25,13 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         member.updateNickname(nickname);
         return member.getNickname();
     }*/
+
+    @Override
+    @Transactional
+    public Member saveMember(Member member) {
+        Member savedMember = memberRepository.save(member);
+
+        // DTO로 변환하여 반환
+        return savedMember;
+    }
 }

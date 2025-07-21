@@ -5,6 +5,7 @@ import com.example.Veco.domain.member.repository.MemberRepository;
 import com.example.Veco.global.apiPayload.exception.VecoException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.example.Veco.global.apiPayload.code.ErrorStatus;
 
 @Service
 @RequiredArgsConstructor
@@ -15,6 +16,6 @@ public class MemberQueryServiceImpl implements MemberQueryService {
     @Override
     public Member findById(Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new VecoException("멤버 에러")); // 에러 처리 나중에 구현 예정
+                .orElseThrow(() -> new VecoException(ErrorStatus._BAD_REQUEST)); // TODO 예외 처리 개선 필요
     }
 }
