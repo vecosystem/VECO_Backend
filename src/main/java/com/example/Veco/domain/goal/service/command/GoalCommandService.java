@@ -20,7 +20,7 @@ import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.member.error.MemberErrorStatus;
 import com.example.Veco.domain.member.error.MemberHandler;
 import com.example.Veco.domain.member.repository.MemberRepository;
-import com.example.Veco.domain.team.exception.TeamExcepiton;
+import com.example.Veco.domain.team.exception.TeamException;
 import com.example.Veco.domain.team.exception.code.TeamErrorCode;
 import com.example.Veco.domain.team.repository.TeamRepository;
 import com.example.Veco.global.aws.util.S3Util;
@@ -80,7 +80,7 @@ public class GoalCommandService {
         // 팀 존재 여부 검증
         if (!teamRepository.existsById(teamId)) {
 
-            throw new TeamExcepiton(TeamErrorCode._NOT_FOUND);
+            throw new TeamException(TeamErrorCode._NOT_FOUND);
         }
 
         // 같은 팀원 여부 검증
@@ -171,7 +171,7 @@ public class GoalCommandService {
 
         // 팀 존재 여부 검증
         if (!teamRepository.existsById(teamId)) {
-            throw new TeamExcepiton(TeamErrorCode._NOT_FOUND);
+            throw new TeamException(TeamErrorCode._NOT_FOUND);
         }
 
         // 팀원 여부 확인: 인증 객체 추출 (임시)
