@@ -1,0 +1,37 @@
+package com.example.Veco.domain.workspace.controller;
+
+import com.example.Veco.domain.member.entity.Member;
+import com.example.Veco.domain.workspace.converter.WorkspaceConverter;
+import com.example.Veco.domain.workspace.dto.WorkspaceResponseDTO;
+import com.example.Veco.domain.workspace.entity.WorkSpace;
+import com.example.Veco.domain.workspace.service.WorkspaceQueryService;
+import com.example.Veco.global.apiPayload.ApiResponse;
+import com.example.Veco.global.auth.oauth2.CustomOAuth2User;
+import com.example.Veco.global.auth.user.userdetails.CustomUserDetails;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@Validated
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/workspace")
+@Tag(name = "워크스페이스 API")
+public class WorkspaceRestController {
+
+    private final WorkspaceQueryService workspaceQueryService;
+
+    @GetMapping("/setting")
+    @Operation(summary = "워크스페이스 정보를 조회합니다.")
+    public ApiResponse<WorkspaceResponseDTO.WorkspaceResponseDto> getWorkspaceInfo(@AuthenticationPrincipal CustomOAuth2User user) {
+
+        Member member = user.getMember();
+        WorkSpace workspace = workspaceQueryService.getWorkSpaceByMember(member);
+        return ApiResponse.onSuccess(WorkspaceConverter.toWorkspaceResponse(workspace));
+    }
+}

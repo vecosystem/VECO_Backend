@@ -1,4 +1,4 @@
 package com.example.Veco.domain.workspace.service;
 
-public class WorkspaceService {
+public interface WorkspaceCommandService {
 }
