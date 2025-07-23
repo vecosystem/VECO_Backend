@@ -16,7 +16,7 @@ import com.example.Veco.domain.issue.repository.IssueRepository;
 import com.example.Veco.domain.mapping.entity.MemberTeam;
 import com.example.Veco.domain.mapping.repository.MemberTeamRepository;
 import com.example.Veco.domain.team.entity.Team;
-import com.example.Veco.domain.team.exception.TeamExcepiton;
+import com.example.Veco.domain.team.exception.TeamException;
 import com.example.Veco.domain.team.exception.code.TeamErrorCode;
 import com.example.Veco.domain.team.repository.TeamRepository;
 import com.example.Veco.global.enums.Category;
@@ -48,7 +48,7 @@ public class GoalTransactionalService {
     ){
         // Team 조회
         Team team = teamRepository.findTeamById(teamId).orElseThrow(() ->
-                new TeamExcepiton(TeamErrorCode._NOT_FOUND));
+                new TeamException(TeamErrorCode._NOT_FOUND));
 
         // 목표 생성
         String name = team.getWorkSpace().getName()+"-g"+team.getGoalNumber();
