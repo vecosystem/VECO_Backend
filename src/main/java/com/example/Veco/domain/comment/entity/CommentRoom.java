@@ -13,7 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "comment_room")
+@Table(name = "comment_room", 
+       uniqueConstraints = @UniqueConstraint(columnNames = {"room_type", "target_id"}))
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

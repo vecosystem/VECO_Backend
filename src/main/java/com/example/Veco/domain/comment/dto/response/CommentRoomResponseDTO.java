@@ -1,4 +1,4 @@
-package com.example.Veco.domain.comment.dto;
+package com.example.Veco.domain.comment.dto.response;
 
 
 import lombok.AllArgsConstructor;

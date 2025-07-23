@@ -3,6 +3,8 @@ package com.example.Veco.domain.comment.service;
 import com.example.Veco.domain.comment.converter.CommentConverter;
 import com.example.Veco.domain.comment.converter.CommentRoomConverter;
 import com.example.Veco.domain.comment.dto.request.CommentCreateDTO;
+import com.example.Veco.domain.comment.dto.response.CommentResponseDTO;
+import com.example.Veco.domain.comment.entity.Comment;
 import com.example.Veco.domain.comment.entity.CommentRoom;
 import com.example.Veco.domain.comment.repository.repository.CommentRepository;
 import com.example.Veco.domain.external.repository.ExternalRepository;
@@ -21,7 +23,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +34,9 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRoomRepository commentRoomRepository;
     private final MemberRepository memberRepository;
     private final CommentRepository commentRepository;
+    private final IssueRepository issueRepository;
+    private final GoalRepository goalRepository;
+    private final ExternalRepository externalRepository;
 
     public Long addComment(CommentCreateDTO commentCreateDTO) {
 
@@ -45,25 +51,60 @@ public class CommentServiceImpl implements CommentService {
         return commentRepository.save(CommentConverter.toComment(commentCreateDTO, commentRoom, member)).getId();
     }
 
+    @Transactional(readOnly = true)
+    public List<CommentResponseDTO> getComments(Long targetId, Category category) {
+        // 리소스 존재 여부 검증
+        validateResourceExists(targetId, category);
+        
+        CommentRoom commentRoom = commentRoomRepository.findByRoomTypeAndTargetId(category, targetId);
+        
+        if (commentRoom == null) {
+            return new ArrayList<>(); // 댓글방이 없으면 빈 리스트 반환
+        }
 
+        List<Comment> comments = commentRepository.findAllByCommentRoomOrderByIdDesc(commentRoom);
+        
+        return comments.stream()
+                .map(CommentConverter::toCommentResponseDTO)
+                .toList();
+    }
 
     private CommentRoom findOrCreateCommentRoom(Long resourceId, Category resourceType) {
-        Optional<CommentRoom> existingRoom = switch (resourceType) {
-            case ISSUE -> commentRoomRepository.findByIssueId(resourceId);
-            case GOAL -> commentRoomRepository.findByGoalId(resourceId);
-            case EXTERNAL -> commentRoomRepository.findByExternalId(resourceId);
-        };
-
-        return existingRoom.orElseGet(() -> createNewCommentRoom(resourceId, resourceType));
+        CommentRoom existingRoom = commentRoomRepository.findByRoomTypeAndTargetId(resourceType, resourceId);
+        
+        if (existingRoom != null) {
+            return existingRoom;
+        }
+        
+        return createNewCommentRoom(resourceId, resourceType);
     }
 
     private CommentRoom createNewCommentRoom(Long resourceId, Category resourceType) {
-
+        // 리소스 존재 여부 검증
+        validateResourceExists(resourceId, resourceType);
+        
         CommentRoom commentRoom = CommentRoomConverter.toCommentRoom(resourceId, resourceType);
-
-        commentRoomRepository.save(commentRoom);
-
-        return commentRoom;
+        return commentRoomRepository.save(commentRoom);
+    }
+    
+    private void validateResourceExists(Long resourceId, Category category) {
+        switch (category) {
+            case ISSUE -> {
+                if (!issueRepository.existsById(resourceId)) {
+                    throw new RuntimeException("Issue not found with id: " + resourceId);
+                }
+            }
+            case GOAL -> {
+                if (!goalRepository.existsById(resourceId)) {
+                    throw new RuntimeException("Goal not found with id: " + resourceId);
+                }
+            }
+            case EXTERNAL -> {
+                if (!externalRepository.existsById(resourceId)) {
+                    throw new RuntimeException("External not found with id: " + resourceId);
+                }
+            }
+        }
     }
 
 
