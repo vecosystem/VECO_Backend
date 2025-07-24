@@ -24,7 +24,7 @@ public class ReminderTargetService {
                 .from(issue)
                 .where(
                         issue.deadline.eq(today),
-                        issue.state.in(State.NONE, State.DOING)
+                        issue.state.in(State.NONE, State.DOING, State.TODO)
                 )
                 .fetch();
     }
@@ -36,7 +36,7 @@ public class ReminderTargetService {
                 .from(goal)
                 .where(
                         goal.deadlineEnd.eq(today),
-                        goal.state.in(State.NONE, State.DOING)
+                        goal.state.in(State.NONE, State.DOING, State.TODO)
                 )
                 .fetch();
     }
@@ -48,7 +48,7 @@ public class ReminderTargetService {
                 .from(external)
                 .where(
                         external.deadline.eq(today),
-                        external.state.in(State.NONE, State.DOING)
+                        external.state.in(State.NONE, State.DOING, State.TODO)
                 )
                 .fetch();
     }

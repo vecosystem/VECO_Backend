@@ -5,12 +5,12 @@ import com.example.Veco.domain.issue.entity.Issue;
 import com.example.Veco.domain.memberNotification.entity.MemberNotification;
 import com.example.Veco.domain.notification.dto.NotiResDTO;
 import com.example.Veco.global.enums.Category;
+import com.example.Veco.global.enums.Priority;
+import com.example.Veco.global.enums.State;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -44,18 +44,76 @@ public class NotiConverter {
                 .collect(Collectors.toList());
     }
 
-    public NotiResDTO.IssuePreViewListDTO toIssuePreViewListDTO(
-            List<NotiResDTO.IssuePreViewDTO> previews, LocalDate deadline
-    ) {
-        return NotiResDTO.IssuePreViewListDTO.builder()
+    public NotiResDTO.GroupedNotiList<NotiResDTO.IssuePreViewDTO> toIssuePreviewListByState(List<NotiResDTO.IssuePreViewDTO> list, LocalDate deadline) {
+        List<State> order = Arrays.asList(State.NONE, State.DOING, State.TODO);
+
+        List<NotiResDTO.GroupedNotiList.NotiGroup<NotiResDTO.IssuePreViewDTO>> grouped = order.stream()
+                .map(state -> {
+                    List<NotiResDTO.IssuePreViewDTO> filtered = list.stream()
+                            .filter(dto -> dto.getState() == state)
+                            .sorted(Comparator.comparing(NotiResDTO.IssuePreViewDTO::getAlarmId).reversed()) 
+                            .collect(Collectors.toList());
+
+                    if (filtered.isEmpty()) return null;
+
+                    return NotiResDTO.GroupedNotiList.NotiGroup.<NotiResDTO.IssuePreViewDTO>builder()
+                            .groupTitle(state.name())
+                            .notiList(filtered)
+                            .build();
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        return NotiResDTO.GroupedNotiList.<NotiResDTO.IssuePreViewDTO>builder()
                 .type(Category.ISSUE)
                 .deadline(deadline)
-                .notificationList(previews)
-                .listSize(previews.size())
+                .groupedList(grouped)
+                .totalSize(list.size())
+                .build();
+    }
+
+    public NotiResDTO.GroupedNotiList<NotiResDTO.IssuePreViewDTO> toIssuePreviewListByPriority(List<NotiResDTO.IssuePreViewDTO> list, LocalDate deadline) {
+        List<Priority> order = Arrays.asList(Priority.NONE, Priority.URGENT, Priority.HIGH, Priority.NORMAL, Priority.LOW);
+
+        List<NotiResDTO.GroupedNotiList.NotiGroup<NotiResDTO.IssuePreViewDTO>> grouped = order.stream()
+                .map(priority -> {
+                    List<NotiResDTO.IssuePreViewDTO> filtered = list.stream()
+                            .filter(dto -> dto.getPriority() == priority)
+                            .sorted(Comparator.comparing(NotiResDTO.IssuePreViewDTO::getAlarmId).reversed())
+                            .collect(Collectors.toList());
+
+                    if (filtered.isEmpty()) return null;
+
+                    return NotiResDTO.GroupedNotiList.NotiGroup.<NotiResDTO.IssuePreViewDTO>builder()
+                            .groupTitle(priority.name())
+                            .notiList(filtered)
+                            .build();
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        return NotiResDTO.GroupedNotiList.<NotiResDTO.IssuePreViewDTO>builder()
+                .type(Category.ISSUE)
+                .deadline(deadline)
+                .groupedList(grouped)
+                .totalSize(list.size())
                 .build();
     }
 
     // 목표
+
+    public NotiResDTO.GoalPreViewDTO toGoalPreViewDTO(Goal goal, MemberNotification memberNoti) {
+
+        return NotiResDTO.GoalPreViewDTO.builder()
+                .alarmId(memberNoti.getId())
+                .name(goal.getName())
+                .typeId(goal.getId())
+                .title(goal.getTitle())
+                .state(goal.getState())
+                .priority(goal.getPriority())
+                .isRead(memberNoti.getIsRead())
+                .build();
+    }
 
     public List<NotiResDTO.GoalPreViewDTO> toGoalPreviewDTOs(
             List<Goal> goals, List<MemberNotification> memberNotifications
@@ -72,30 +130,60 @@ public class NotiConverter {
                 .toList();
     }
 
+    public NotiResDTO.GroupedNotiList<NotiResDTO.GoalPreViewDTO> toGoalPreviewListByState(List<NotiResDTO.GoalPreViewDTO> list, LocalDate deadline) {
+        List<State> order = Arrays.asList(State.NONE, State.DOING,State.TODO);
 
-    public NotiResDTO.GoalPreViewListDTO toGoalPreViewListDTO(
-            List<NotiResDTO.GoalPreViewDTO> previews, LocalDate deadline
-    ) {
-        return NotiResDTO.GoalPreViewListDTO.builder()
+        List<NotiResDTO.GroupedNotiList.NotiGroup<NotiResDTO.GoalPreViewDTO>> grouped = order.stream()
+                .map(state -> {
+                    List<NotiResDTO.GoalPreViewDTO> filtered = list.stream()
+                            .filter(dto -> dto.getState() == state)
+                            .sorted(Comparator.comparing(NotiResDTO.GoalPreViewDTO::getAlarmId).reversed())
+                            .collect(Collectors.toList());
+
+                    if (filtered.isEmpty()) return null;
+
+                    return NotiResDTO.GroupedNotiList.NotiGroup.<NotiResDTO.GoalPreViewDTO>builder()
+                            .groupTitle(state.name())
+                            .notiList(filtered)
+                            .build();
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        return NotiResDTO.GroupedNotiList.<NotiResDTO.GoalPreViewDTO>builder()
                 .type(Category.GOAL)
                 .deadline(deadline)
-                .notificationList(previews)
-                .listSize(previews.size())
+                .groupedList(grouped)
+                .totalSize(list.size())
                 .build();
     }
 
+    public NotiResDTO.GroupedNotiList<NotiResDTO.GoalPreViewDTO> toGoalPreviewListByPriority(List<NotiResDTO.GoalPreViewDTO> list, LocalDate deadline) {
+        List<Priority> order = Arrays.asList(Priority.NONE, Priority.URGENT, Priority.HIGH, Priority.NORMAL, Priority.LOW);
 
-    public NotiResDTO.GoalPreViewDTO toGoalPreViewDTO(Goal goal, MemberNotification memberNoti) {
+        List<NotiResDTO.GroupedNotiList.NotiGroup<NotiResDTO.GoalPreViewDTO>> grouped = order.stream()
+                .map(priority -> {
+                    List<NotiResDTO.GoalPreViewDTO> filtered = list.stream()
+                            .filter(dto -> dto.getPriority() == priority)
+                            .sorted(Comparator.comparing(NotiResDTO.GoalPreViewDTO::getAlarmId).reversed())
+                            .collect(Collectors.toList());
 
-        return NotiResDTO.GoalPreViewDTO.builder()
-                .alarmId(memberNoti.getId())
-                .name(goal.getName())
-                .typeId(goal.getId())
-                .title(goal.getTitle())
-                .state(goal.getState())
-                .priority(goal.getPriority())
-                .isRead(memberNoti.getIsRead())
+                    if (filtered.isEmpty()) return null;
+
+                    return NotiResDTO.GroupedNotiList.NotiGroup.<NotiResDTO.GoalPreViewDTO>builder()
+                            .groupTitle(priority.name())
+                            .notiList(filtered)
+                            .build();
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        return NotiResDTO.GroupedNotiList.<NotiResDTO.GoalPreViewDTO>builder()
+                .type(Category.GOAL)
+                .deadline(deadline)
+                .groupedList(grouped)
+                .totalSize(list.size())
                 .build();
     }
+
 }
-

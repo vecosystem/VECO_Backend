@@ -31,7 +31,7 @@ public class NotiQueryServiceImpl implements NotiQueryService {
     private final NotiConverter notiConverter;
     private final ReminderService reminderService;
 
-    public Object getNotiList(Long memberId, Category alarmType) {
+    public Object getNotiList(Long memberId, Category alarmType, String filter) {
 
         // FIXME : 예외처리수정
         Optional<Member> member = memberRepository.findById(memberId);
@@ -50,14 +50,22 @@ public class NotiQueryServiceImpl implements NotiQueryService {
             List<Issue> issues = issueRepository.findByIdIn(typeIds);
             List<NotiResDTO.IssuePreViewDTO> previews = notiConverter.toIssuePreviewDTOs(issues, memberNotis);
 
-            return notiConverter.toIssuePreViewListDTO(previews, deadline);
+            if ("priority".equalsIgnoreCase(filter)) {
+                return notiConverter.toIssuePreviewListByPriority(previews, deadline);
+            } else { // default = state
+                return notiConverter.toIssuePreviewListByState(previews, deadline);
+            }
 
         } else if (alarmType == Category.GOAL) {
 
             List<Goal> goals = goalRepository.findByIdIn(typeIds);
             List<NotiResDTO.GoalPreViewDTO> previews = notiConverter.toGoalPreviewDTOs(goals, memberNotis);
 
-            return notiConverter.toGoalPreViewListDTO(previews, deadline);
+            if ("priority".equalsIgnoreCase(filter)) {
+                return notiConverter.toGoalPreviewListByPriority(previews, deadline);
+            } else {
+                return notiConverter.toGoalPreviewListByState(previews, deadline);
+            }
 
         } else {
             // TODO : External 추가

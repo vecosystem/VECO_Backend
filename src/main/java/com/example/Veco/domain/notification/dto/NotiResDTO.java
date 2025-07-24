@@ -13,16 +13,24 @@ import java.util.List;
 
 public class NotiResDTO {
 
-    // 이슈 DTO
     @Builder
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class IssuePreViewListDTO {
-        Category type;
+    public static class GroupedNotiList<T> {
+        private Category type;
         private LocalDate deadline;
-        List<NotiResDTO.IssuePreViewDTO> notificationList;
-        Integer listSize;
+        private List<NotiGroup<T>> groupedList;
+        private Integer totalSize;
+
+        @Getter
+        @Builder
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class NotiGroup<T> {
+            private String groupTitle;  // 상태명, 우선순위명
+            private List<T> notiList;
+        }
     }
 
     @Builder
@@ -38,18 +46,6 @@ public class NotiResDTO {
         private Priority priority;
         private String goalTitle;
         private boolean isRead;
-    }
-
-    // 목표 DTO
-    @Builder
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class GoalPreViewListDTO {
-        Category type;
-        private LocalDate deadline;
-        List<NotiResDTO.GoalPreViewDTO> notificationList;
-        Integer listSize;
     }
 
     @Builder

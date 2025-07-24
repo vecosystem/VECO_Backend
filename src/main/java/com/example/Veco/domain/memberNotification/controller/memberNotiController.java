@@ -36,7 +36,7 @@ public class memberNotiController {
             description = "해당 알림을 삭제하는 API 입니다." +
                     "Request Body로 삭제할 알림ID 목록들을 주시면 됩니다."
     )
-    @DeleteMapping
+    @DeleteMapping("{memberId}")
     public ApiResponse<Void> deleteAlarms(
             @PathVariable Long memberId,   // HACK
             @RequestBody List<Long> alarmIds
