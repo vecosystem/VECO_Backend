@@ -31,7 +31,7 @@ public class NotiQueryServiceImpl implements NotiQueryService {
     private final NotiConverter notiConverter;
     private final ReminderService reminderService;
 
-    public Object getNotiList(Long memberId, Category alarmType, String filter) {
+    public NotiResDTO.GroupedNotiList getNotiList(Long memberId, Category alarmType, String filter) {
 
         // FIXME : 예외처리수정
         Optional<Member> member = memberRepository.findById(memberId);
@@ -73,4 +73,5 @@ public class NotiQueryServiceImpl implements NotiQueryService {
         }
 
     }
+
 }
