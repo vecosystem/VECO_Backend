@@ -1,5 +1,7 @@
 package com.example.Veco.global.apiPayload;
 
+import com.example.Veco.global.apiPayload.code.BaseErrorStatus;
+import com.example.Veco.global.apiPayload.code.BaseSuccessStatus;
 import com.example.Veco.global.apiPayload.code.SuccessStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -19,6 +21,16 @@ public class ApiResponse<T> {
     private String message;
 
     private T result;
+
+    // 커스텀 성공 응답
+    public static <T> ApiResponse<T> onSuccess(BaseSuccessStatus status, T data) {
+        return new ApiResponse<>(
+                true,
+                status.getReasonHttpStatus().getCode(),
+                status.getReasonHttpStatus().getMessage(),
+                data
+        );
+    }
 
     public static <T> ApiResponse<T> onSuccess(T result) {
         return new ApiResponse<>(true, SuccessStatus._OK.getCode(), SuccessStatus._OK.getMessage(), result);
