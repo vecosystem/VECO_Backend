@@ -2,8 +2,8 @@ package com.example.Veco.domain.reminder.service;
 
 import com.example.Veco.domain.assignee.entity.Assignee;
 import com.example.Veco.domain.assignee.repository.AssigneeRepository;
-import com.example.Veco.domain.mapping.MemberTeam;
-import com.example.Veco.domain.mapping.MemberTeamRepository;
+import com.example.Veco.domain.mapping.entity.MemberTeam;
+import com.example.Veco.domain.mapping.repository.MemberTeamRepository;
 import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.notification.service.NotiCommandService;
 import com.example.Veco.domain.team.entity.Team;
