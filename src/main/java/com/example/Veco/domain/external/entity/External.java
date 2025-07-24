@@ -9,7 +9,7 @@ import com.example.Veco.global.enums.State;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "external")
@@ -46,7 +46,7 @@ public class External extends BaseEntity {
 
     @Column(name = "deadline")
     @Builder.Default
-    private LocalDateTime deadline = null;
+    private LocalDate deadline = null;
 
     @Column(name = "service_type", nullable = false)
     @Enumerated(EnumType.STRING)
