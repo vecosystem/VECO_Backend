@@ -5,10 +5,10 @@ import com.example.Veco.global.apiPayload.code.BaseErrorStatus;
 
 public class VecoException extends RuntimeException {
 
-    private BaseErrorStatus errorStatus;
+    private final BaseErrorStatus errorStatus;
 
-    public VecoException(String message) {
-        super(message);
+    public VecoException(BaseErrorStatus errorStatus) {
+        this.errorStatus = errorStatus;
     }
     public ErrorReasonDTO getErrorReasonHttpStatus() {
         return errorStatus.getReasonHttpStatus();

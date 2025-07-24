@@ -1,8 +1,8 @@
-package com.example.Veco.domain.mapping;
+package com.example.Veco.domain.mapping.entity;
 
+import com.example.Veco.domain.comment.entity.CommentRoom;
 import com.example.Veco.domain.common.BaseEntity;
 import com.example.Veco.domain.member.entity.Member;
-import com.example.Veco.domain.team.entity.Team;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,18 +11,17 @@ import lombok.*;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Table(name = "member_team")
-public class MemberTeam extends BaseEntity {
+public class Participant extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @ManyToOne
-    @JoinColumn(name = "team_id")
-    private Team team;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "comment_room_id")
+    private CommentRoom commentRoom;
 }

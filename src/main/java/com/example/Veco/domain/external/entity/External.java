@@ -1,6 +1,8 @@
 package com.example.Veco.domain.external.entity;
 
+
 import com.example.Veco.domain.common.BaseEntity;
+import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.global.enums.ExtServiceType;
 import com.example.Veco.global.enums.Priority;
 import com.example.Veco.global.enums.State;
@@ -54,4 +56,8 @@ public class External extends BaseEntity {
     @Column(name = "external_number", nullable = false)
     private Integer external_number;
 
+    // 연관 관계
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    private Team team;
 }

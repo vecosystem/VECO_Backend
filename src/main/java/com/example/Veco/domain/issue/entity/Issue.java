@@ -49,8 +49,11 @@ public class Issue extends BaseEntity {
     @Column(name = "issue_number", nullable = false)
     private Integer issue_number;
 
+    // 연관 관계
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "goal_id")
     private Goal goal;
 
+    // update
+    public void updateGoal(Goal goal) { this.goal = goal; }
 }

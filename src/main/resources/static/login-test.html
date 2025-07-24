@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>OAuth2 Login Test</title>
+</head>
+<body>
+<h1>🔐 Google 로그인 테스트</h1>
+
+<button id="loginBtn">Google로 로그인</button>
+
+<script>
+    document.getElementById("loginBtn").addEventListener("click", () => {
+        // 구글 OAuth2 로그인 시작
+        window.location.href = "/oauth2/authorization/google";
+    })
+</script>
+</body>
+</html>

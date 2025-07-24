@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>AccessToken 재발급 테스트</title>
+</head>
+<body>
+<h1>AccessToken 재발급 테스트</h1>
+<button id="refreshBtn">재발급 요청</button>
+<pre id="result"></pre>
+
+<script>
+    const refreshBtn = document.getElementById('refreshBtn');
+    const result = document.getElementById('result');
+
+    refreshBtn.addEventListener('click', async () => {
+        result.textContent = '요청 중...';
+
+        try {
+            const response = await fetch('http://localhost:8080/api/token/reissue', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                // body는 필요 없음 (쿠키로 refreshToken 전송)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                result.textContent = `에러: ${response.status} - ${errorText}`;
+                return;
+            }
+
+            const data = await response.json();
+            // 예: { accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." }
+            result.textContent = JSON.stringify(data, null, 2);
+
+        } catch (err) {
+            result.textContent = '통신 에러: ' + err.message;
+        }
+    });
+</script>
+</body>
+</html>
