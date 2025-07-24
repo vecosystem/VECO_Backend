@@ -1,16 +1,7 @@
 package com.example.Veco.domain.goal.controller;
 
 import com.example.Veco.domain.goal.dto.request.GoalReqDTO;
-import com.example.Veco.domain.goal.dto.response.GoalResDTO;
-import com.example.Veco.domain.goal.dto.response.GoalResDTO.GoalInfo;
-import com.example.Veco.domain.goal.dto.response.GoalResDTO.UpdateGoal;
-import com.example.Veco.domain.goal.dto.response.GoalResDTO.CreateGoal;
-import com.example.Veco.domain.goal.dto.response.GoalResDTO.Data;
-import com.example.Veco.domain.goal.dto.response.GoalResDTO.FilteringGoal;
-import com.example.Veco.domain.goal.dto.response.GoalResDTO.FullGoal;
-import com.example.Veco.domain.goal.dto.response.GoalResDTO.Pageable;
-import com.example.Veco.domain.goal.dto.response.GoalResDTO.SimpleGoal;
-import com.example.Veco.domain.goal.dto.response.GoalResDTO.Teammate;
+import com.example.Veco.domain.goal.dto.response.GoalResDTO.*;
 import com.example.Veco.domain.goal.exception.code.GoalSuccessCode;
 import com.example.Veco.domain.goal.service.command.GoalCommandService;
 import com.example.Veco.domain.goal.service.query.GoalQueryService;

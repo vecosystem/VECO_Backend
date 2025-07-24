@@ -1,6 +1,5 @@
 package com.example.Veco.global.apiPayload;
 
-import com.example.Veco.global.apiPayload.code.BaseErrorStatus;
 import com.example.Veco.global.apiPayload.code.BaseSuccessStatus;
 import com.example.Veco.global.apiPayload.code.SuccessStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
