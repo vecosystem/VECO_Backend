@@ -42,4 +42,22 @@ public class WorkspaceResponseDTO {
         private int memberCount;
         private LocalDateTime createdAt;
     }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CreateTeamResponseDto {
+        private Long teamId;
+        private String teamName;
+        private List<MemberDto> members;
+
+        @Getter
+        @Builder
+        @AllArgsConstructor
+        public static class MemberDto {
+            private Long memberId;
+            private String memberName;
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package com.example.Veco.domain.workspace.converter;
 
+import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.domain.workspace.dto.WorkspaceResponseDTO;
 import com.example.Veco.domain.workspace.entity.WorkSpace;
@@ -46,5 +47,18 @@ public class WorkspaceConverter {
                 .build();
     }
 
-
+    public static WorkspaceResponseDTO.CreateTeamResponseDto toCreateTeamResponseDto(Team team, List<Member> members) {
+        return WorkspaceResponseDTO.CreateTeamResponseDto.builder()
+                .teamId(team.getId())
+                .teamName(team.getName())
+                .members(
+                        members.stream()
+                                .map(member -> WorkspaceResponseDTO.CreateTeamResponseDto.MemberDto.builder()
+                                        .memberId(member.getId())
+                                        .memberName(member.getName())
+                                        .build())
+                                .collect(Collectors.toList())
+                        )
+                        .build();
+    }
 }
