@@ -48,6 +48,9 @@ public class WorkspaceRestController {
     private final MemberQueryService memberQueryService;
     private final MemberCommandService memberCommandService;
 
+    /**
+     * 유저 프로필 조회 API
+     */
     @GetMapping("/setting/my-profile")
     @Operation(summary = "유저의 프로필을 조회합니다.")
     public ApiResponse<MemberResponseDTO.ProfileResponseDto> getProfile(
@@ -59,6 +62,10 @@ public class WorkspaceRestController {
         return ApiResponse.onSuccess(MemberConverter.toProfileResponseDTO(member));
     }
 
+    /**
+     * 유저 프로필 이미지 수정 API
+     * - 로그인된 유저의 프로필 이미지를 MulipartFile로 수정
+     */
     @PatchMapping(value = "/setting/my-profile/profileImage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "유저의 프로필 이미지를 수정합니다.")
     public ApiResponse<MemberResponseDTO.MemberProfileImageResponseDto> patchProfileImage(
@@ -72,6 +79,9 @@ public class WorkspaceRestController {
         return ApiResponse.onSuccess(MemberConverter.toMemberProfileImageResponseDTO(member1));
     }
 
+    /**
+     * 유저 프로필 이미지 삭제 API
+     */
     @DeleteMapping("/setting/my-profile/profileImage")
     @Operation(summary = "유저의 프로필 이미지를 삭제합니다.")
     public ApiResponse<Void> deleteProfileImage(@AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -83,7 +93,7 @@ public class WorkspaceRestController {
     }
 
     /**
-     * 워크스페이스 정보 조회
+     * 워크스페이스 정보 조회 API
      * - 로그인한 멤버의 워크스페이스 정보를 반환
      */
     @GetMapping("/setting")
@@ -99,7 +109,7 @@ public class WorkspaceRestController {
     }
 
     /**
-     * 워크스페이스 내 팀 목록 조회 (페이징)
+     * 워크스페이스 내 팀 목록 조회 (페이징) API
      * - 팀 ID 기준 내림차순 정렬
      * - 각 팀의 멤버 수 포함
      */
@@ -144,6 +154,10 @@ public class WorkspaceRestController {
         return ApiResponse.onSuccess(response); // 생성된 팀 정보 + 멤버 목록 반환
     }
 
+    /**
+     * 워크스페이스 내 멤버 전체 조회 API
+     * - 멤버별로 속한 팀 정보도 포함
+     */
     @GetMapping("/setting/members")
     @Operation(summary = "워크스페이스 내의 멤버 정보를 조회합니다.")
     public ApiResponse<List<WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto>> getWorkspaceMembers(
