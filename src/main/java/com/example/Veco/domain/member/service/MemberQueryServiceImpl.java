@@ -17,7 +17,7 @@ public class MemberQueryServiceImpl implements MemberQueryService {
     @Override
     public Member findById(Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND)); // 에러 처리 나중에 구현 예정
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND));
     }
 
     @Override

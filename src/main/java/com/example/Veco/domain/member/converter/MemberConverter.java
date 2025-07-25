@@ -2,12 +2,18 @@ package com.example.Veco.domain.member.converter;
 
 import com.example.Veco.domain.member.dto.MemberResponseDTO;
 import com.example.Veco.domain.member.entity.Member;
+import com.example.Veco.domain.member.error.MemberErrorStatus;
+import com.example.Veco.domain.member.error.MemberHandler;
 import org.springframework.stereotype.Component;
 
 @Component
 public class MemberConverter {
 
     public static MemberResponseDTO.ProfileResponseDto toProfileResponseDTO(Member member) {
+        if (member.getProfile() == null) {
+            throw new MemberHandler(MemberErrorStatus._PROFILE_NOT_FOUND);
+        }
+
         return MemberResponseDTO.ProfileResponseDto.builder()
                 .memberId(member.getId())
                 .name(member.getName())

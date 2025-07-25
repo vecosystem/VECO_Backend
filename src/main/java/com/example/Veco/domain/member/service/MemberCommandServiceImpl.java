@@ -1,7 +1,11 @@
 package com.example.Veco.domain.member.service;
 
 import com.example.Veco.domain.member.entity.Member;
+import com.example.Veco.domain.member.error.MemberErrorStatus;
+import com.example.Veco.domain.member.error.MemberHandler;
 import com.example.Veco.domain.member.repository.MemberRepository;
+import com.example.Veco.global.aws.exception.S3Exception;
+import com.example.Veco.global.aws.exception.code.S3ErrorCode;
 import com.example.Veco.global.aws.util.S3Util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +26,16 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     @Transactional
     @Override
     public Member updateProfileImage(MultipartFile file, Member member) {
+        // 프로필 존재 확인
+        if (member.getProfile() == null) {
+            throw new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND);
+        }
+
+        // 파일 유효성 검사
+        if (file == null || file.isEmpty()) {
+            throw new S3Exception(S3ErrorCode.NOT_FOUND_FILE);
+        }
+
         // S3 업로드 및 URL 생성
         String uploadedPath = s3Util.uploadFile(List.of(file), "profile/").get(0);
         String imageUrl = s3Util.getImageUrl(uploadedPath);
@@ -34,6 +48,11 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     @Transactional
     @Override
     public void deleteProfileImage(Member member) {
+        //프로필 존재 확인
+        if (member.getProfile() == null) {
+            throw new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND);
+        }
+
         String imageUrl = member.getProfile().getProfileImageUrl();
         if (imageUrl != null && !imageUrl.isEmpty()) {
             s3Util.deleteFile(imageUrl);
