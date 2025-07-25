@@ -7,8 +7,14 @@ import com.example.Veco.domain.comment.dto.response.CommentResponseDTO;
 import com.example.Veco.domain.comment.entity.Comment;
 import com.example.Veco.domain.comment.entity.CommentRoom;
 import com.example.Veco.domain.comment.repository.repository.CommentRepository;
+import com.example.Veco.domain.external.exception.ExternalException;
+import com.example.Veco.domain.external.exception.code.ExternalErrorCode;
 import com.example.Veco.domain.external.repository.ExternalRepository;
+import com.example.Veco.domain.goal.exception.GoalException;
+import com.example.Veco.domain.goal.exception.code.GoalErrorCode;
 import com.example.Veco.domain.goal.repository.GoalRepository;
+import com.example.Veco.domain.issue.exception.IssueException;
+import com.example.Veco.domain.issue.exception.code.IssueErrorCode;
 import com.example.Veco.domain.issue.repository.IssueRepository;
 import com.example.Veco.domain.mapping.repository.CommentRoomRepository;
 import com.example.Veco.domain.member.entity.Member;
@@ -91,17 +97,17 @@ public class CommentServiceImpl implements CommentService {
         switch (category) {
             case ISSUE -> {
                 if (!issueRepository.existsById(resourceId)) {
-                    throw new RuntimeException("Issue not found with id: " + resourceId);
+                    throw new IssueException(IssueErrorCode.NOT_FOUND);
                 }
             }
             case GOAL -> {
                 if (!goalRepository.existsById(resourceId)) {
-                    throw new RuntimeException("Goal not found with id: " + resourceId);
+                    throw new GoalException(GoalErrorCode.NOT_FOUND);
                 }
             }
             case EXTERNAL -> {
                 if (!externalRepository.existsById(resourceId)) {
-                    throw new RuntimeException("External not found with id: " + resourceId);
+                    throw new ExternalException(ExternalErrorCode.NOT_FOUND);
                 }
             }
         }
