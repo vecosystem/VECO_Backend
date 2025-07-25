@@ -21,9 +21,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
 
     @Transactional
     @Override
-    public Member updateProfileImage(MultipartFile file, Long memberId) {
-        Member member = memberQueryService.findById(memberId);
-
+    public Member updateProfileImage(MultipartFile file, Member member) {
         // S3 업로드 및 URL 생성
         String uploadedPath = s3Util.uploadFile(List.of(file), "profile/").get(0);
         String imageUrl = s3Util.getImageUrl(uploadedPath);
@@ -35,9 +33,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
 
     @Transactional
     @Override
-    public void deleteProfileImage(Long memberId) {
-        Member member = memberQueryService.findById(memberId);
-
+    public void deleteProfileImage(Member member) {
         String imageUrl = member.getProfile().getProfileImageUrl();
         if (imageUrl != null && !imageUrl.isEmpty()) {
             s3Util.deleteFile(imageUrl);

@@ -1,7 +1,10 @@
 package com.example.Veco.domain.workspace.controller;
 
+import com.example.Veco.domain.member.converter.MemberConverter;
+import com.example.Veco.domain.member.dto.MemberResponseDTO;
 import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.member.repository.MemberRepository;
+import com.example.Veco.domain.member.service.MemberCommandService;
 import com.example.Veco.domain.member.service.MemberQueryService;
 import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.domain.team.service.TeamQueryService;
@@ -22,9 +25,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -40,6 +46,41 @@ public class WorkspaceRestController {
     private final WorkspaceCommandService workspaceCommandService;
     private final MemberRepository memberRepository;
     private final MemberQueryService memberQueryService;
+    private final MemberCommandService memberCommandService;
+
+    @GetMapping("/setting/my-profile")
+    @Operation(summary = "유저의 프로필을 조회합니다.")
+    public ApiResponse<MemberResponseDTO.ProfileResponseDto> getProfile(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        String socialUid = userDetails.getSocialUid();
+        Member member = memberQueryService.getMemberBySocialUid(socialUid);
+
+        return ApiResponse.onSuccess(MemberConverter.toProfileResponseDTO(member));
+    }
+
+    @PatchMapping(value = "/setting/my-profile/profileImage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "유저의 프로필 이미지를 수정합니다.")
+    public ApiResponse<MemberResponseDTO.MemberProfileImageResponseDto> patchProfileImage(
+            @RequestParam MultipartFile image,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        String socialUid = userDetails.getSocialUid();
+        Member member = memberQueryService.getMemberBySocialUid(socialUid);
+
+        Member member1 = memberCommandService.updateProfileImage(image, member);
+        return ApiResponse.onSuccess(MemberConverter.toMemberProfileImageResponseDTO(member1));
+    }
+
+    @DeleteMapping("/setting/my-profile/profileImage")
+    @Operation(summary = "유저의 프로필 이미지를 삭제합니다.")
+    public ApiResponse<Void> deleteProfileImage(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        String socialUid = userDetails.getSocialUid();
+        Member member = memberQueryService.getMemberBySocialUid(socialUid);
+
+        memberCommandService.deleteProfileImage(member);
+        return ApiResponse.onSuccess(null);
+    }
 
     /**
      * 워크스페이스 정보 조회
