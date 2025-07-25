@@ -1,6 +1,7 @@
 package com.example.Veco.domain.workspace.controller;
 
 import com.example.Veco.domain.member.entity.Member;
+import com.example.Veco.domain.member.repository.MemberRepository;
 import com.example.Veco.domain.member.service.MemberQueryService;
 import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.domain.team.service.TeamQueryService;
@@ -37,6 +38,8 @@ public class WorkspaceRestController {
     private final WorkspaceQueryService workspaceQueryService;
     private final TeamQueryService teamQueryService;
     private final WorkspaceCommandService workspaceCommandService;
+    private final MemberRepository memberRepository;
+    private final MemberQueryService memberQueryService;
 
     /**
      * 워크스페이스 정보 조회
@@ -45,9 +48,11 @@ public class WorkspaceRestController {
     @GetMapping("/setting")
     @Operation(summary = "워크스페이스 정보를 조회합니다.")
     public ApiResponse<WorkspaceResponseDTO.WorkspaceResponseDto> getWorkspaceInfo(
-            @AuthenticationPrincipal CustomOAuth2User user // 로그인된 사용자 정보
+            @AuthenticationPrincipal CustomUserDetails userDetails // 로그인된 사용자 정보
     ) {
-        Member member = user.getMember(); // 로그인한 멤버 추출
+        String socialUid = userDetails.getSocialUid();
+        Member member = memberQueryService.getMemberBySocialUid(socialUid);
+
         WorkSpace workspace = workspaceQueryService.getWorkSpaceByMember(member); // 워크스페이스 조회
         return ApiResponse.onSuccess(WorkspaceConverter.toWorkspaceResponse(workspace));
     }
@@ -60,11 +65,13 @@ public class WorkspaceRestController {
     @GetMapping("/setting/teams")
     @Operation(summary = "워크스페이스 안의 팀 목록을 조회합니다.")
     public ApiResponse<WorkspaceResponseDTO.WorkspaceTeamListDto> getTeamList(
-            @AuthenticationPrincipal CustomOAuth2User user, // 로그인 유저
+            @AuthenticationPrincipal CustomUserDetails userDetails, // 로그인 유저
             @RequestParam(defaultValue = "0") int page,     // 페이지 번호 (기본 0)
             @RequestParam(defaultValue = "20") int size     // 페이지 크기 (기본 20)
     ) {
-        Member member = user.getMember();
+        String socialUid = userDetails.getSocialUid();
+        Member member = memberQueryService.getMemberBySocialUid(socialUid);
+
         WorkSpace workspace = workspaceQueryService.getWorkSpaceByMember(member);
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending()); // 페이지 설정
@@ -81,10 +88,17 @@ public class WorkspaceRestController {
     @PostMapping("/setting/teams")
     @Operation(summary = "워크스페이스 안에 팀을 생성합니다.")
     public ApiResponse<WorkspaceResponseDTO.CreateTeamResponseDto> createTeam(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody WorkspaceRequestDTO.CreateTeamRequestDto request // 팀 이름 + 멤버 ID 리스트
     ) {
+
+        String socialUid = userDetails.getSocialUid();
+        Member member = memberQueryService.getMemberBySocialUid(socialUid);
+
+        WorkSpace workspace = workspaceQueryService.getWorkSpaceByMember(member);
+
         WorkspaceResponseDTO.CreateTeamResponseDto response =
-                workspaceCommandService.createTeam(request); // 팀 생성
+                workspaceCommandService.createTeam(workspace, request); // 팀 생성
 
         return ApiResponse.onSuccess(response); // 생성된 팀 정보 + 멤버 목록 반환
     }
@@ -92,9 +106,11 @@ public class WorkspaceRestController {
     @GetMapping("/setting/members")
     @Operation(summary = "워크스페이스 내의 멤버 정보를 조회합니다.")
     public ApiResponse<List<WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto>> getWorkspaceMembers(
-            @AuthenticationPrincipal CustomUserDetails user) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        Member member = user.getMember();
+        String socialUid = userDetails.getSocialUid();
+        Member member = memberQueryService.getMemberBySocialUid(socialUid);
+
         List<WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto> result =
                 workspaceQueryService.getWorkspaceMembers(member);
 

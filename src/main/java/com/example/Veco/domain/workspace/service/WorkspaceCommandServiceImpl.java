@@ -11,6 +11,7 @@ import com.example.Veco.domain.team.repository.TeamRepository;
 import com.example.Veco.domain.workspace.converter.WorkspaceConverter;
 import com.example.Veco.domain.workspace.dto.WorkspaceRequestDTO;
 import com.example.Veco.domain.workspace.dto.WorkspaceResponseDTO;
+import com.example.Veco.domain.workspace.entity.WorkSpace;
 import com.example.Veco.domain.workspace.repository.WorkspaceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,10 +34,11 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
      * 4. 연결 저장 후 DTO 반환
      */
     @Override
-    public WorkspaceResponseDTO.CreateTeamResponseDto createTeam(WorkspaceRequestDTO.CreateTeamRequestDto request) {
+    public WorkspaceResponseDTO.CreateTeamResponseDto createTeam(WorkSpace workspace, WorkspaceRequestDTO.CreateTeamRequestDto request) {
         // 1. 팀 저장
         Team team = teamRepository.save(Team.builder()
                 .name(request.getTeamName())
+                .workSpace(workspace)
                 .build());
 
         // 2. 요청으로 전달된 멤버 ID 리스트로 멤버 조회

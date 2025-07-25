@@ -11,7 +11,7 @@ import java.util.List;
 public class CustomUserDetails extends AuthUser implements UserDetails {
 
     public CustomUserDetails(Member member) {
-        super(member.getSocialUid(), member.getEmail(), "", member);
+        super(member.getSocialUid(), member.getEmail(), "");
     }
 
     @Override
