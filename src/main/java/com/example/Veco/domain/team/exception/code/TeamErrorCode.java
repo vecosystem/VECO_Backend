@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 public enum TeamErrorCode implements BaseErrorStatus {
 
     _NOT_FOUND(HttpStatus.NOT_FOUND, "TEAM404_0", "해당 팀을 찾을 수 없습니다."),
+    _TEAM_NOT_IN_WORKSPACE(HttpStatus.BAD_REQUEST, "TEAM404_1", "팀이 해당 워크스페이스에 없습니다.")
 
     ;
 

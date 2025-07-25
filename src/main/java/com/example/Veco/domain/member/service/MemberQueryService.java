@@ -7,4 +7,6 @@ import java.util.Map;
 
 public interface MemberQueryService {
     Member findById(Long memberId);
+
+    Member getMemberBySocialUid(String socialUid);
 }
