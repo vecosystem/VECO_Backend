@@ -12,6 +12,7 @@ import com.example.Veco.domain.workspace.dto.WorkspaceResponseDTO;
 import com.example.Veco.domain.workspace.entity.WorkSpace;
 import com.example.Veco.domain.workspace.error.WorkspaceErrorStatus;
 import com.example.Veco.domain.workspace.error.WorkspaceHandler;
+import com.example.Veco.domain.workspace.repository.WorkspaceQueryDslRepository;
 import com.example.Veco.domain.workspace.repository.WorkspaceRepository;
 import com.example.Veco.global.apiPayload.exception.VecoException;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,7 @@ public class WorkspaceQueryServiceImpl implements WorkspaceQueryService {
     private final TeamRepository teamRepository;
     private final MemberTeamRepository memberTeamRepository;
     private final MemberRepository memberRepository;
+    private final WorkspaceQueryDslRepository workspaceQueryDslRepository;
 
     /**
      * 로그인한 멤버가 속한 워크스페이스 조회
@@ -74,5 +76,13 @@ public class WorkspaceQueryServiceImpl implements WorkspaceQueryService {
 
         // DTO로 변환하여 반환
         return WorkspaceConverter.toWorkspaceTeamListDto(teamPage, memberCountMap);
+    }
+
+    @Override
+    public List<WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto> getWorkspaceMembers(Member loginMember) {
+        WorkSpace workspace = Optional.ofNullable(loginMember.getWorkSpace())
+                .orElseThrow(() -> new WorkspaceHandler(WorkspaceErrorStatus._WORKSPACE_NOT_FOUND));
+
+        return workspaceQueryDslRepository.findWorkspaceMembersWithTeams(workspace);
     }
 }

@@ -12,6 +12,7 @@ import com.example.Veco.domain.workspace.service.WorkspaceCommandService;
 import com.example.Veco.domain.workspace.service.WorkspaceQueryService;
 import com.example.Veco.global.apiPayload.ApiResponse;
 import com.example.Veco.global.auth.oauth2.CustomOAuth2User;
+import com.example.Veco.global.auth.user.userdetails.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,6 +24,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Validated
 @RestController
@@ -84,5 +87,17 @@ public class WorkspaceRestController {
                 workspaceCommandService.createTeam(request); // 팀 생성
 
         return ApiResponse.onSuccess(response); // 생성된 팀 정보 + 멤버 목록 반환
+    }
+
+    @GetMapping("/setting/members")
+    @Operation(summary = "워크스페이스 내의 멤버 정보를 조회합니다.")
+    public ApiResponse<List<WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto>> getWorkspaceMembers(
+            @AuthenticationPrincipal CustomUserDetails user) {
+
+        Member member = user.getMember();
+        List<WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto> result =
+                workspaceQueryService.getWorkspaceMembers(member);
+
+        return ApiResponse.onSuccess(result);
     }
 }

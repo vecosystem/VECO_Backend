@@ -79,4 +79,23 @@ public class WorkspaceResponseDTO {
             private String memberName;
         }
     }
+
+    @Getter
+    @Builder
+    public static class WorkspaceMemberWithTeamsDto {
+        private Long memberId;
+        private String email;
+        private String name;
+        private String profileUrl;
+        private List<TeamInfoDto> teams;
+        private LocalDateTime joinedAt;
+
+        @Getter
+        @Builder
+        public static class TeamInfoDto {
+            private Long teamId;
+            private String teamName;
+            private String teamProfileUrl;
+        }
+    }
 }
