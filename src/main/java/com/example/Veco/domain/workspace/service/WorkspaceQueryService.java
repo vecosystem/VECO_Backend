@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @Service
 public interface WorkspaceQueryService {
 
-    public WorkSpace getWorkSpaceByMember(Member member);
+    WorkSpace getWorkSpaceByMember(Member member);
 
-   WorkspaceResponseDTO.WorkspaceTeamListDto getTeamListByWorkSpace(Pageable pageable, WorkSpace workspace);
+    WorkspaceResponseDTO.WorkspaceTeamListDto getTeamListByWorkSpace(Pageable pageable, WorkSpace workspace);
 }

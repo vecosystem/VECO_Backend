@@ -35,37 +35,54 @@ public class WorkspaceRestController {
     private final TeamQueryService teamQueryService;
     private final WorkspaceCommandService workspaceCommandService;
 
+    /**
+     * 워크스페이스 정보 조회
+     * - 로그인한 멤버의 워크스페이스 정보를 반환
+     */
     @GetMapping("/setting")
     @Operation(summary = "워크스페이스 정보를 조회합니다.")
-    public ApiResponse<WorkspaceResponseDTO.WorkspaceResponseDto> getWorkspaceInfo(@AuthenticationPrincipal CustomOAuth2User user) {
-
-        Member member = user.getMember();
-        WorkSpace workspace = workspaceQueryService.getWorkSpaceByMember(member);
+    public ApiResponse<WorkspaceResponseDTO.WorkspaceResponseDto> getWorkspaceInfo(
+            @AuthenticationPrincipal CustomOAuth2User user // 로그인된 사용자 정보
+    ) {
+        Member member = user.getMember(); // 로그인한 멤버 추출
+        WorkSpace workspace = workspaceQueryService.getWorkSpaceByMember(member); // 워크스페이스 조회
         return ApiResponse.onSuccess(WorkspaceConverter.toWorkspaceResponse(workspace));
     }
 
+    /**
+     * 워크스페이스 내 팀 목록 조회 (페이징)
+     * - 팀 ID 기준 내림차순 정렬
+     * - 각 팀의 멤버 수 포함
+     */
     @GetMapping("/setting/teams")
     @Operation(summary = "워크스페이스 안의 팀 목록을 조회합니다.")
     public ApiResponse<WorkspaceResponseDTO.WorkspaceTeamListDto> getTeamList(
-            @AuthenticationPrincipal CustomOAuth2User user,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-
+            @AuthenticationPrincipal CustomOAuth2User user, // 로그인 유저
+            @RequestParam(defaultValue = "0") int page,     // 페이지 번호 (기본 0)
+            @RequestParam(defaultValue = "20") int size     // 페이지 크기 (기본 20)
+    ) {
         Member member = user.getMember();
         WorkSpace workspace = workspaceQueryService.getWorkSpaceByMember(member);
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
-        WorkspaceResponseDTO.WorkspaceTeamListDto result = workspaceQueryService.getTeamListByWorkSpace(pageable, workspace);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending()); // 페이지 설정
+        WorkspaceResponseDTO.WorkspaceTeamListDto result =
+                workspaceQueryService.getTeamListByWorkSpace(pageable, workspace); // 팀 목록 조회
 
         return ApiResponse.onSuccess(result);
     }
 
+    /**
+     * 워크스페이스 내 팀 생성 API
+     * - 팀 이름 및 멤버 ID 리스트를 요청 바디로 받아 팀 생성
+     */
     @PostMapping("/setting/teams")
     @Operation(summary = "워크스페이스 안에 팀을 생성합니다.")
     public ApiResponse<WorkspaceResponseDTO.CreateTeamResponseDto> createTeam(
-            @RequestBody WorkspaceRequestDTO.CreateTeamRequestDto request
-            ) {
-        WorkspaceResponseDTO.CreateTeamResponseDto response = workspaceCommandService.createTeam(request);
-        return ApiResponse.onSuccess(response);
+            @RequestBody WorkspaceRequestDTO.CreateTeamRequestDto request // 팀 이름 + 멤버 ID 리스트
+    ) {
+        WorkspaceResponseDTO.CreateTeamResponseDto response =
+                workspaceCommandService.createTeam(request); // 팀 생성
+
+        return ApiResponse.onSuccess(response); // 생성된 팀 정보 + 멤버 목록 반환
     }
 }

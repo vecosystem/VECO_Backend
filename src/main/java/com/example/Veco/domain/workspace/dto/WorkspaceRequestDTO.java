@@ -9,6 +9,10 @@ import java.util.List;
 
 public class WorkspaceRequestDTO {
 
+    /**
+     * 팀 생성 요청 DTO
+     * - 팀 이름, 멤버 ID 리스트를 전달받음
+     */
     @Builder
     @Getter
     @NoArgsConstructor

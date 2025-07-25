@@ -7,5 +7,5 @@ import org.springframework.stereotype.Service;
 @Service
 public interface WorkspaceCommandService {
 
-    public WorkspaceResponseDTO.CreateTeamResponseDto createTeam(WorkspaceRequestDTO.CreateTeamRequestDto request);
+    WorkspaceResponseDTO.CreateTeamResponseDto createTeam(WorkspaceRequestDTO.CreateTeamRequestDto request);
 }

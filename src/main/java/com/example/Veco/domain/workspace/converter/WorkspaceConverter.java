@@ -12,6 +12,9 @@ import java.util.stream.Collectors;
 
 public class WorkspaceConverter {
 
+    /**
+     * Workspace 기본 정보 응답 DTO 변환
+     */
     public static WorkspaceResponseDTO.WorkspaceResponseDto toWorkspaceResponse(WorkSpace workspace) {
         return WorkspaceResponseDTO.WorkspaceResponseDto.builder()
                 .name(workspace.getName())
@@ -20,6 +23,9 @@ public class WorkspaceConverter {
                 .build();
     }
 
+    /**
+     * 워크 스페이스 내 단일 팀 정보 DTO 변환
+     */
     public static WorkspaceResponseDTO.WorkspaceTeamDto toWorkspaceTeamDto(Team team, int memberCount) {
         return WorkspaceResponseDTO.WorkspaceTeamDto.builder()
                 .teamId(team.getId())
@@ -28,6 +34,10 @@ public class WorkspaceConverter {
                 .build();
     }
 
+    /**
+     * 워크 스페이스 내 팀 리스트 조회 응답 DTO 변환
+     * - 페이지네이션 된 Team + 각 팀별 멤버 수 Map
+     */
     public static WorkspaceResponseDTO.WorkspaceTeamListDto toWorkspaceTeamListDto(
             Page<Team> teamPage, Map<Long, Integer> memberCountMap) {
 
@@ -47,6 +57,10 @@ public class WorkspaceConverter {
                 .build();
     }
 
+    /**
+     * 팀 생성 응답 DTO 변환
+     * - Team + 멤버 리스트
+     */
     public static WorkspaceResponseDTO.CreateTeamResponseDto toCreateTeamResponseDto(Team team, List<Member> members) {
         return WorkspaceResponseDTO.CreateTeamResponseDto.builder()
                 .teamId(team.getId())
