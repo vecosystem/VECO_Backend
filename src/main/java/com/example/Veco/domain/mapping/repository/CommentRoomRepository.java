@@ -8,7 +8,5 @@ import java.util.Optional;
 
 public interface CommentRoomRepository extends JpaRepository<CommentRoom, Long> {
     CommentRoom findByRoomTypeAndTargetId(Category category, Long targetId);
-    Optional<CommentRoom> findByIssueId(Long issueId);
-    Optional<CommentRoom> findByExternalId(Long externalId);
-    Optional<CommentRoom> findByGoalId(Long goalId);
+    boolean existsByRoomTypeAndTargetId(Category category, Long targetId);
 }

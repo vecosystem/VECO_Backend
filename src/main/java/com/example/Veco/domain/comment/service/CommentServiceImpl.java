@@ -6,7 +6,7 @@ import com.example.Veco.domain.comment.dto.request.CommentCreateDTO;
 import com.example.Veco.domain.comment.dto.response.CommentResponseDTO;
 import com.example.Veco.domain.comment.entity.Comment;
 import com.example.Veco.domain.comment.entity.CommentRoom;
-import com.example.Veco.domain.comment.repository.repository.CommentRepository;
+import com.example.Veco.domain.comment.repository.CommentRepository;
 import com.example.Veco.domain.external.exception.ExternalException;
 import com.example.Veco.domain.external.exception.code.ExternalErrorCode;
 import com.example.Veco.domain.external.repository.ExternalRepository;

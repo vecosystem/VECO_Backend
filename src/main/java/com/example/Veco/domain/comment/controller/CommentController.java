@@ -79,4 +79,5 @@ public class CommentController {
             @RequestParam("category") Category category) {
         return ApiResponse.onSuccess(commentService.getComments(targetId, category));
     }
+
 }
