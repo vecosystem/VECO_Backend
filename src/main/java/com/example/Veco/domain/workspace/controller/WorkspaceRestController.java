@@ -125,7 +125,7 @@ public class WorkspaceRestController {
 
         WorkSpace workspace = workspaceQueryService.getWorkSpaceByMember(member);
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending()); // 페이지 설정
+        Pageable pageable = PageRequest.of(page, size, Sort.by("order").ascending()); // order를 기준으로 페이지 설정
         WorkspaceResponseDTO.WorkspaceTeamListDto result =
                 workspaceQueryService.getTeamListByWorkSpace(pageable, workspace); // 팀 목록 조회
 
@@ -170,5 +170,23 @@ public class WorkspaceRestController {
                 workspaceQueryService.getWorkspaceMembers(member);
 
         return ApiResponse.onSuccess(result);
+    }
+
+    /**
+     *
+     */
+    @PatchMapping("/setting/teams")
+    @Operation(summary = "사이드 바의 팀 목록 순서를 수정합니다.")
+    public ApiResponse<Void> updateTeamOrder(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody WorkspaceRequestDTO.TeamOrderRequestDto request
+    ) {
+        String socialUid = userDetails.getSocialUid();
+        Member member = memberQueryService.getMemberBySocialUid(socialUid);
+        WorkSpace workspace = workspaceQueryService.getWorkSpaceByMember(member);
+
+        workspaceCommandService.updateTeamOrder(workspace, request.getTeamIdList());
+
+        return ApiResponse.onSuccess(null);
     }
 }

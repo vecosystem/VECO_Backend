@@ -7,6 +7,8 @@ import com.example.Veco.domain.member.error.MemberErrorStatus;
 import com.example.Veco.domain.member.error.MemberHandler;
 import com.example.Veco.domain.member.repository.MemberRepository;
 import com.example.Veco.domain.team.entity.Team;
+import com.example.Veco.domain.team.exception.TeamException;
+import com.example.Veco.domain.team.exception.code.TeamErrorCode;
 import com.example.Veco.domain.team.repository.TeamRepository;
 import com.example.Veco.domain.workspace.converter.WorkspaceConverter;
 import com.example.Veco.domain.workspace.dto.WorkspaceRequestDTO;
@@ -15,6 +17,7 @@ import com.example.Veco.domain.workspace.entity.WorkSpace;
 import com.example.Veco.domain.workspace.repository.WorkspaceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -62,5 +65,22 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
 
         // 6. 응답 DTO 생성 후 반환
         return WorkspaceConverter.toCreateTeamResponseDto(team, members);
+    }
+
+    @Transactional
+    @Override
+    public void updateTeamOrder(WorkSpace workspace, List<Long> teamIdList) {
+        for (int i = 0; i < teamIdList.size(); i++) {
+            Long teamId = teamIdList.get(i);
+            Team team = teamRepository.findById(teamId)
+                    .orElseThrow(() -> new TeamException(TeamErrorCode._NOT_FOUND));
+
+            // 워크스페이스에 속한 팀인지 확인
+            if (!team.getWorkSpace().equals(workspace)) {
+                throw new TeamException(TeamErrorCode._TEAM_NOT_IN_WORKSPACE);
+            }
+
+            team.updateOrder(i); // 인덱스를 order로 저장
+        }
     }
 }

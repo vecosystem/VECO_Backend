@@ -21,4 +21,15 @@ public class WorkspaceRequestDTO {
         private String teamName;
         private List<Long> memberId;
     }
+
+    /**
+     *
+     */
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TeamOrderRequestDto {
+        private List<Long> teamIdList;
+    }
 }
