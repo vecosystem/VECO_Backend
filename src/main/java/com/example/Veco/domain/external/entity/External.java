@@ -56,6 +56,9 @@ public class External extends BaseEntity {
     @Column(name = "external_number", nullable = false)
     private Integer external_number;
 
+    @Column(name = "external_code", nullable = false)
+    private String externalCode;
+
     // 연관 관계
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")

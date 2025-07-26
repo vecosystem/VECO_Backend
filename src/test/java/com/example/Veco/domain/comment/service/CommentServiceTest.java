@@ -1,7 +1,7 @@
 package com.example.Veco.domain.comment.service;
 
 import com.example.Veco.domain.comment.dto.request.CommentCreateDTO;
-import com.example.Veco.domain.comment.dto.response.CommentResponseDTO;
+import com.example.Veco.domain.comment.dto.response.CommentListResponseDTO;
 import com.example.Veco.domain.comment.entity.Comment;
 import com.example.Veco.domain.comment.entity.CommentRoom;
 import com.example.Veco.domain.comment.repository.CommentRepository;
@@ -17,6 +17,7 @@ import com.example.Veco.domain.issue.repository.IssueRepository;
 import com.example.Veco.domain.mapping.repository.CommentRoomRepository;
 import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.member.repository.MemberRepository;
+import com.example.Veco.domain.profile.entity.Profile;
 import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.domain.team.repository.TeamRepository;
 import com.example.Veco.global.auth.user.userdetails.CustomUserDetails;
@@ -29,6 +30,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
+import jakarta.persistence.EntityManager;
 
 import java.util.List;
 
@@ -64,6 +66,9 @@ class CommentServiceTest {
     @Autowired
     private ExternalRepository externalRepository;
     
+    @Autowired
+    private EntityManager entityManager;
+    
     private Member testMember;
     private Team testTeam;
     private Issue testIssue;
@@ -78,12 +83,20 @@ class CommentServiceTest {
                 .build();
         teamRepository.save(testTeam);
         
+        // 테스트용 프로필 생성
+        Profile testProfile = Profile.builder()
+                .name("testUser")
+                .profileImageUrl("http://example.com/profile.jpg")
+                .build();
+        entityManager.persist(testProfile);
+        
         // 테스트용 멤버 생성
         testMember = Member.builder()
                 .socialUid("test-uid")
                 .email("test@example.com")
                 .name("testUser")
                 .nickname("testUser")
+                .profile(testProfile)
                 .build();
         memberRepository.save(testMember);
         
@@ -109,6 +122,7 @@ class CommentServiceTest {
                 .title("Test External")
                 .content("Test External Content")
                 .external_number(2)
+                .externalCode("TEST-EXT-001")
                 .name("Test External Name")
                 .build();
         externalRepository.save(testExternal);
@@ -205,23 +219,41 @@ class CommentServiceTest {
         commentService.addComment(commentCreateDTO2);
         
         // when
-        List<CommentResponseDTO> comments = commentService.getComments(testIssue.getId(), Category.ISSUE);
+        CommentListResponseDTO response = commentService.getComments(testIssue.getId(), Category.ISSUE);
         
         // then
-        assertThat(comments).hasSize(2);
-        assertThat(comments.get(0).getContent()).isEqualTo("Second comment"); // 최신순 정렬
-        assertThat(comments.get(1).getContent()).isEqualTo("First comment");
-        assertThat(comments.get(0).getAuthor().getAuthorName()).isEqualTo("testUser");
+        // 총 댓글 수 검증
+        assertThat(response.getTotalSize()).isEqualTo(2);
+        assertThat(response.getComments()).hasSize(2);
+        
+        // 댓글 내용 검증 (최신순 정렬)
+        assertThat(response.getComments().get(0).getContent()).isEqualTo("Second comment");
+        assertThat(response.getComments().get(1).getContent()).isEqualTo("First comment");
+        
+        // 작성자 정보 검증
+        CommentListResponseDTO.CommentResponseDTO firstComment = response.getComments().get(0);
+        CommentListResponseDTO.CommentResponseDTO secondComment = response.getComments().get(1);
+        
+        assertThat(firstComment.getCommentId()).isNotNull();
+        assertThat(firstComment.getAuthor().getAuthorId()).isEqualTo(testMember.getId());
+        assertThat(firstComment.getAuthor().getAuthorName()).isEqualTo("testUser");
+        assertThat(firstComment.getCreatedAt()).isNotNull();
+        
+        assertThat(secondComment.getCommentId()).isNotNull();
+        assertThat(secondComment.getAuthor().getAuthorId()).isEqualTo(testMember.getId());
+        assertThat(secondComment.getAuthor().getAuthorName()).isEqualTo("testUser");
+        assertThat(secondComment.getCreatedAt()).isNotNull();
     }
     
     @DisplayName("댓글 조회 성공 - 댓글이 없는 경우")
     @Test
     void getComments_Success_NoComments() {
         // when
-        List<CommentResponseDTO> comments = commentService.getComments(testIssue.getId(), Category.ISSUE);
+        CommentListResponseDTO response = commentService.getComments(testIssue.getId(), Category.ISSUE);
         
         // then
-        assertThat(comments).isEmpty();
+        assertThat(response.getTotalSize()).isEqualTo(0);
+        assertThat(response.getComments()).isEmpty();
     }
     
     @DisplayName("댓글 조회 실패 - 존재하지 않는 리소스")

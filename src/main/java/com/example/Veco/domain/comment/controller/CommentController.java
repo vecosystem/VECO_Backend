@@ -1,7 +1,7 @@
 package com.example.Veco.domain.comment.controller;
 
 import com.example.Veco.domain.comment.dto.request.CommentCreateDTO;
-import com.example.Veco.domain.comment.dto.response.CommentResponseDTO;
+import com.example.Veco.domain.comment.dto.response.CommentListResponseDTO;
 import com.example.Veco.domain.comment.service.CommentService;
 import com.example.Veco.global.apiPayload.ApiResponse;
 import com.example.Veco.global.enums.Category;
@@ -63,7 +63,7 @@ public class CommentController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200",
                     description = "댓글 목록 조회 성공",
-                    content = @Content(schema = @Schema(implementation = CommentResponseDTO.class))
+                    content = @Content(schema = @Schema(implementation = CommentListResponseDTO.class))
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
@@ -72,7 +72,7 @@ public class CommentController {
             )
     })
     @GetMapping
-    public ApiResponse<List<CommentResponseDTO>> getAllComments(
+    public ApiResponse<CommentListResponseDTO> getAllComments(
             @Parameter(description = "댓글을 조회할 대상 리소스의 ID", required = true, example = "1")
             @RequestParam("targetId") Long targetId,
             @Parameter(description = "리소스 카테고리 (ISSUE, GOAL, EXTERNAL)", required = true, example = "ISSUE")

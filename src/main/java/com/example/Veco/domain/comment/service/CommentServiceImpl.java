@@ -3,7 +3,7 @@ package com.example.Veco.domain.comment.service;
 import com.example.Veco.domain.comment.converter.CommentConverter;
 import com.example.Veco.domain.comment.converter.CommentRoomConverter;
 import com.example.Veco.domain.comment.dto.request.CommentCreateDTO;
-import com.example.Veco.domain.comment.dto.response.CommentResponseDTO;
+import com.example.Veco.domain.comment.dto.response.CommentListResponseDTO;
 import com.example.Veco.domain.comment.entity.Comment;
 import com.example.Veco.domain.comment.entity.CommentRoom;
 import com.example.Veco.domain.comment.repository.CommentRepository;
@@ -58,21 +58,19 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Transactional(readOnly = true)
-    public List<CommentResponseDTO> getComments(Long targetId, Category category) {
+    public CommentListResponseDTO getComments(Long targetId, Category category) {
         // 리소스 존재 여부 검증
         validateResourceExists(targetId, category);
         
         CommentRoom commentRoom = commentRoomRepository.findByRoomTypeAndTargetId(category, targetId);
         
         if (commentRoom == null) {
-            return new ArrayList<>(); // 댓글방이 없으면 빈 리스트 반환
+            return CommentConverter.toCommentResponseDTO(new ArrayList<>()); // 댓글방이 없으면 빈 리스트 반환
         }
 
         List<Comment> comments = commentRepository.findAllByCommentRoomOrderByIdDesc(commentRoom);
-        
-        return comments.stream()
-                .map(CommentConverter::toCommentResponseDTO)
-                .toList();
+
+        return CommentConverter.toCommentResponseDTO(comments);
     }
 
     private CommentRoom findOrCreateCommentRoom(Long resourceId, Category resourceType) {

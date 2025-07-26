@@ -14,6 +14,6 @@ public class CommentRoomResponseDTO {
 
         private Long commentRoomId;
         private int size;
-        private List<CommentResponseDTO> comments;
+        private List<CommentListResponseDTO> comments;
     }
 }

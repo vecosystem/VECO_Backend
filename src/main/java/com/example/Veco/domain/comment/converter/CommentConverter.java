@@ -1,10 +1,13 @@
 package com.example.Veco.domain.comment.converter;
 
 import com.example.Veco.domain.comment.dto.request.CommentCreateDTO;
-import com.example.Veco.domain.comment.dto.response.CommentResponseDTO;
+import com.example.Veco.domain.comment.dto.response.CommentListResponseDTO;
 import com.example.Veco.domain.comment.entity.Comment;
 import com.example.Veco.domain.comment.entity.CommentRoom;
 import com.example.Veco.domain.member.entity.Member;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CommentConverter {
 
@@ -19,23 +22,30 @@ public class CommentConverter {
         return comment;
     }
 
-    public static CommentResponseDTO toCommentResponseDTO(Comment comment) {
-        String profileImageUrl = null;
-        if (comment.getMember().getProfile() != null) {
-            profileImageUrl = comment.getMember().getProfile().getProfileImageUrl();
-        }
-        
-        CommentResponseDTO.AuthorResponseDTO authorDTO = CommentResponseDTO.AuthorResponseDTO.builder()
-                .authorId(comment.getMember().getId())
-                .authorName(comment.getMember().getName())
-                .profileImageUrl(profileImageUrl)
-                .build();
+    public static CommentListResponseDTO toCommentResponseDTO(List<Comment> comments) {
 
-        return CommentResponseDTO.builder()
-                .commentId(comment.getId())
-                .content(comment.getContent())
-                .author(authorDTO)
-                .createdAt(comment.getCreatedAt())
+        List<CommentListResponseDTO.CommentResponseDTO> commentResponseDTOS = new ArrayList<>();
+
+        comments.forEach(comment -> {
+            CommentListResponseDTO.AuthorResponseDTO authorDTO = CommentListResponseDTO.AuthorResponseDTO.builder()
+                    .authorId(comment.getMember().getId())
+                    .authorName(comment.getMember().getName())
+                    .profileImageUrl(comment.getMember().getProfile().getProfileImageUrl())
+                    .build();
+
+            CommentListResponseDTO.CommentResponseDTO commentDTO = CommentListResponseDTO.CommentResponseDTO.builder()
+                    .commentId(comment.getId())
+                    .content(comment.getContent())
+                    .author(authorDTO)
+                    .createdAt(comment.getCreatedAt())
+                    .build();
+
+            commentResponseDTOS.add(commentDTO);
+        });
+
+        return CommentListResponseDTO.builder()
+                .comments(commentResponseDTOS)
+                .totalSize(comments.size())
                 .build();
     }
 }
