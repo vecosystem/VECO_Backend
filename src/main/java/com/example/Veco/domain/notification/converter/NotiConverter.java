@@ -45,7 +45,7 @@ public class NotiConverter {
     }
 
     public NotiResDTO.GroupedNotiList<NotiResDTO.IssuePreViewDTO> toIssuePreviewListByState(List<NotiResDTO.IssuePreViewDTO> list, LocalDate deadline) {
-        List<State> order = Arrays.asList(State.NONE, State.DOING, State.TODO);
+        List<State> order = Arrays.asList(State.NONE, State.IN_PROGRESS, State.TODO);
 
         List<NotiResDTO.GroupedNotiList.NotiGroup<NotiResDTO.IssuePreViewDTO>> grouped = order.stream()
                 .map(state -> {
@@ -131,7 +131,7 @@ public class NotiConverter {
     }
 
     public NotiResDTO.GroupedNotiList<NotiResDTO.GoalPreViewDTO> toGoalPreviewListByState(List<NotiResDTO.GoalPreViewDTO> list, LocalDate deadline) {
-        List<State> order = Arrays.asList(State.NONE, State.DOING,State.TODO);
+        List<State> order = Arrays.asList(State.NONE, State.IN_PROGRESS,State.TODO);
 
         List<NotiResDTO.GroupedNotiList.NotiGroup<NotiResDTO.GoalPreViewDTO>> grouped = order.stream()
                 .map(state -> {
