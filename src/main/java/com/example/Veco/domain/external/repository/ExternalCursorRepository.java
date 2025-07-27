@@ -1,5 +1,6 @@
 package com.example.Veco.domain.external.repository;
 
+import com.example.Veco.domain.assignee.entity.QAssignee;
 import com.example.Veco.domain.external.converter.ExternalConverter;
 import com.example.Veco.domain.external.dto.ExternalCursor;
 import com.example.Veco.domain.external.dto.ExternalResponseDTO;
@@ -28,7 +29,7 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
 
     private final JPAQueryFactory queryFactory;
     private final QExternal external = QExternal.external;
-    private final QAssignment assignment = QAssignment.assignment;
+    private final QAssignee assignee = QAssignee.assignee;
     private final AssigmentRepository assigmentRepository;
 
     public ExternalCursorRepository(EntityManager entityManager, AssigmentRepository assigmentRepository) {
@@ -132,7 +133,7 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
                 case NONE -> 1;
                 case TODO -> 2;
                 case IN_PROGRESS -> 3;
-                case DONE -> 4;
+                case FINISH -> 4;
                 case REVIEW -> 5;
                 default -> null;
             };
@@ -165,7 +166,7 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
                 .when(external.state.eq(State.NONE)).then(1)
                 .when(external.state.eq(State.TODO)).then(2)
                 .when(external.state.eq(State.IN_PROGRESS)).then(3)
-                .when(external.state.eq(State.DONE)).then(4)
+                .when(external.state.eq(State.FINISH)).then(4)
                 .when(external.state.eq(State.REVIEW)).then(5)
                 .otherwise(6);
     }

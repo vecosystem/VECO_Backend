@@ -118,7 +118,7 @@ public class External extends BaseEntity {
     }
 
     public void closeIssue(){
-        this.state = State.DONE;
+        this.state = State.FINISH;
     }
 
     public void updateExternalByGithubIssue(GitHubWebhookPayload.Issue issue ){
