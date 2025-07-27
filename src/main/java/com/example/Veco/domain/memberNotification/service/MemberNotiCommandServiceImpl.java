@@ -1,6 +1,8 @@
 package com.example.Veco.domain.memberNotification.service;
 
 import com.example.Veco.domain.memberNotification.entity.MemberNotification;
+import com.example.Veco.domain.memberNotification.exception.MemberNotiException;
+import com.example.Veco.domain.memberNotification.exception.code.MemberNotiErrorCode;
 import com.example.Veco.domain.memberNotification.repository.MemberNotiRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +21,7 @@ public class MemberNotiCommandServiceImpl implements MemberNotiCommandService {
     public void markAsRead(Long memberId, Long alarmId) {
         MemberNotification memberNotification = memberNotiRepository
                 .findById(alarmId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 알림이 존재하지 않습니다.")); // FIXME
+                .orElseThrow(() -> new MemberNotiException(MemberNotiErrorCode.NOT_FOUND));
         // TODO : 사용자 검증
         memberNotification.markAsRead();
     }
