@@ -1,5 +1,6 @@
 package com.example.Veco.domain.memberNotification.controller;
 
+import com.example.Veco.domain.memberNotification.exception.code.MemberNotiSuccessCode;
 import com.example.Veco.domain.memberNotification.service.MemberNotiCommandService;
 import com.example.Veco.global.apiPayload.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,7 +29,7 @@ public class memberNotiController {
             @PathVariable Long alarmId
     ){
         memberNotiCommandService.markAsRead(memberId, alarmId);
-        return ApiResponse.onSuccess(null);
+        return ApiResponse.onSuccess(MemberNotiSuccessCode.UPDATE,null);
     }
 
     @Operation(
@@ -42,7 +43,7 @@ public class memberNotiController {
             @RequestBody List<Long> alarmIds
     ) {
         memberNotiCommandService.deleteMemberNotifications(memberId, alarmIds);
-        return ApiResponse.onSuccess(null);
+        return ApiResponse.onSuccess(MemberNotiSuccessCode.DELETE,null);
     }
 
 }
