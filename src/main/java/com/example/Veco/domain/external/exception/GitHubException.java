@@ -1,10 +1,10 @@
-package com.example.Veco.domain.team.exception;
+package com.example.Veco.domain.external.exception;
 
 import com.example.Veco.global.apiPayload.code.BaseErrorStatus;
 import com.example.Veco.global.apiPayload.exception.VecoException;
 
-public class TeamException extends VecoException {
-    public TeamException(BaseErrorStatus errorStatus) {
+public class GitHubException extends VecoException {
+    public GitHubException(BaseErrorStatus errorStatus) {
         super(errorStatus);
     }
 }
