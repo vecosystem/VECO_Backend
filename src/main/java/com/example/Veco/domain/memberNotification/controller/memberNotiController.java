@@ -4,6 +4,7 @@ import com.example.Veco.domain.memberNotification.exception.code.MemberNotiSucce
 import com.example.Veco.domain.memberNotification.service.MemberNotiCommandService;
 import com.example.Veco.global.apiPayload.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +26,8 @@ public class memberNotiController {
     )
     @PatchMapping("{memberId}/{alarmId}")
     public ApiResponse<Void> getAlarmList(
-            @PathVariable Long memberId,  // HACK: memberId 임시 사용
-            @PathVariable Long alarmId
+            @Parameter(description = "멤버ID (임시사용)") @PathVariable("memberId") Long memberId,  // HACK: memberId 임시 사용
+            @Parameter(description = "알림ID", required = true) @PathVariable("alarmId") Long alarmId
     ){
         memberNotiCommandService.markAsRead(memberId, alarmId);
         return ApiResponse.onSuccess(MemberNotiSuccessCode.UPDATE,null);
@@ -39,8 +40,8 @@ public class memberNotiController {
     )
     @DeleteMapping("{memberId}")
     public ApiResponse<Void> deleteAlarms(
-            @PathVariable Long memberId,   // HACK
-            @RequestBody List<Long> alarmIds
+            @Parameter(description = "멤버ID (임시사용)") @PathVariable("memberId") Long memberId,   // HACK
+            @Parameter(description = "알림ID 리스트", required = true) @RequestBody List<Long> alarmIds
     ) {
         memberNotiCommandService.deleteMemberNotifications(memberId, alarmIds);
         return ApiResponse.onSuccess(MemberNotiSuccessCode.DELETE,null);

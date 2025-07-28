@@ -6,6 +6,7 @@ import com.example.Veco.domain.notification.service.NotiQueryService;
 import com.example.Veco.global.apiPayload.ApiResponse;
 import com.example.Veco.global.enums.Category;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -26,9 +27,9 @@ public class NotiController {
     )
     @GetMapping("{memberId}/{alarmtype}")
     public ApiResponse<GroupedNotiList<?>> getAlarmList(
-            @PathVariable Long memberId,  // HACK: memberId 임시 사용
-            @PathVariable Category alarmtype,
-            @RequestParam(required = false, defaultValue = "state") String query
+            @Parameter(description = "멤버ID (임시사용)") @PathVariable("memberId") Long memberId,  // HACK: memberId 임시 사용
+            @Parameter(description = "알림타입", required = true) @PathVariable("alarmtype") Category alarmtype,
+            @Parameter(description = "필터 쿼리") @RequestParam(value = "query", required = false, defaultValue = "state") String query
     ){
         GroupedNotiList<?> result = notiQueryService.getNotiList(memberId,alarmtype,query);
         if (result != null){
