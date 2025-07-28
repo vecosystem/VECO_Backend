@@ -14,6 +14,7 @@ import com.example.Veco.domain.slack.converter.SlackConverter;
 import com.example.Veco.domain.slack.dto.SlackResDTO;
 import com.example.Veco.domain.slack.exception.SlackException;
 import com.example.Veco.domain.slack.exception.code.SlackErrorCode;
+import com.example.Veco.domain.slack.util.SlackUtil;
 import com.example.Veco.domain.workspace.entity.WorkSpace;
 import com.example.Veco.global.auth.jwt.util.JwtUtil;
 import com.example.Veco.global.enums.ExtServiceType;
@@ -22,10 +23,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -36,20 +38,35 @@ public class SlackCommandService {
     private final ExternalServiceRepository externalServiceRepository;
     private final LinkRepository linkRepository;
     private final MemberRepository memberRepository;
-    private final JwtUtil jwtUtil;
 
-    // 비공개 값
+    // 유틸
+    private final JwtUtil jwtUtil;
+    private final SlackUtil slackUtil;
+
+    // yml 값
     @Value("${slack.client-id}")
     private String clientId;
-    @Value("${slack.client-secret}")
-    private String clientSecret;
+    @Value("${slack.scope}")
+    private String scope;
 
-    WebClient client = WebClient.builder()
-            .baseUrl("https://slack.com/api")
-            .defaultHeader("Content-Type", "application/x-www-form-urlencoded")
-            .build();
+    // 리다이렉트 링크 생성
+    public RedirectView redirectSlackOAuth(
+            String token
+    ){
+        // 토큰 Bearer 제거
+        token = token.replace("Bearer ", "");
 
-    // Slack App 설치 과정
+        String url = "https://slack.com/oauth/v2/authorize?" +
+                "client_id="+clientId+
+                "&scope="+scope+
+                "&state="+token;
+
+        RedirectView redirectView = new RedirectView();
+        redirectView.setUrl(url);
+        return redirectView;
+    }
+
+    // Slack 연동 비즈니스 로직
     @Transactional
     public SlackResDTO.InstallApp installApp(
             String code,
@@ -61,16 +78,7 @@ public class SlackCommandService {
                 .orElseThrow(() -> new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND));
 
         // Bot Access Token 발급
-        SlackResDTO.ExchangeAccessToken tokenResult = client.post()
-                .uri("/oauth.v2.access")
-                .bodyValue(
-                        "code=" + code +
-                        "&client_id=" + clientId +
-                        "&client_secret=" + clientSecret
-                )
-                .retrieve()
-                .bodyToMono(SlackResDTO.ExchangeAccessToken.class)
-                .block();
+        SlackResDTO.ExchangeAccessToken tokenResult = slackUtil.ExchangeAccessToken(code);
 
         // 정상적으로 토큰 발급되었는지 검증
         if (!(tokenResult != null && tokenResult.ok())){
@@ -82,12 +90,7 @@ public class SlackCommandService {
         String channelId = "";
         boolean breakPoint = false;
         do {
-            SlackResDTO.GetChannelList channelResult = client.get()
-                    .uri("/conversations.list")
-                    .header("Authorization", "Bearer " + tokenResult.access_token())
-                    .retrieve()
-                    .bodyToMono(SlackResDTO.GetChannelList.class)
-                    .block();
+            SlackResDTO.GetChannelList channelResult = slackUtil.GetChannelList(tokenResult.access_token());
 
             // 응답이 제대로 오지 않은 경우
             if (!(channelResult != null && channelResult.ok())) {
@@ -110,21 +113,45 @@ public class SlackCommandService {
             throw new SlackException(SlackErrorCode.LIST_FAILED);
         }
 
+        // 채널 참여
+        SlackResDTO.JoinChannel joinResult = slackUtil.joinChannel(tokenResult.access_token(), channelId);
+
+        // 창여 실패시
+        if (!(joinResult != null && joinResult.ok())) {
+            throw new SlackException(SlackErrorCode.JOIN_FAILED);
+        }
+
         // 조회한 정보들 모두 저장 (연동)
         WorkSpace workspace = member.getWorkSpace();
 
-        ExternalService externalService = ExternalServiceConverter.toExternalService(
-                ExtServiceType.SLACK,
-                tokenResult.access_token(),
-                channelId
+        // 이미 존재하면 update
+        Optional<Link> link = linkRepository.findLinkByWorkspaceAndExternalService_ServiceType(
+                workspace, ExtServiceType.SLACK
         );
+        if (link.isPresent()) {
+            LocalDateTime now = LocalDateTime.now();
+            link.get().getExternalService().updateSlackDefaultChannelId(channelId);
+            link.get().getExternalService().updateAccessToken(tokenResult.access_token());
+            link.get().updateLinkedAt(now);
 
-        LocalDateTime now = LocalDateTime.now();
-        Link link = LinkConverter.toLink(now, workspace, externalService);
+            return SlackConverter.toInstallApp(
+                    link.get().getWorkspace().getId(), link.get().getLinkedAt()
+            );
+        } else { // 존재하지 않는 경우
 
-        externalServiceRepository.save(externalService);
-        linkRepository.save(link);
+            // 객체 생성
+            ExternalService externalService = ExternalServiceConverter.toExternalService(
+                    ExtServiceType.SLACK,
+                    tokenResult.access_token(),
+                    channelId
+            );
+            LocalDateTime now = LocalDateTime.now();
+            Link newLink = LinkConverter.toLink(now, workspace, externalService);
 
-        return SlackConverter.toInstallApp(workspace.getId(), now);
+            externalServiceRepository.save(externalService);
+            Link result = linkRepository.save(newLink);
+
+            return SlackConverter.toInstallApp(result.getWorkspace().getId(), result.getLinkedAt());
+        }
     }
 }

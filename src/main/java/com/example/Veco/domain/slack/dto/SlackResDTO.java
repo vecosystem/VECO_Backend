@@ -40,6 +40,22 @@ public class SlackResDTO {
             String error // 에러 발생시 상태 메시지
     ){}
 
+    // 채널 참여
+    @Builder
+    public record JoinChannel(
+            boolean ok,
+            boolean is_general,
+            String error // 에러 발생시 상태 메시지
+    ){}
+
+    // 메시지 전송
+    @Builder
+    public record PostSlackMessage(
+            boolean ok,
+            String text,
+            String error // 에러 발생시 상태 메시지
+    ){}
+
     // 부가 요소
     // Team
     private record Team(
