@@ -30,4 +30,9 @@ public class Link {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "external_service_id")
     private ExternalService externalService;
+
+    // update
+    public void updateLinkedAt(LocalDateTime linkedAt){
+        this.linkedAt = linkedAt;
+    }
 }

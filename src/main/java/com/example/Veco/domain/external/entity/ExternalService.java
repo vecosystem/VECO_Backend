@@ -25,4 +25,12 @@ public class ExternalService {
 
     @Column(name = "slack_default_channel_id")
     private String slackDefaultChannelId;
+
+    // update
+    public void updateAccessToken(String accessToken){
+        this.accessToken = accessToken;
+    }
+    public void updateSlackDefaultChannelId(String slackDefaultChannelId){
+        this.slackDefaultChannelId = slackDefaultChannelId;
+    }
 }
