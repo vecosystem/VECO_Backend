@@ -1,5 +1,5 @@
-# 도커 X
-name: CI/CD Pipeline (.jar)
+# 도커 O
+name: CI/CD PipeLine (Docker)
 
 on:
   push:
@@ -19,10 +19,10 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: application.yml 대체
+      - name: application.yml 추가
         run: |
-          cd ./src/main/resources
-          echo "${{ secrets.APPLICATION_YML }}" > ./application.yml
+          mkdir -p src/main/resources
+          echo "${{ secrets.APPLICATION_YML }}" > src/main/resources/application.yml
         shell: bash
 
       - name: gradlew 실행 권한 부여
@@ -32,38 +32,35 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: gradle 빌드
-        run: ./gradlew build -x test
+        run: ./gradlew clean build -x test
 
-      - name: 빌드된 아티팩트 업로드
-        uses: actions/upload-artifact@v4
+      - name: Docker Hub 로그인
+        uses: docker/login-action@v2
         with:
-          name: BackEnd
-          path: build/libs/*.jar
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Docker 이미지 빌드
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGENAME }} .
+
+      - name: docker 이미지 push
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGENAME }}
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
 
     steps:
-      - name: 아티팩트 다운로드
-        uses: actions/download-artifact@v4
+      - name: EC2에 Docker Image 배포
+        uses: appleboy/ssh-action@v0.1.6
         with:
-          name: BackEnd
-          path: build/libs/
-
-      - name: EC2 배포
-        env:
-          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
-          EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
-          EC2_HOST: ${{ secrets.EC2_HOST }}
-        run: |
-          echo "$EC2_SSH_KEY" > private_key.pem
-          chmod 600 private_key.pem
-          jar_file=$(find build/libs -name '*.jar' ! -name '*plain.jar' | head -n 1)
-          scp -i private_key.pem -o StrictHostKeyChecking=no "$jar_file" $EC2_USERNAME@$EC2_HOST:/home/$EC2_USERNAME/BackEnd.jar
-          ssh -i private_key.pem -o StrictHostKeyChecking=no $EC2_USERNAME@$EC2_HOST "
-            pgrep java | xargs -r kill -15  # 기존에 실행 중인 Java 프로세스 종료
-            sleep 10
-            nohup java -jar /home/$EC2_USERNAME/BackEnd.jar > app.log 2>&1 &  # 새 버전 애플리케이션 실행
-          "
-          rm -f private_key.pem  # 민감한 정보 삭제
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          timeout: 60s
+          script: |
+            sudo docker stop ${{ secrets.DOCKER_IMAGENAME }}
+            sudo docker rm ${{ secrets.DOCKER_IMAGENAME }}
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGENAME }}
+            sudo docker run -it -d --network host --name ${{ secrets.DOCKER_IMAGENAME }} -e TZ=Asia/Seoul ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGENAME }}
