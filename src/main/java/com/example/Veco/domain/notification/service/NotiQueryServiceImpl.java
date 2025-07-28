@@ -1,5 +1,7 @@
 package com.example.Veco.domain.notification.service;
 
+import com.example.Veco.domain.external.entity.External;
+import com.example.Veco.domain.external.repository.ExternalRepository;
 import com.example.Veco.domain.goal.entity.Goal;
 import com.example.Veco.domain.goal.repository.GoalRepository;
 import com.example.Veco.domain.issue.entity.Issue;
@@ -9,7 +11,10 @@ import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.memberNotification.entity.MemberNotification;
 import com.example.Veco.domain.memberNotification.repository.MemberNotiRepository;
 import com.example.Veco.domain.notification.converter.NotiConverter;
-import com.example.Veco.domain.notification.dto.NotiResDTO;
+import com.example.Veco.domain.notification.dto.NotiResDTO.*;
+import com.example.Veco.domain.notification.enums.FilterType;
+import com.example.Veco.domain.notification.exception.NotificationException;
+import com.example.Veco.domain.notification.exception.code.NotiErrorCode;
 import com.example.Veco.domain.reminder.service.ReminderService;
 import com.example.Veco.global.enums.Category;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +22,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,50 +35,77 @@ public class NotiQueryServiceImpl implements NotiQueryService {
     private final MemberNotiRepository memberNotiRepository;
     private final IssueRepository issueRepository;
     private final GoalRepository goalRepository;
+    private final ExternalRepository externalRepository;
     private final NotiConverter notiConverter;
     private final ReminderService reminderService;
 
-    public NotiResDTO.GroupedNotiList getNotiList(Long memberId, Category alarmType, String filter) {
-
-        // FIXME : 예외처리수정
+    public GroupedNotiList getNotiList(Long memberId, Category alarmType, String filter) {
         Optional<Member> member = memberRepository.findById(memberId);
         reminderService.handleReminder(member.orElse(null)); // 알림 동적 생성
 
         LocalDate deadline = LocalDate.now();
-
         List<MemberNotification> memberNotis = memberNotiRepository.findByMemberIdAndTypeAndNotDeleted(memberId, alarmType);
-
         List<Long> typeIds = memberNotis.stream()
-                .map(memberNoti -> memberNoti.getNotification().getTypeId())
+                .map(mn -> mn.getNotification().getTypeId())
                 .collect(Collectors.toList());
 
-        if (alarmType == Category.ISSUE) {
+        FilterType filterType = FilterType.from(filter);
 
-            List<Issue> issues = issueRepository.findByIdIn(typeIds);
-            List<NotiResDTO.IssuePreViewDTO> previews = notiConverter.toIssuePreviewDTOs(issues, memberNotis);
+        return switch (alarmType) {
+            case ISSUE -> handleIssue(typeIds, memberNotis, filterType, deadline);
+            case GOAL -> handleGoal(typeIds, memberNotis, filterType, deadline);
+            case EXTERNAL -> handleExternal(typeIds, memberNotis, filterType, deadline);
+            default -> throw new NotificationException(NotiErrorCode.QUERY_INVALID);
+        };
+    }
+    private GroupedNotiList handleIssue(List<Long> typeIds, List<MemberNotification> memberNotis,
+                                        FilterType filter, LocalDate deadline) {
+        List<Issue> issues = issueRepository.findByIdIn(typeIds);
+        Map<Long, MemberNotification> memberNotiMap = memberNotis.stream()
+                .collect(Collectors.toMap(
+                        mn -> mn.getNotification().getTypeId(),
+                        Function.identity()
+                ));
+        List<IssuePreViewDTO> previews = notiConverter.toIssuePreviewDTOs(issues, memberNotiMap);
 
-            if ("priority".equalsIgnoreCase(filter)) {
-                return notiConverter.toIssuePreviewListByPriority(previews, deadline);
-            } else { // default = state
-                return notiConverter.toIssuePreviewListByState(previews, deadline);
-            }
+        return switch (filter) {
+            case PRIORITY -> notiConverter.toIssuePreviewListByPriority(previews, deadline);
+            case GOAL -> notiConverter.toIssuePreviewListByGoal(previews, deadline);
+            default -> notiConverter.toIssuePreviewListByState(previews, deadline);
+        };
+    }
 
-        } else if (alarmType == Category.GOAL) {
+    private GroupedNotiList handleGoal(List<Long> typeIds, List<MemberNotification> memberNotis,
+                                       FilterType filter, LocalDate deadline) {
+        List<Goal> goals = goalRepository.findByIdIn(typeIds);
+        Map<Long, MemberNotification> memberNotiMap = memberNotis.stream()
+                .collect(Collectors.toMap(
+                        mn -> mn.getNotification().getTypeId(),
+                        Function.identity()
+                ));
+        List<GoalPreViewDTO> previews = notiConverter.toGoalPreviewDTOs(goals, memberNotiMap);
 
-            List<Goal> goals = goalRepository.findByIdIn(typeIds);
-            List<NotiResDTO.GoalPreViewDTO> previews = notiConverter.toGoalPreviewDTOs(goals, memberNotis);
+        return filter == FilterType.PRIORITY
+                ? notiConverter.toGoalPreviewListByPriority(previews, deadline)
+                : notiConverter.toGoalPreviewListByState(previews, deadline);
+    }
 
-            if ("priority".equalsIgnoreCase(filter)) {
-                return notiConverter.toGoalPreviewListByPriority(previews, deadline);
-            } else {
-                return notiConverter.toGoalPreviewListByState(previews, deadline);
-            }
+    private GroupedNotiList handleExternal(List<Long> typeIds, List<MemberNotification> memberNotis,
+                                           FilterType filter, LocalDate deadline) {
+        List<External> externals = externalRepository.findByIdIn(typeIds);
+        Map<Long, MemberNotification> memberNotiMap = memberNotis.stream()
+                .collect(Collectors.toMap(
+                        mn -> mn.getNotification().getTypeId(),
+                        Function.identity()
+                ));
+        List<ExternalPreViewDTO> previews = notiConverter.toExternalPreviewDTOs(externals, memberNotiMap);
 
-        } else {
-            // TODO : External 추가
-            throw new IllegalArgumentException("지원하지 않는 알림 타입입니다.");
-        }
-
+        return switch (filter) {
+            case PRIORITY -> notiConverter.toExternalPreviewListByPriority(previews, deadline);
+            case GOAL -> notiConverter.toExternalPreviewListByGoal(previews, deadline);
+            case EXTERNAL -> notiConverter.toExternalPreviewListByExternal(previews, deadline);
+            default -> notiConverter.toExternalPreviewListByState(previews, deadline);
+        };
     }
 
 }

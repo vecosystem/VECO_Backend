@@ -1,6 +1,7 @@
 package com.example.Veco.domain.notification.dto;
 
 import com.example.Veco.global.enums.Category;
+import com.example.Veco.global.enums.ExtServiceType;
 import com.example.Veco.global.enums.Priority;
 import com.example.Veco.global.enums.State;
 import lombok.AllArgsConstructor;
@@ -62,6 +63,20 @@ public class NotiResDTO {
         private boolean isRead;
     }
 
-    // 외부 DTO
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ExternalPreViewDTO {
+        private Long alarmId;
+        private String name;
+        private Long typeId;
+        private String title;
+        private State state;
+        private Priority priority;
+        private String goalTitle;
+        private ExtServiceType extServiceType;
+        private boolean isRead;
+    }
 
 }

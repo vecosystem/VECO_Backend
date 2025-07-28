@@ -19,4 +19,6 @@ public interface ExternalRepository extends JpaRepository<External, Long>{
     void deleteByExternalId(@Param("externalIds") List<Long> externalIds);
 
     Optional<External> findByGithubDataId(Long githubDataId);
+
+    List<External> findByIdIn(List<Long> externalIds);
 }
