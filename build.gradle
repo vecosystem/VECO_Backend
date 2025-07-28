@@ -78,6 +78,10 @@ dependencies {
 
 	// WebClient
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+	// Retry
+	implementation 'org.springframework.retry:spring-retry:2.0.4'
+	implementation 'org.springframework:spring-aspects:6.0.13'
 }
 
 tasks.named('test') {
