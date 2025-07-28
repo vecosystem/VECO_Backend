@@ -5,6 +5,7 @@ import com.querydsl.core.types.Predicate;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public interface CustomIssueRepository {
     List<IssueResponseDTO.SimpleIssue> findIssuesByTeamId(

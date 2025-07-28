@@ -1,10 +1,12 @@
 package com.example.Veco.domain.issue.dto;
 
+import com.example.Veco.domain.comment.entity.Comment;
 import com.example.Veco.global.enums.Priority;
 import com.example.Veco.global.enums.State;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class IssueResponseDTO {
@@ -22,6 +24,13 @@ public class IssueResponseDTO {
     ) {
     }
 
+    // 데이터 틀: 이슈 정보, 댓글 정보, 담당자 정보
+    @Builder
+    public record Data<T> (
+            Integer cnt,
+            List<T> info
+    ){}
+
     @Builder
     public record Deadline(
             LocalDate start,
@@ -34,6 +43,13 @@ public class IssueResponseDTO {
             Long id,
             Long issueId,
             String profileImage,
+            String name
+    ) {
+    }
+
+    @Builder
+    public record SimpleManagerInfo(
+            String profileUrl,
             String name
     ) {
     }
@@ -78,6 +94,30 @@ public class IssueResponseDTO {
             Boolean hasNext,
             String nextCursor,
             Integer pageSize
+    ) {
+    }
+
+    @Builder
+    public record DetailIssue(
+            Long id,
+            String name,
+            String title,
+            String content,
+            State state,
+            Priority priority,
+            Deadline deadline,
+            GoalInfo goal,
+            Data<SimpleManagerInfo> managers,
+            Data<CommentInfo> comments
+    ) {
+    }
+
+    @Builder
+    public record CommentInfo(
+            String name,
+            String profileUrl,
+            String content,
+            LocalDateTime createdAt
     ) {
     }
 

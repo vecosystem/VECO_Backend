@@ -12,10 +12,10 @@ public enum IssueErrorCode implements BaseErrorStatus {
 
     NOT_FOUND(HttpStatus.NOT_FOUND,
             "ISSUE404_0",
-            "해당 목표가 존재하지 않습니다."),
+            "해당 이슈가 존재하지 않습니다."),
     NOT_FOUND_IN_TEAM(HttpStatus.NOT_FOUND,
             "ISSUE404_1",
-            "해당 팀에 목표가 존재하지 않습니다."),
+            "해당 팀에 이슈가 존재하지 않습니다."),
     CURSOR_INVALID(HttpStatus.BAD_REQUEST,
             "ISSUE400_0",
             "유효하지 않은 커서입니다."),

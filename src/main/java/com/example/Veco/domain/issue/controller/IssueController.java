@@ -1,5 +1,6 @@
 package com.example.Veco.domain.issue.controller;
 
+import com.example.Veco.domain.issue.dto.IssueResponseDTO;
 import com.example.Veco.domain.issue.exception.code.IssueSuccessCode;
 import com.example.Veco.domain.issue.service.IssueQueryService;
 import com.example.Veco.global.apiPayload.ApiResponse;
@@ -24,7 +25,7 @@ public class IssueController {
                     "커서 기반 페이지네이션, 최신 순으로 정렬합니다."
     )
     @GetMapping("/teams/{teamId}/issues")
-    public ApiResponse<?> getTeamIssues (
+    public ApiResponse<IssueResponseDTO.Pageable<IssueResponseDTO.FilteringIssue<IssueResponseDTO.IssueWithManagers>>> getTeamIssues (
             @PathVariable Long teamId,
             @RequestParam(defaultValue = "-1") @Min(value = -1, message = "커서는 -1보다 큰 정수여야 합니다.")
             String cursor,
@@ -36,6 +37,15 @@ public class IssueController {
         return ApiResponse.onSuccess(IssueSuccessCode.OK, issueQueryService.getIssuesByTeamId(teamId, cursor, size, query));
     }
 
-
+    @Operation(
+            summary = "이슈 상세 조회 API",
+            description = "단일 이슈의 상세 정보를 조회합니다."
+    )
+    @GetMapping("/issues/{issueId}")
+    public ApiResponse<IssueResponseDTO.DetailIssue> getTeamIssues (
+            @PathVariable Long issueId
+    ) {
+        return ApiResponse.onSuccess(IssueSuccessCode.OK, issueQueryService.getIssueDetailById(issueId));
+    }
 
 }

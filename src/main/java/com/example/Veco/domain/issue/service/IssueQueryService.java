@@ -1,14 +1,24 @@
 package com.example.Veco.domain.issue.service;
 
+import com.example.Veco.domain.assignee.entity.Assignee;
+import com.example.Veco.domain.assignee.repository.AssigneeRepository;
+import com.example.Veco.domain.comment.entity.Comment;
+import com.example.Veco.domain.comment.entity.CommentRoom;
+import com.example.Veco.domain.comment.repository.CommentRepository;
+import com.example.Veco.domain.goal.entity.Goal;
 import com.example.Veco.domain.goal.exception.GoalException;
 import com.example.Veco.domain.goal.exception.code.GoalErrorCode;
+import com.example.Veco.domain.goal.repository.GoalRepository;
 import com.example.Veco.domain.issue.converter.IssueConverter;
 import com.example.Veco.domain.issue.dto.IssueResponseDTO;
 import com.example.Veco.domain.issue.dto.IssueResponseDTO.SimpleIssue;
+import com.example.Veco.domain.issue.entity.Issue;
 import com.example.Veco.domain.issue.entity.QIssue;
 import com.example.Veco.domain.issue.exception.IssueException;
 import com.example.Veco.domain.issue.exception.code.IssueErrorCode;
 import com.example.Veco.domain.issue.repository.IssueRepository;
+import com.example.Veco.domain.mapping.repository.CommentRoomRepository;
+import com.example.Veco.global.enums.Category;
 import com.example.Veco.global.enums.Priority;
 import com.example.Veco.global.enums.State;
 import com.querydsl.core.BooleanBuilder;
@@ -26,6 +36,10 @@ import java.util.*;
 public class IssueQueryService {
 
     private final IssueRepository issueRepository;
+    private final AssigneeRepository assigneeRepository;
+    private final GoalRepository goalRepository;
+    private final CommentRoomRepository commentRoomRepository;
+    private final CommentRepository commentRepository;
 
     public IssueResponseDTO.Pageable<IssueResponseDTO.FilteringIssue<IssueResponseDTO.IssueWithManagers>> getIssuesByTeamId(
             Long teamId,
@@ -191,5 +205,42 @@ public class IssueQueryService {
         }
 
         return IssueConverter.toPageable(filterResult, hasNext, nextCursor, pageSize);
+    }
+
+    public IssueResponseDTO.DetailIssue getIssueDetailById(Long issueId) {
+        Issue issue = issueRepository.findById(issueId).orElseThrow(() ->
+                new IssueException(IssueErrorCode.NOT_FOUND));
+
+        // 담당자 조회: 없으면 []
+        List<Assignee> assignees = assigneeRepository.findAllByTypeAndTargetId(Category.ISSUE, issueId)
+                .orElse(new ArrayList<>());
+
+        // 목표 조회
+        Goal goal = null;
+
+        if (issue.getGoal() != null) {
+            goal = goalRepository.findById(issue.getGoal().getId())
+                    .orElse(Goal.builder()
+                            .id(-1L)
+                            .title("목표 없음")
+                            .build()
+                    );
+        } else {
+            goal = Goal.builder()
+                    .id(-1L)
+                    .title("목표 없음")
+                    .build();
+        }
+
+        CommentRoom commentRooms = commentRoomRepository.findByRoomTypeAndTargetId(Category.ISSUE, issueId);
+        List<Comment> comments = commentRepository.findAllByCommentRoomOrderByIdDesc(commentRooms)
+                .orElse(new ArrayList<>());
+
+        return IssueConverter.toDetailIssue(
+                issue,
+                IssueConverter.toSimpleManagerInfos(assignees),
+                goal,
+                IssueConverter.toCommentInfos(comments)
+        );
     }
 }

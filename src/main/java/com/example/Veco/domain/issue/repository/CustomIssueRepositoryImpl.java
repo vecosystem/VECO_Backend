@@ -3,6 +3,7 @@ package com.example.Veco.domain.issue.repository;
 import com.example.Veco.domain.assignee.entity.QAssignee;
 import com.example.Veco.domain.goal.entity.QGoal;
 import com.example.Veco.domain.issue.dto.IssueResponseDTO;
+import com.example.Veco.domain.issue.entity.Issue;
 import com.example.Veco.domain.issue.entity.QIssue;
 import com.example.Veco.domain.issue.exception.IssueException;
 import com.example.Veco.domain.issue.exception.code.IssueErrorCode;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -65,7 +67,7 @@ public class CustomIssueRepositoryImpl implements CustomIssueRepository {
                         )
                 );
 
-        // 목표가 없는 경우 throw
+        // 이슈가 없는 경우 throw
         if (result.isEmpty()){
             throw new IssueException(IssueErrorCode.NOT_FOUND_IN_TEAM);
         }
