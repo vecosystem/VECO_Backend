@@ -1,5 +1,6 @@
 package com.example.Veco.domain.issue.controller;
 
+import com.example.Veco.domain.issue.exception.code.IssueSuccessCode;
 import com.example.Veco.domain.issue.service.IssueQueryService;
 import com.example.Veco.global.apiPayload.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,7 +33,7 @@ public class IssueController {
             @RequestParam(required = false, defaultValue = "state")
             String query
     ) {
-        return ApiResponse.onSuccess(issueQueryService.getIssuesByTeamId(teamId, cursor, size, query));
+        return ApiResponse.onSuccess(IssueSuccessCode.OK, issueQueryService.getIssuesByTeamId(teamId, cursor, size, query));
     }
 
 
