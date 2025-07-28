@@ -1,6 +1,5 @@
 package com.example.Veco.domain.issue.dto;
 
-import com.example.Veco.domain.comment.entity.Comment;
 import com.example.Veco.global.enums.Priority;
 import com.example.Veco.global.enums.State;
 import lombok.*;
@@ -84,7 +83,7 @@ public class IssueResponseDTO {
         Priority priority;
         Deadline deadline;
         GoalInfo goal;
-        List<ManagerInfo> managers;
+        Data<SimpleManagerInfo> managers;
     }
 
     // 커서 기반 페이지네이션 틀

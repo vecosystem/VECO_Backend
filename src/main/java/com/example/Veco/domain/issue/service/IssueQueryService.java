@@ -75,7 +75,6 @@ public class IssueQueryService {
             result = result.subList(0, size);
         }
 
-
         // 필터별 분류
         // 상태: 없음 → 진행중 → 해야할 일 → 완료 → 검토 → 삭제
         // 우선순위: 없음 → 긴급 → 높음 → 보통 → 낮음
@@ -85,10 +84,11 @@ public class IssueQueryService {
         Map<Long, List<IssueResponseDTO.ManagerInfo>> managerInfos = issueRepository.findManagerInfoByTeamId(teamId);
         List<IssueResponseDTO.IssueWithManagers> issueWithManagers = new ArrayList<>();
 
+        List<Assignee> assignees = assigneeRepository.findAllByTypeAndMemberTeam_Team_id(Category.ISSUE, teamId);
+
         // 조회한 이슈와 매니저 정보를 결합
         result.forEach(issue -> {
-            List<IssueResponseDTO.ManagerInfo> managers = managerInfos.getOrDefault(issue.id(), new ArrayList<>());
-            issueWithManagers.add(IssueConverter.toIssueWithManagers(issue, managers));
+            issueWithManagers.add(IssueConverter.toIssueWithManagers(issue, IssueConverter.toSimpleManagerInfos(assignees)));
         });
 
         switch (query.toLowerCase()) {
@@ -154,11 +154,11 @@ public class IssueQueryService {
                     List<IssueResponseDTO.IssueWithManagers> temp = new ArrayList<>();
                     issueWithManagers.forEach(
                             value -> {
-                                if (value.getManagers().stream()
+                                if (value.getManagers().info().stream()
                                         .anyMatch(dto -> dto.name().equals(filter))
                                 ) {
                                     temp.add(value);
-                                } else if (value.getManagers().isEmpty() && filter.equals("담당자 없음")) {
+                                } else if (value.getManagers().cnt() == 0 && filter.equals("담당자 없음")) {
                                     // 담당자가 없는 경우
                                     temp.add(value);
                                     map.put("담당자 없음", map.get("담당자 없음") + 1);

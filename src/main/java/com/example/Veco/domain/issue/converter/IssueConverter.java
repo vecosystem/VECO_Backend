@@ -41,7 +41,8 @@ public class IssueConverter {
     }
 
     public static IssueResponseDTO.IssueWithManagers toIssueWithManagers(
-            IssueResponseDTO.SimpleIssue simpleIssue, List<IssueResponseDTO.ManagerInfo> managerInfos
+            IssueResponseDTO.SimpleIssue simpleIssue,
+            List<IssueResponseDTO.SimpleManagerInfo> assignees
     ) {
         return IssueResponseDTO.IssueWithManagers.builder()
                 .id(simpleIssue.id())
@@ -51,7 +52,7 @@ public class IssueConverter {
                 .priority(simpleIssue.priority())
                 .deadline(simpleIssue.deadline())
                 .goal(simpleIssue.goal())
-                .managers(managerInfos)
+                .managers(toData(assignees))
                 .build();
     }
 
@@ -110,7 +111,6 @@ public class IssueConverter {
                 .name(assignee.getMemberTeam().getMember().getName())
                 .build();
     }
-
 
     public static IssueResponseDTO.CommentInfo toCommentInfo(
             Comment comment
