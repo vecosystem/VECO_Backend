@@ -62,7 +62,7 @@ class ExternalPaginationTest {
         createExternalWithState("NONE_External", State.NONE);
         createExternalWithState("TODO_External", State.TODO);
         createExternalWithState("IN_PROGRESS_External", State.IN_PROGRESS);
-        createExternalWithState("DONE_External", State.DONE);
+        createExternalWithState("DONE_External", State.FINISH);
         createExternalWithState("REVIEW_External", State.REVIEW);
 
         ExternalSearchCriteria criteria = ExternalSearchCriteria.builder().build();
@@ -79,7 +79,7 @@ class ExternalPaginationTest {
         assertThat(externals.get(0).getState()).isEqualTo(State.NONE);
         assertThat(externals.get(1).getState()).isEqualTo(State.TODO);
         assertThat(externals.get(2).getState()).isEqualTo(State.IN_PROGRESS);
-        assertThat(externals.get(3).getState()).isEqualTo(State.DONE);
+        assertThat(externals.get(3).getState()).isEqualTo(State.FINISH);
         assertThat(externals.get(4).getState()).isEqualTo(State.REVIEW);
     }
 
