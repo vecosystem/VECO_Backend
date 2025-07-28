@@ -3,9 +3,9 @@ package com.example.Veco.domain.goal.repository;
 import com.example.Veco.domain.assignee.entity.QAssignee;
 import com.example.Veco.domain.goal.dto.response.GoalResDTO;
 import com.example.Veco.domain.goal.entity.QGoal;
-import com.example.Veco.domain.goal.exception.GoalException;
-import com.example.Veco.domain.goal.exception.code.GoalErrorCode;
+import com.example.Veco.domain.mapping.entity.QMemberTeam;
 import com.example.Veco.domain.member.entity.QMember;
+import com.example.Veco.domain.profile.entity.QProfile;
 import com.example.Veco.global.enums.Category;
 import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Predicate;
@@ -14,6 +14,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -32,16 +33,30 @@ public class GoalQueryDslImpl implements GoalQueryDsl {
         // 객체 설정
         QGoal goal = QGoal.goal;
         QAssignee assignee = QAssignee.assignee;
+        QMemberTeam memberTeam = QMemberTeam.memberTeam;
         QMember member = QMember.member;
+        QProfile profile = QProfile.profile;
 
         // 조회
         List<GoalResDTO.SimpleGoal> result = queryFactory
                 .from(goal)
                 .where(query)
-                .leftJoin(assignee).on(assignee.type.eq(Category.GOAL).and(assignee.targetId.eq(goal.id)))
-                .leftJoin(member).on(member.eq(assignee.memberTeam.member))
+                .leftJoin(assignee).on(assignee.targetId.eq(goal.id).and(assignee.type.eq(Category.GOAL)))
+                .leftJoin(memberTeam).on(memberTeam.id.eq(assignee.memberTeam.id))
+                .leftJoin(member).on(member.id.eq(memberTeam.member.id))
+                .leftJoin(profile).on(profile.id.eq(member.profile.id))
                 .orderBy(goal.id.desc())
-                .groupBy(goal.id, assignee.id)
+                .groupBy(
+                        goal.id,
+                        goal.name,
+                        goal.title,
+                        goal.state,
+                        goal.priority,
+                        goal.deadlineStart,
+                        goal.deadlineEnd,
+                        member.name,
+                        profile.profileImageUrl
+                )
                 .transform(GroupBy.groupBy(goal.id).list(
                         Projections.constructor(
                                 GoalResDTO.SimpleGoal.class,
@@ -61,7 +76,7 @@ public class GoalQueryDslImpl implements GoalQueryDsl {
                                         GroupBy.list(
                                                 Projections.constructor(
                                                         GoalResDTO.ManagerInfo.class,
-                                                        member.profile.profileImageUrl,
+                                                        profile.profileImageUrl,
                                                         member.name
                                                 )
                                         ).as("info")
@@ -69,13 +84,12 @@ public class GoalQueryDslImpl implements GoalQueryDsl {
                         )
                 ));
 
-        // 목표가 없는 경우 throw
-        if (result.isEmpty()){
-            throw new GoalException(GoalErrorCode.NOT_FOUND_IN_TEAM);
-        }
-
         // 담당자 수 정확히 설정
         for (GoalResDTO.SimpleGoal value : result) {
+            // 담당자 이름이 없는 경우 = 담당자가 없는 경우
+            if (value.managers().getInfo().getFirst().name() == null){
+                value.managers().setInfo(new ArrayList<>());
+            }
             value.managers().setCnt((long) value.managers().getInfo().size());
         }
         return result;

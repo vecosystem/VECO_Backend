@@ -1,6 +1,5 @@
 package com.example.Veco.domain.issue.entity;
 
-
 import com.example.Veco.domain.common.BaseEntity;
 import com.example.Veco.domain.goal.entity.Goal;
 import com.example.Veco.domain.team.entity.Team;
@@ -8,9 +7,7 @@ import com.example.Veco.global.enums.Priority;
 import com.example.Veco.global.enums.State;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "issue")

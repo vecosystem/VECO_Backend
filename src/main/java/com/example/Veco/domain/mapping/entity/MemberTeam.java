@@ -9,11 +9,11 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "member_team")
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Table(name = "member_team")
 public class MemberTeam extends BaseEntity {
 
     @Id

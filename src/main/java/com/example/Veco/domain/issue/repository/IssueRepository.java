@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IssueRepository extends JpaRepository<Issue, Long>, CustomIssueRepository {
+    List<Issue> findByIdIn(List<Long> issueIds);
 
     void deleteAllByGoalId(Long id);
 

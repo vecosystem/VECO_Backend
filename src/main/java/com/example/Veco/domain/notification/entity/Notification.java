@@ -1,13 +1,12 @@
 package com.example.Veco.domain.notification.entity;
 
-
 import com.example.Veco.domain.common.BaseEntity;
 import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.global.enums.Category;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "notification")
@@ -21,24 +20,19 @@ public class Notification extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "content")
-    private String content;
-
-    @Column(name = "type")
+    @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
     private Category type;
 
-    @Column(name = "type_id")
+    @Column(name = "type_id", nullable = false)
     private Long typeId;
 
-    @Column(name = "is_read")
-    private Boolean isRead;
+    // 마감일 기준 1일 뒤 만료
+    @Column(name = "expire_at", nullable = false)
+    private LocalDate expireAt;
 
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt = null;
-
-    // 연관 관계
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
     private Team team;
+
 }
