@@ -16,6 +16,15 @@ public enum SlackErrorCode implements BaseErrorStatus {
     LIST_FAILED(HttpStatus.BAD_REQUEST,
             "SLACK400_1",
             "Slack 채널 조회에 실패했습니다."),
+    MESSAGE_POST_FAILED(HttpStatus.BAD_REQUEST,
+            "SLACK400_2",
+            "Slack 메시지 전송에 실패했습니다."),
+    JOIN_FAILED(HttpStatus.BAD_REQUEST,
+            "SLACK400_3",
+            "기본 채널 참여에 실패했습니다."),
+    REINSTALL(HttpStatus.UNAUTHORIZED,
+            "SLACK401_0",
+            "Slack Access Token이 만료되었습니다. App을 재설치해야 합니다."),
     ;
 
     private final HttpStatus status;
@@ -24,6 +33,11 @@ public enum SlackErrorCode implements BaseErrorStatus {
 
     @Override
     public ErrorReasonDTO getReasonHttpStatus() {
-        return null;
+        return ErrorReasonDTO.builder()
+                .isSuccess(false)
+                .httpStatus(status)
+                .code(code)
+                .message(message)
+                .build();
     }
 }
