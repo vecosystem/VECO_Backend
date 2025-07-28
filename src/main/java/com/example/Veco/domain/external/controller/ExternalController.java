@@ -143,12 +143,11 @@ public class ExternalController {
             )
     })
     @PostMapping("/")
-    public ApiResponse<?> createExternal(
+    public ApiResponse<ExternalResponseDTO.CreateResponseDTO> createExternal(
             @Parameter(description = "팀 ID", required = true) @PathVariable("teamId") Long teamId,
             @Valid @RequestBody ExternalRequestDTO.ExternalCreateRequestDTO requestDTO) {
-        Long externalId = externalService.createExternal(teamId, requestDTO);
 
-        return ApiResponse.onSuccess(externalId);
+        return ApiResponse.onSuccess(externalService.createExternal(teamId, requestDTO));
     }
 
     @Operation(

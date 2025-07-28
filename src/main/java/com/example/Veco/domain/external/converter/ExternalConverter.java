@@ -161,4 +161,11 @@ public class ExternalConverter {
                 .updatedAt(external.getUpdatedAt())
                 .build();
     }
+
+    public static ExternalResponseDTO.CreateResponseDTO createResponseDTO(External external){
+        return ExternalResponseDTO.CreateResponseDTO.builder()
+                .externalId(external.getId())
+                .createdAt(external.getCreatedAt())
+                .build();
+    }
 }

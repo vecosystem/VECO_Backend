@@ -59,9 +59,6 @@ public class ExternalResponseDTO {
         private DeadlineResponseDTO deadlines;
 
         private ExternalCommentResponseDTO comments;
-//
-//        @Schema(description = "배정자 목록")
-//        private List<AssigneeResponseDTO.AssigneeDTO> managers;
     }
 
     @Getter
@@ -107,36 +104,63 @@ public class ExternalResponseDTO {
         private DeadlineResponseDTO deadlines;
     }
 
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class CreateResponseDTO {
+        private Long externalId;
+        private LocalDateTime createdAt;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
     @Builder
     public static class UpdateResponseDTO {
         private Long externalId;
         private LocalDateTime updatedAt;
     }
 
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
     @Builder
     public static class AssigneeResponseDTO{
         private Integer cnt;
         List<AssigneeInfoDTO> info;
     }
 
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
     @Builder
     public static class AssigneeInfoDTO {
         private String profileUrl;
         private String nickname;
     }
 
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
     @Builder
     public static class DeadlineResponseDTO {
         private LocalDate start;
         private LocalDate end;
     }
 
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
     @Builder
     public static class ExternalCommentResponseDTO {
         private Integer cnt;
         List<CommentResponseDTO> info;
     }
 
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
     @Builder
     public static class CommentResponseDTO {
         private String profileUrl;

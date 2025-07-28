@@ -15,7 +15,6 @@ public class ExternalRequestDTO {
 
     @Getter
     public static class ExternalCreateRequestDTO{
-        private String workSpaceName;
         private String title;
         private String content;
         private State state;

@@ -60,19 +60,22 @@ public class ExternalService {
     private final CommentRoomRepository commentRoomRepository;
 
     @Transactional
-    public Long createExternal(Long teamId, ExternalRequestDTO.ExternalCreateRequestDTO request){
-
-        NumberSequenceResponseDTO sequenceDTO = numberSequenceService
-                .allocateNextNumber(request.getWorkSpaceName(), teamId, Category.EXTERNAL);
+    public ExternalResponseDTO.CreateResponseDTO createExternal(Long teamId, ExternalRequestDTO.ExternalCreateRequestDTO request){
 
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new TeamException(TeamErrorCode._NOT_FOUND));
+
+        NumberSequenceResponseDTO sequenceDTO = numberSequenceService
+                .allocateNextNumber(team.getWorkSpace().getName(), teamId, Category.EXTERNAL);
+
 
         Goal goal = findGoalById(request.getGoalId());
 
         External external = ExternalConverter.toExternal(team, goal, request, sequenceDTO.getNextCode());
 
-        return externalRepository.save(external).getId();
+        externalRepository.save(external);
+
+        return ExternalConverter.createResponseDTO(external);
     }
 
     public ExternalResponseDTO.ExternalInfoDTO getExternalById(Long externalId) {
