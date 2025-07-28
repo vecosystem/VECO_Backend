@@ -10,9 +10,15 @@ import com.example.Veco.domain.external.repository.ExternalRepository;
 import com.example.Veco.domain.goal.entity.Goal;
 import com.example.Veco.domain.goal.repository.GoalRepository;
 import com.example.Veco.domain.mapping.Assignment;
+import com.example.Veco.domain.mapping.entity.Link;
 import com.example.Veco.domain.mapping.repository.AssigmentRepository;
+import com.example.Veco.domain.mapping.repository.LinkRepository;
 import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.member.repository.MemberRepository;
+import com.example.Veco.domain.slack.dto.SlackResDTO;
+import com.example.Veco.domain.slack.exception.SlackException;
+import com.example.Veco.domain.slack.exception.code.SlackErrorCode;
+import com.example.Veco.domain.slack.util.SlackUtil;
 import com.example.Veco.domain.team.converter.AssigneeConverter;
 import com.example.Veco.domain.team.dto.AssigneeResponseDTO;
 import com.example.Veco.domain.team.dto.NumberSequenceResponseDTO;
@@ -25,6 +31,7 @@ import com.example.Veco.domain.team.service.NumberSequenceService;
 import com.example.Veco.global.apiPayload.code.ErrorStatus;
 import com.example.Veco.global.apiPayload.exception.VecoException;
 import com.example.Veco.global.apiPayload.page.CursorPage;
+import com.example.Veco.global.enums.ExtServiceType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +51,10 @@ public class ExternalService {
     private final TeamRepository teamRepository;
     private final GoalRepository goalRepository;
     private final MemberRepository memberRepository;
+    private final LinkRepository linkRepository;
+
+    // 유틸
+    private final SlackUtil slackUtil;
 
     @Transactional
     public Long createExternal(Long teamId, ExternalRequestDTO.ExternalCreateRequestDTO request){
@@ -58,7 +69,33 @@ public class ExternalService {
 
         External external = ExternalConverter.toExternal(team, goal, request, sequenceDTO.getNextCode());
 
-        return externalRepository.save(external).getId();
+        // 생성 후, 메시지 전송을 위해 return에서 분리
+        Long result = externalRepository.save(external).getId();
+
+        // Slack일 시, 생성 후 기본 채널에 전송: 연동되어 있는지도 확인
+        Link link = linkRepository.findLinkByWorkspaceAndExternalService_ServiceType(
+                team.getWorkSpace(), ExtServiceType.SLACK).orElse(null);
+        if (request.getExtServiceType().equals(ExtServiceType.SLACK) && link != null) {
+            com.example.Veco.domain.external.entity.ExternalService exService = link.getExternalService();
+            try {
+                // 메시지 전송
+                SlackResDTO.PostSlackMessage messageResult = slackUtil.PostSlackMessage(
+                        exService.getAccessToken(),
+                        exService.getSlackDefaultChannelId()
+                );
+
+                // 토큰 관련 문제라면
+                if (messageResult != null && messageResult.error() != null
+                        && messageResult.error().equals("invalid_auth")
+                ){
+                    throw new SlackException(SlackErrorCode.REINSTALL);
+                }
+            } catch (Exception e){
+                throw new SlackException(SlackErrorCode.MESSAGE_POST_FAILED);
+            }
+        }
+
+        return result;
     }
 
     public ExternalResponseDTO.ExternalDTO getExternalById(Long externalId) {
