@@ -2,7 +2,6 @@ package com.example.Veco.domain.external.controller;
 
 import com.example.Veco.domain.external.config.GitHubConfig;
 import com.example.Veco.domain.external.service.GitHubService;
-import com.example.Veco.domain.mapping.GithubInstallation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -84,21 +83,21 @@ public class GitHubController {
         }
     }
 
-    @Operation(
-            summary = "GitHub App 설치 콜백",
-            description = "GitHub App 설치 완료 후 호출되는 콜백 API입니다. " +
-                    "GitHub에서 자동으로 호출하며, 설치 정보를 데이터베이스에 저장합니다.",
-            hidden = true
-    )
-    @GetMapping("/installation/callback")
-    public String appInstallationCallback(
-            @Parameter(description = "팀 ID") @RequestParam("state") Long state,
-            @Parameter(description = "GitHub App 설치 ID") @RequestParam("installation_id") Long installationId) {
-        log.info("teamId : {}", state);
-        log.info("installationId : {}", installationId);
-
-        gitHubService.saveInstallationInfo(state, installationId);
-
-        return "redirect:/";
-    }
+//    @Operation(
+//            summary = "GitHub App 설치 콜백",
+//            description = "GitHub App 설치 완료 후 호출되는 콜백 API입니다. " +
+//                    "GitHub에서 자동으로 호출하며, 설치 정보를 데이터베이스에 저장합니다.",
+//            hidden = true
+//    )
+//    @GetMapping("/installation/callback")
+//    public String appInstallationCallback(
+//            @Parameter(description = "팀 ID") @RequestParam("state") Long state,
+//            @Parameter(description = "GitHub App 설치 ID") @RequestParam("installation_id") Long installationId) {
+//        log.info("teamId : {}", state);
+//        log.info("installationId : {}", installationId);
+//
+//        gitHubService.saveInstallationInfo(state, installationId);
+//
+//        return "redirect:/";
+//    }
 }

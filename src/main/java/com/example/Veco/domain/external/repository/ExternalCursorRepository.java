@@ -2,12 +2,11 @@ package com.example.Veco.domain.external.repository;
 
 import com.example.Veco.domain.assignee.entity.QAssignee;
 import com.example.Veco.domain.external.converter.ExternalConverter;
-import com.example.Veco.domain.external.dto.ExternalCursor;
-import com.example.Veco.domain.external.dto.ExternalResponseDTO;
-import com.example.Veco.domain.external.dto.ExternalSearchCriteria;
+import com.example.Veco.domain.external.dto.paging.ExternalCursor;
+import com.example.Veco.domain.external.dto.response.ExternalResponseDTO;
+import com.example.Veco.domain.external.dto.paging.ExternalSearchCriteria;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.external.entity.QExternal;
-import com.example.Veco.domain.mapping.QAssignment;
 import com.example.Veco.domain.mapping.repository.AssigmentRepository;
 import com.example.Veco.domain.team.converter.AssigneeConverter;
 import com.example.Veco.domain.team.dto.AssigneeResponseDTO;
@@ -112,14 +111,10 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
         }
 
 
-        List<ExternalResponseDTO.ExternalDTO> result = externals.stream().map(e -> {
-            List<AssigneeResponseDTO.AssigneeDTO> assigneeDTOS =
-                    e.getAssignments().stream().map(AssigneeConverter::toAssigneeResponseDTO).toList();
+        List<ExternalResponseDTO.ExternalDTO> externalDTOS = externals.stream()
+                .map(e -> ExternalConverter.toExternalDTO(e, e.getAssignments())).toList();
 
-            return ExternalConverter.toExternalDTO(e, assigneeDTOS);
-        }).toList();
-
-        return CursorPage.of(result, nextCursor, hasNext);
+        return CursorPage.of(externalDTOS, nextCursor, hasNext);
     }
 
     private ExternalCursor createCursorFromExternal(External last, ExternalSearchCriteria criteria) {

@@ -2,13 +2,12 @@ package com.example.Veco.domain.external.entity;
 
 
 import com.example.Veco.domain.common.BaseEntity;
-import com.example.Veco.domain.external.dto.ExternalRequestDTO;
+import com.example.Veco.domain.external.dto.request.ExternalRequestDTO;
 import com.example.Veco.domain.external.dto.GitHubWebhookPayload;
 import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.domain.goal.entity.Goal;
 import com.example.Veco.domain.mapping.Assignment;
 import com.example.Veco.domain.member.entity.Member;
-import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.global.enums.ExtServiceType;
 import com.example.Veco.global.enums.Priority;
 import com.example.Veco.global.enums.State;
@@ -18,8 +17,6 @@ import lombok.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.time.LocalDateTime;
-import java.time.LocalDate;
 
 @Entity
 @Table(name = "external")
@@ -103,17 +100,17 @@ public class External extends BaseEntity {
         if(requestDTO.getTitle() != null) {
             this.title = requestDTO.getTitle();
         }
-        if(requestDTO.getDescription() != null) {
-            this.description = requestDTO.getDescription();
+        if(requestDTO.getContent() != null) {
+            this.description = requestDTO.getContent();
         }
         if(requestDTO.getState() != null) {
             this.state = requestDTO.getState();
         }
-        if (requestDTO.getStartDate() != null) {
-            this.startDate = requestDTO.getStartDate();
+        if (requestDTO.getDeadline().getStart() != null) {
+            this.startDate = requestDTO.getDeadline().getStart();
         }
-        if (requestDTO.getEndDate() != null) {
-            this.endDate = requestDTO.getEndDate();
+        if (requestDTO.getDeadline().getEnd() != null) {
+            this.endDate = requestDTO.getDeadline().getEnd() ;
         }
         if(requestDTO.getPriority() != null) {
             this.priority = requestDTO.getPriority();

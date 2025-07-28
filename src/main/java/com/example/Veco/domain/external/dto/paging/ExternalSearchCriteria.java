@@ -1,4 +1,4 @@
-package com.example.Veco.domain.external.dto;
+package com.example.Veco.domain.external.dto.paging;
 
 import com.example.Veco.global.enums.Priority;
 import com.example.Veco.global.enums.State;

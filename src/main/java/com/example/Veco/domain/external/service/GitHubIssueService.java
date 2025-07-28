@@ -1,7 +1,6 @@
 package com.example.Veco.domain.external.service;
 
 import com.example.Veco.domain.external.converter.ExternalConverter;
-import com.example.Veco.domain.external.dto.ExternalCursor;
 import com.example.Veco.domain.external.dto.GitHubWebhookPayload;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.external.entity.GitHubIssue;
@@ -18,7 +17,6 @@ import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.domain.team.enums.Category;
 import com.example.Veco.domain.team.repository.TeamRepository;
 import com.example.Veco.domain.team.service.NumberSequenceService;
-import com.example.Veco.global.apiPayload.exception.VecoException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

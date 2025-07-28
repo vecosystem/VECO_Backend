@@ -1,4 +1,4 @@
-package com.example.Veco.domain.external.dto;
+package com.example.Veco.domain.external.dto.request;
 
 import com.example.Veco.global.enums.ExtServiceType;
 import com.example.Veco.global.enums.Priority;
@@ -17,14 +17,19 @@ public class ExternalRequestDTO {
     public static class ExternalCreateRequestDTO{
         private String workSpaceName;
         private String title;
-        private String description;
+        private String content;
         private State state;
         private Priority priority;
-        private List<Long> workers;
-        private LocalDate startDate;
-        private LocalDate endDate;
+        private List<Long> managersId;
+        private DeadlineRequestDTO deadline;
         private ExtServiceType extServiceType;
         private Long goalId;
+    }
+
+    @Getter
+    public static class DeadlineRequestDTO{
+        private LocalDate start;
+        private LocalDate end;
     }
 
     @Getter
@@ -38,12 +43,11 @@ public class ExternalRequestDTO {
     @Builder
     public static class ExternalUpdateRequestDTO{
         private String title;
-        private String description;
+        private String content;
         private State state;
         private Priority priority;
-        private List<Long> assigneeIds;
-        private LocalDate startDate;
-        private LocalDate endDate;
+        private List<Long> managersId;
+        private DeadlineRequestDTO deadline;
         private Long goalId;
         private ExtServiceType extServiceType;
     }

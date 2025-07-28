@@ -1,7 +1,6 @@
 package com.example.Veco.domain.external.service;
 
-import com.example.Veco.domain.external.converter.ExternalConverter;
-import com.example.Veco.domain.external.dto.ExternalRequestDTO;
+import com.example.Veco.domain.external.dto.request.ExternalRequestDTO;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.external.repository.ExternalRepository;
 import com.example.Veco.domain.mapping.Assignment;
@@ -83,8 +82,8 @@ class ExternalServiceTest {
         //given
         ExternalRequestDTO.ExternalUpdateRequestDTO request = ExternalRequestDTO.ExternalUpdateRequestDTO.builder()
                 .title("modified")
-                .description("description")
-                .assigneeIds(List.of(1L, 2L))
+                .content("description")
+                .managersId(List.of(1L, 2L))
                 .build();
 
         //when
@@ -96,7 +95,7 @@ class ExternalServiceTest {
                         .forEach(assignment -> {assignment.getAssignee().getId();});
 
         //then
-        Assertions.assertThat(external).extracting("title", "description")
+        Assertions.assertThat(external).extracting("title", "content")
                 .containsExactly("modified", "description");
 
 

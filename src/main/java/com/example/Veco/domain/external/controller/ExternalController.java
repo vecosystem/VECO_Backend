@@ -1,6 +1,11 @@
 package com.example.Veco.domain.external.controller;
 
-import com.example.Veco.domain.external.dto.*;
+import com.example.Veco.domain.external.dto.paging.ExternalCursorPageResponse;
+import com.example.Veco.domain.external.dto.paging.ExternalSearchCriteria;
+import com.example.Veco.domain.external.dto.request.ExternalRequestDTO;
+import com.example.Veco.domain.external.dto.response.ExternalApiResponse;
+import com.example.Veco.domain.external.dto.response.ExternalResponseDTO;
+import com.example.Veco.domain.external.exception.code.ExternalSuccessCode;
 import com.example.Veco.domain.external.service.ExternalService;
 import com.example.Veco.global.apiPayload.ApiResponse;
 import com.example.Veco.global.apiPayload.page.CursorPage;
@@ -15,7 +20,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -51,9 +55,9 @@ public class ExternalController {
             )
     })
     @GetMapping("/{externalId}")
-    public ResponseEntity<ApiResponse<ExternalResponseDTO.ExternalDTO>> getExternal(
+    public ApiResponse<ExternalResponseDTO.ExternalInfoDTO> getExternal(
             @Parameter(description = "외부이슈 ID", required = true) @PathVariable Long externalId) {
-        return ResponseEntity.ok(ApiResponse.onSuccess(externalService.getExternalById(externalId)));
+        return ApiResponse.onSuccess(externalService.getExternalById(externalId));
     }
 
     @Operation(
@@ -80,7 +84,7 @@ public class ExternalController {
             )
     })
     @GetMapping("/")
-    public ResponseEntity<ApiResponse<CursorPage<ExternalResponseDTO.ExternalDTO>>> getExternals(
+    public ApiResponse<CursorPage<ExternalResponseDTO.ExternalDTO>> getExternals(
             @Parameter(description = "팀 ID", required = true) @PathVariable("teamId") Long teamId,
             @Parameter(description = "이슈 상태 (선택)", required = false) @RequestParam(value = "state", required = false) State state,
             @Parameter(description = "우선순위 (선택)", required = false) @RequestParam(value = "priority", required = false) Priority priority,
@@ -94,7 +98,7 @@ public class ExternalController {
                 .priority(priority)
                 .assigneeId(assigneeId).build();
 
-        return ResponseEntity.ok(ApiResponse.onSuccess(externalService.getExternalsWithPagination(searchCriteria, cursor, size)));
+        return ApiResponse.onSuccess(externalService.getExternalsWithPagination(searchCriteria, cursor, size));
 
     }
 
@@ -139,12 +143,12 @@ public class ExternalController {
             )
     })
     @PostMapping("/")
-    public ResponseEntity<ApiResponse<?>> createExternal(
+    public ApiResponse<?> createExternal(
             @Parameter(description = "팀 ID", required = true) @PathVariable("teamId") Long teamId,
             @Valid @RequestBody ExternalRequestDTO.ExternalCreateRequestDTO requestDTO) {
         Long externalId = externalService.createExternal(teamId, requestDTO);
 
-        return ResponseEntity.ok(ApiResponse.onSuccess(externalId));
+        return ApiResponse.onSuccess(externalId);
     }
 
     @Operation(
@@ -182,11 +186,11 @@ public class ExternalController {
             )
     })
     @PatchMapping("/{externalId}")
-    public ResponseEntity<ApiResponse<?>> modifyExternal(
+    public ApiResponse<ExternalResponseDTO.UpdateResponseDTO> modifyExternal(
             @Parameter(description = "외부이슈 ID", required = true) @PathVariable Long externalId,
             @Valid @RequestBody ExternalRequestDTO.ExternalUpdateRequestDTO requestDTO) {
-        externalService.updateExternal(externalId, requestDTO);
-        return ResponseEntity.ok(ApiResponse.onSuccessWithNullResult());
+
+        return ApiResponse.onSuccess(externalService.updateExternal(externalId, requestDTO));
     }
 
     @Operation(
@@ -213,8 +217,13 @@ public class ExternalController {
             )
     })
     @DeleteMapping("/")
-    public ResponseEntity<ApiResponse<?>> deleteExternal(@Valid @RequestBody ExternalRequestDTO.ExternalDeleteRequestDTO requestDTO) {
+    public ApiResponse<?> deleteExternal(@Valid @RequestBody ExternalRequestDTO.ExternalDeleteRequestDTO requestDTO) {
         externalService.deleteExternals(requestDTO);
-        return ResponseEntity.ok(ApiResponse.onSuccessWithNullResult());
+        return ApiResponse.onSuccess(ExternalSuccessCode.DELETE);
+    }
+
+    @GetMapping("/external-name")
+    public ApiResponse<?> getExternalName(@PathVariable("teamId") Long teamId) {
+        return ApiResponse.onSuccess(externalService.getExternalName(teamId));
     }
 }
