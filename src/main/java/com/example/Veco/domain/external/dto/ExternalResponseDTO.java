@@ -28,7 +28,7 @@ public class ExternalResponseDTO {
         private String title;
         
         @Schema(description = "이슈 설명", example = "이슈에 대한 상세 설명")
-        private String description;
+        private String content;
         
         @Schema(description = "우선순위", example = "HIGH")
         private Priority priority;
@@ -49,12 +49,32 @@ public class ExternalResponseDTO {
         private String goalTitle;
         
         @Schema(description = "외부 이슈 코드", example = "EXT-001")
-        private String externalCode;
+        private String name;
 
         @Schema(description = "연동된 외부 툴", example = "GITHUB")
         private ExtServiceType extServiceType;
-        
-        @Schema(description = "배정자 목록")
-        private List<AssigneeResponseDTO.AssigneeDTO> assignees;
+
+        private AssigneeResponseDTO managers;
+//
+//        @Schema(description = "배정자 목록")
+//        private List<AssigneeResponseDTO.AssigneeDTO> managers;
+    }
+
+    @Builder
+    public static class AssigneeResponseDTO{
+        private Integer cnt;
+        List<AssigneeInfoDTO> info;
+    }
+
+    @Builder
+    public static class AssigneeInfoDTO {
+        private String profileUrl;
+        private String nickname;
+    }
+
+    @Builder
+    public static class DeadlineResposneDTO {
+        private LocalDate start;
+        private LocalDate end;
     }
 }
