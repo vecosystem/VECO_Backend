@@ -33,6 +33,7 @@ public class External extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "github_data_id")
     private Long githubDataId;
 
     @Column(name = "name", nullable = false)

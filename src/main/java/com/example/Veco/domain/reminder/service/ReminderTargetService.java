@@ -23,7 +23,7 @@ public class ReminderTargetService {
                 .select(issue.id)
                 .from(issue)
                 .where(
-                        issue.deadline.eq(today),
+                        issue.deadlineEnd.eq(today),
                         issue.state.in(State.NONE, State.IN_PROGRESS, State.TODO)
                 )
                 .fetch();

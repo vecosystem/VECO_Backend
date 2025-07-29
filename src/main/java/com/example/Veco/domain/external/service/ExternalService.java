@@ -79,7 +79,7 @@ public class ExternalService {
 
     @Transactional
     public void deleteExternals(ExternalRequestDTO.ExternalDeleteRequestDTO request) {
-        externalRepository.deleteByExternalId(request.getExternalIds());
+        externalRepository.deleteAllById(request.getExternalIds());
     }
 
     @Transactional
