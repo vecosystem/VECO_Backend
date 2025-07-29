@@ -2,10 +2,12 @@ package com.example.Veco.global.auth.oauth2.handler;
 
 import com.example.Veco.domain.member.enums.MemberRole;
 import com.example.Veco.domain.member.service.MemberCommandService;
+import com.example.Veco.global.apiPayload.ApiResponse;
 import com.example.Veco.global.auth.jwt.converter.TokenConverter;
 import com.example.Veco.global.auth.jwt.dto.TokenDTO;
 import com.example.Veco.global.auth.oauth2.CustomOAuth2User;
 import com.example.Veco.global.auth.user.userdetails.CustomUserDetails;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -51,29 +53,33 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         Cookie refreshTokenCookie = jwtUtil.createRefreshTokenCookie(refreshToken);
         response.addCookie(refreshTokenCookie);
 
+        UsernamePasswordAuthenticationToken authToken =
+                new UsernamePasswordAuthenticationToken(customUserDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authToken);
+
         // 최초 로그인
         if (userDetails.getMember().getRole() == null || userDetails.getMember().getRole() == MemberRole.GUEST) {
-            member.setName(member.getName());
-            member.setRole(MemberRole.USER);
-
-            member.setRefreshToken(refreshToken);
-            memberCommandService.saveMember(member);
+            Member updatedMember = member.toBuilder()
+                    .role(MemberRole.USER)
+                    .refreshToken(refreshToken)
+                    .build();
+            memberCommandService.saveMember(updatedMember);
 
             redirectURL = UriComponentsBuilder.fromUriString("https://veco-eight.vercel.app/onboarding")
                     .build()
                     .encode(StandardCharsets.UTF_8)
                     .toUriString();
         } else {
+            Member updatedMember = member.toBuilder()
+                    .refreshToken(refreshToken)
+                    .build();
+            memberCommandService.saveMember(updatedMember);
+
             redirectURL = UriComponentsBuilder.fromUriString("https://veco-eight.vercel.app/workspace")
                     .build()
                     .encode(StandardCharsets.UTF_8)
                     .toUriString();
         }
-
-        // 인증용 객체 생성 및 SecurityContext 설정
-        UsernamePasswordAuthenticationToken authToken =
-                new UsernamePasswordAuthenticationToken(customUserDetails, null, userDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authToken);
 
         getRedirectStrategy().sendRedirect(request, response, redirectURL);
     }

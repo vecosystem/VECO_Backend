@@ -1,6 +1,5 @@
 package com.example.Veco.domain.assignee.entity;
 
-
 import com.example.Veco.domain.common.BaseEntity;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.goal.entity.Goal;

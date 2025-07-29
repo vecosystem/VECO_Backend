@@ -3,6 +3,8 @@ package com.example.Veco.domain.team.entity;
 
 import com.example.Veco.domain.common.BaseEntity;
 import com.example.Veco.domain.mapping.entity.MemberTeam;
+import com.example.Veco.domain.external.entity.External;
+import com.example.Veco.domain.mapping.GithubInstallation;
 import com.example.Veco.domain.workspace.entity.WorkSpace;
 import jakarta.persistence.*;
 import lombok.*;
@@ -41,6 +43,13 @@ public class Team extends BaseEntity {
 
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberTeam> memberTeams = new ArrayList<>();
+
+    @OneToOne(mappedBy = "team")
+    private GithubInstallation githubInstallation;
+
+    @OneToMany(mappedBy = "team")
+    @Builder.Default
+    private List<External> externals = new ArrayList<>();
 
     // update
     public void updateGoalNumber(Long goalNumber){ this.goalNumber = goalNumber; }

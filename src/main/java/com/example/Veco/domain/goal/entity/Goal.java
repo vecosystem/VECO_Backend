@@ -1,6 +1,7 @@
 package com.example.Veco.domain.goal.entity;
 
 import com.example.Veco.domain.common.BaseEntity;
+import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.global.enums.Priority;
 import com.example.Veco.global.enums.State;
@@ -11,6 +12,8 @@ import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "goal")
@@ -26,25 +29,26 @@ public class Goal extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
     @Column(name = "name", nullable = false)
     private String name;
 
     @Column(name = "title", nullable = false)
-    private  String title;
+    private String title;
 
     @Column(name = "content")
     @Builder.Default
-    private  String content = "";
+    private String content = "";
 
     @Column(name = "state", nullable = false)
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private State state = State.NONE;
 
-    @Column(name = "priority",  nullable = false)
+    @Column(name = "priority", nullable = false)
     @Enumerated(EnumType.STRING)
     @Builder.Default
-    private Priority priority =  Priority.NONE;
+    private Priority priority = Priority.NONE;
 
     @Column(name = "deadline_start")
     @Builder.Default
@@ -57,6 +61,9 @@ public class Goal extends BaseEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+    @OneToMany(mappedBy = "goal")
+    @Builder.Default
+    private List<External> externals = new ArrayList<>();
     // 연관 관계
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")

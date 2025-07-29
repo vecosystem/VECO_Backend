@@ -1,6 +1,5 @@
 package com.example.Veco.domain.issue.entity;
 
-
 import com.example.Veco.domain.common.BaseEntity;
 import com.example.Veco.domain.goal.entity.Goal;
 import com.example.Veco.global.enums.Priority;
@@ -8,7 +7,7 @@ import com.example.Veco.global.enums.State;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "issue")
@@ -45,7 +44,7 @@ public class Issue extends BaseEntity {
 
     @Column(name = "deadline")
     @Builder.Default
-    private LocalDateTime deadline = null;
+    private LocalDate deadline = null;
 
     @Column(name = "issue_number", nullable = false)
     private Integer issue_number;
