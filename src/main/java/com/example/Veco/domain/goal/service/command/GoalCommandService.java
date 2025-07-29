@@ -104,7 +104,7 @@ public class GoalCommandService {
         RLock lock = redissonClient.getLock("lock:goal:" + teamId);
         Long goalId;
         try {
-            boolean available = lock.tryLock(10, 30, TimeUnit.SECONDS);
+            boolean available = lock.tryLock(60, 30, TimeUnit.SECONDS);
             if (!available) {
                 throw new RedisException(RedisErrorCode.LOCK_TIMEOUT);
             }
