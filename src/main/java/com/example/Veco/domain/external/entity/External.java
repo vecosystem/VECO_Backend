@@ -63,6 +63,7 @@ public class External extends BaseEntity {
     @Builder.Default
     private LocalDate startDate = null;
 
+    @Column(name = "end_date")
     @Builder.Default
     private LocalDate endDate = null;
 
@@ -72,8 +73,9 @@ public class External extends BaseEntity {
     private ExtServiceType type = ExtServiceType.NONE;
 
     @Column(name = "external_code", nullable = false)
-    private String external_code;
+    private String externalCode;
 
+    // 연관 관계
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
     private Team team;

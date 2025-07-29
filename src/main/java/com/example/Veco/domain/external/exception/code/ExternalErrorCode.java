@@ -9,10 +9,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum ExternalErrorCode implements BaseErrorStatus {
-
-    EXTERNAL_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 외부이슈가 존재하지 않습니다.", "EXTERNAL400"),
-
-    ;
+    NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 외부이슈가 존재하지 않습니다.", "EXTERNAL404");
 
     private HttpStatus httpStatus;
     private String message;
