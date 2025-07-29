@@ -2,11 +2,11 @@ package com.example.Veco.domain.issue.entity;
 
 import com.example.Veco.domain.common.BaseEntity;
 import com.example.Veco.domain.goal.entity.Goal;
+import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.global.enums.Priority;
 import com.example.Veco.global.enums.State;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDate;
 
 @Entity
@@ -20,7 +20,6 @@ public class Issue extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -42,12 +41,21 @@ public class Issue extends BaseEntity {
     @Builder.Default
     private Priority priority =  Priority.NONE;
 
-    @Column(name = "deadline")
+    @Column(name = "deadline_start")
     @Builder.Default
-    private LocalDate deadline = null;
+    private LocalDate deadlineStart = null;
 
-    @Column(name = "issue_number", nullable = false)
-    private Integer issue_number;
+    @Column(name = "deadline_end")
+    @Builder.Default
+    private LocalDate deadlineEnd = null;
+
+    // 이슈가 속한 팀
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    private Team team;
+
+//    @Column(name = "issue_number", nullable = false)
+//    private Integer issue_number;
 
     // 연관 관계
     @ManyToOne(fetch = FetchType.LAZY)
