@@ -33,6 +33,9 @@ public class WorkSpace extends BaseEntity {
     @Column(name = "cert_pwd")
     private String certPwd;
 
+    private String invitePassword;
+    private String inviteUrl;
+
     @OneToMany(mappedBy = "workSpace")
     @Builder.Default
     private List<Member> members = new ArrayList<>();
