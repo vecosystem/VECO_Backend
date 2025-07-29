@@ -47,7 +47,7 @@ public class ReminderTargetService {
                 .select(external.id)
                 .from(external)
                 .where(
-                        external.deadline.eq(today),
+                        external.endDate.eq(today),
                         external.state.in(State.NONE, State.IN_PROGRESS, State.TODO)
                 )
                 .fetch();

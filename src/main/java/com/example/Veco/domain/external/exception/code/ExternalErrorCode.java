@@ -15,7 +15,6 @@ public enum ExternalErrorCode implements BaseErrorStatus {
     private String message;
     private String code;
 
-
     @Override
     public ErrorReasonDTO getReasonHttpStatus() {
         return ErrorReasonDTO.builder()
