@@ -16,6 +16,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -150,9 +152,10 @@ public class GoalController {
     public ApiResponse<UpdateGoal> updateGoal(
             @PathVariable Long teamId,
             @PathVariable Long goalId,
-            @RequestBody GoalReqDTO.UpdateGoal dto
+            @RequestBody GoalReqDTO.UpdateGoal dto,
+            @AuthenticationPrincipal AuthUser user
     ){
-        UpdateGoal result = goalCommandService.updateGoal(dto, teamId, goalId);
+        UpdateGoal result = goalCommandService.updateGoal(dto, teamId, goalId, user);
         if (result != null){
             return ApiResponse.onSuccess(GoalSuccessCode.UPDATE, result);
         } else {
@@ -164,14 +167,15 @@ public class GoalController {
     // 목표 삭제
     @Operation(
             summary = "목표 삭제 API By 김주헌",
-            description = "목표를 삭제합니다. (Soft Delete)"
+            description = "목표를 삭제합니다. (Soft Delete)" +
+                    "삭제할 목표 ID를 리스트 형태로 보내주시면 일괄 삭제 처리 가능합니다."
     )
-    @DeleteMapping("/teams/{teamId}/goals/{goalId}")
-    public ApiResponse<Void> deleteGoal(
+    @DeleteMapping("/teams/{teamId}/goals")
+    public ApiResponse<List<Long>> deleteGoal(
             @PathVariable Long teamId,
-            @PathVariable Long goalId
+            @RequestBody GoalReqDTO.DeleteGoal dto,
+            @AuthenticationPrincipal AuthUser user
     ){
-        goalCommandService.deleteGoal(teamId, goalId);
-        return ApiResponse.onSuccess(GoalSuccessCode.DELETE, null);
+        return ApiResponse.onSuccess(GoalSuccessCode.DELETE, goalCommandService.deleteGoal(teamId, dto, user));
     }
 }
