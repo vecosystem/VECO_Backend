@@ -23,6 +23,7 @@ import com.example.Veco.domain.member.repository.MemberRepository;
 import com.example.Veco.domain.team.exception.TeamException;
 import com.example.Veco.domain.team.exception.code.TeamErrorCode;
 import com.example.Veco.domain.team.repository.TeamRepository;
+import com.example.Veco.global.auth.user.AuthUser;
 import com.example.Veco.global.aws.util.S3Util;
 import com.example.Veco.global.redis.exception.RedisException;
 import com.example.Veco.global.redis.exception.code.RedisErrorCode;
@@ -62,13 +63,16 @@ public class GoalCommandService {
     // 목표 작성
     public CreateGoal createGoal(
             Long teamId,
-            GoalReqDTO.CreateGoal dto
+            GoalReqDTO.CreateGoal dto,
+            AuthUser user
     ) {
         // 담당자 존재 여부, 같은 팀 여부 검증 + 본인 포함 여부 확인 후 업데이트
         List<Long> memberIds = new ArrayList<>(dto.managersId());
         if (dto.isIncludeMe()) {
             // 인증 객체에서 가져오기
-            memberIds.add(1L);
+            Member member = memberRepository.findBySocialUid(user.getSocialUid()).orElseThrow(() ->
+                    new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND));
+            memberIds.add(member.getId());
         }
 
         // 사용자 존재 여부 검증
