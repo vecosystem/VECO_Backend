@@ -59,7 +59,7 @@ public class GoalTransactionalService {
         memberTeamList.forEach(
                 value -> assigneeList.add(
                         AssigneeConverter.toAssignee(
-                                value, goal.getId(), Category.GOAL
+                                value, Category.GOAL, goal
                         )
                 )
         );
@@ -133,7 +133,7 @@ public class GoalTransactionalService {
                     .findAllByMemberIdInAndTeamId(dto.managersId(), teamId);
             memberTeamList.forEach(
                     value -> assigneeRepository.save(
-                            AssigneeConverter.toAssignee(value, goalId, Category.GOAL)
+                            AssigneeConverter.toAssignee(value, Category.GOAL, goal)
                     )
             );
             isRestore = true;
