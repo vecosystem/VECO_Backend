@@ -104,4 +104,16 @@ public class WorkspaceResponseDTO {
     public static class PreviewUrlResponseDto {
         private String inviteUrl;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CreateWorkspaceResponseDto {
+        private Long workspaceId;
+        private String workspaceName;
+        private String inviteUrl;
+        private String invitePassword;
+    }
+
 }

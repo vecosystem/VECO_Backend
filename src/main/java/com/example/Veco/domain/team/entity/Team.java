@@ -42,6 +42,7 @@ public class Team extends BaseEntity {
     private WorkSpace workSpace;
 
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<MemberTeam> memberTeams = new ArrayList<>();
 
     @OneToOne(mappedBy = "team")

@@ -43,11 +43,22 @@ import java.util.List;
 public class WorkspaceRestController {
 
     private final WorkspaceQueryService workspaceQueryService;
+    private final WorkspaceCommandService workspaceCommandService;
+    private final MemberQueryService memberQueryService;
 
     @PostMapping("/create-url")
     @Operation(summary = "워크스페이스 이름에 맞는 url를 미리보기합니다.")
     public ApiResponse<WorkspaceResponseDTO.PreviewUrlResponseDto> createWorkspaceUrl(@Valid @RequestBody WorkspaceRequestDTO.PreviewUrlRequestDto request) {
         String previewUrl = workspaceQueryService.createPreviewUrl(request.getWorkspaceName());
         return ApiResponse.onSuccess(WorkspaceConverter.toPreviewUrlResponseDto(previewUrl));
+    }
+
+    @PostMapping("")
+    @Operation(summary = "워크스페이스를 생성합니다.")
+    public ApiResponse<WorkspaceResponseDTO.CreateWorkspaceResponseDto> createWorkspace(@AuthenticationPrincipal CustomUserDetails userDetails, @Valid @RequestBody WorkspaceRequestDTO.CreateWorkspaceRequestDto request) {
+        String socialUid = userDetails.getSocialUid();
+        Long memberId = memberQueryService.getMemberBySocialUid(socialUid).getId();
+
+         return ApiResponse.onSuccess(workspaceCommandService.createWorkspace(memberId, request));
     }
 }

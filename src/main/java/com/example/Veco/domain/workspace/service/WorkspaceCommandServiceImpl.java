@@ -14,11 +14,19 @@ import com.example.Veco.domain.workspace.converter.WorkspaceConverter;
 import com.example.Veco.domain.workspace.dto.WorkspaceRequestDTO;
 import com.example.Veco.domain.workspace.dto.WorkspaceResponseDTO;
 import com.example.Veco.domain.workspace.entity.WorkSpace;
+import com.example.Veco.domain.workspace.error.WorkspaceErrorStatus;
+import com.example.Veco.domain.workspace.error.WorkspaceHandler;
 import com.example.Veco.domain.workspace.repository.WorkspaceRepository;
+import com.example.Veco.domain.workspace.util.InvitePasswordGenerator;
+import com.example.Veco.domain.workspace.util.InviteTokenGenerator;
+import com.example.Veco.domain.workspace.util.SlugGenerator;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -28,6 +36,10 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
     private final TeamRepository teamRepository;
     private final MemberRepository memberRepository;
     private final MemberTeamRepository memberTeamRepository;
+    private final WorkspaceRepository workspaceRepository;
+    private final SlugGenerator slugGenerator;
+    private final InviteTokenGenerator inviteTokenGenerator;
+    private final InvitePasswordGenerator invitePasswordGenerator;
 
     /**
      * 팀 생성 및 멤버 할당 로직
@@ -83,4 +95,64 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
             team.updateOrder(i); // 인덱스를 order로 저장
         }
     }
+
+    @Override
+    public WorkspaceResponseDTO.CreateWorkspaceResponseDto createWorkspace(Long memberId, WorkspaceRequestDTO.CreateWorkspaceRequestDto request) {
+        // 1. 멤버 조회
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND));
+
+        // 2. 이미 워크스페이스가 있으면 예외
+        if (member.getWorkSpace() != null) {
+            throw new WorkspaceHandler(WorkspaceErrorStatus._WORKSPACE_DUPLICATED);
+        }
+
+        // 3. 슬러그, 토큰, 초대 암호 생성
+        String slug = slugGenerator.generate(request.getWorkspaceName());
+        String token = inviteTokenGenerator.generate();
+        String invitePassword = invitePasswordGenerator.generate();
+        String inviteUrl = "https://veco-eight.vercel.app/" + slug + "/invite?token=" + token;
+
+        // 4. 워크스페이스 생성
+        WorkSpace workSpace = WorkSpace.builder()
+                .name(request.getWorkspaceName())
+                .slug(slug)
+                .inviteToken(token)
+                .invitePassword(invitePassword)
+                .inviteUrl(inviteUrl)
+                .members(new ArrayList<>()) // 초기화
+                .teams(new ArrayList<>())   // 초기화
+                .build();
+
+        // 5. 양방향 연관관계 설정
+        workSpace.getMembers().add(member);
+        member.setWorkSpace(workSpace);
+
+        // 6. 기본 팀 생성 (별도 defaultTeamId 응답 없이 그냥 포함만 시킴)
+        Team defaultTeam = Team.builder()
+                .name("전체 멤버")
+                .workSpace(workSpace)
+                .build();
+
+        MemberTeam memberTeam = MemberTeam.builder()
+                .member(member)
+                .team(defaultTeam)
+                .build();
+
+        workSpace.getTeams().add(defaultTeam);
+        defaultTeam.getMemberTeams().add(memberTeam);
+
+        // 7. 저장
+        workspaceRepository.save(workSpace);
+        teamRepository.save(defaultTeam);
+
+        // 8. 응답
+        return WorkspaceResponseDTO.CreateWorkspaceResponseDto.builder()
+                .workspaceId(workSpace.getId())
+                .workspaceName(workSpace.getName())
+                .inviteUrl(workSpace.getInviteUrl())
+                .invitePassword(workSpace.getInvitePassword())
+                .build();
+    }
+
 }
