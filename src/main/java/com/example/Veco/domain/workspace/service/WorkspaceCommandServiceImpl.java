@@ -152,6 +152,7 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
                 .workspaceName(workSpace.getName())
                 .inviteUrl(workSpace.getInviteUrl())
                 .invitePassword(workSpace.getInvitePassword())
+                .defaultTeamId(defaultTeam.getId())
                 .build();
     }
 

@@ -81,14 +81,4 @@ public class WorkspaceConverter {
                 .inviteUrl(previewUrl)
                 .build();
     }
-
-    public static WorkspaceResponseDTO.CreateWorkspaceResponseDto toCreateWorkspaceResponseDto(WorkSpace workspace) {
-        return WorkspaceResponseDTO.CreateWorkspaceResponseDto.builder()
-                .workspaceName(workspace.getName())
-                .workspaceId(workspace.getId())
-                .inviteUrl(workspace.getInviteUrl())
-                .invitePassword(workspace.getInvitePassword())
-                .defaultTeamId(workspace.getTeams().getFirst().getId())
-                .build();
-    }
 }
