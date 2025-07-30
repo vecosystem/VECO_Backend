@@ -19,8 +19,9 @@ public class ExternalConverter {
     public static External toExternal(Team team, Goal goal, ExternalRequestDTO.ExternalCreateRequestDTO dto, String externalCode){
         External external = External.builder()
                 .description(dto.getContent())
-                .startDate(dto.getDeadline().getStart())
-                .endDate(dto.getDeadline().getEnd())
+                .name(externalCode)
+                .startDate(dto.getDeadline() != null ? dto.getDeadline().getStart() : null)
+                .endDate(dto.getDeadline() != null ? dto.getDeadline().getEnd() : null)
                 .external_code(externalCode)
                 .description(dto.getDescription())
                 .startDate(dto.getStartDate())
@@ -33,7 +34,10 @@ public class ExternalConverter {
                 .build();
 
         external.setTeam(team);
-        external.setGoal(goal);
+
+        if(goal != null){
+            external.setGoal(goal);
+        }
 
         return external;
     }

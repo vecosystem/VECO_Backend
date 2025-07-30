@@ -40,6 +40,10 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/**", "/api/test/login", "/api/token/reissue", "/login-test.html", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**", "/css/**", "/images/**", "/js/**", "/h2-console/**", "/profile", "/workspace/create-url").permitAll()
+                        .requestMatchers("/", "/api/test/login", "/api/token/reissue", "/login-test.html", "/v3/api-docs/**", "/swagger-ui/**",
+                                "/swagger-resources/**", "/css/**", "/images/**",
+                                "/js/**", "/h2-console/**", "/profile", "/github/**","/api/github/**").permitAll()
+                        .requestMatchers("/**", "/api/test/login", "/api/token/reissue", "/login-test.html", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**", "/css/**", "/images/**", "/js/**", "/h2-console/**", "/profile").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(AbstractHttpConfigurer::disable)

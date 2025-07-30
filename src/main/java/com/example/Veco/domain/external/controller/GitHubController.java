@@ -39,9 +39,9 @@ public class GitHubController {
     @GetMapping("/connect")
     public String connectGithub(
             @Parameter(description = "연동할 팀 ID", required = true, example = "1") 
-            @RequestParam("teamId") String teamId){
+            @RequestParam("teamId") Long teamId){
         String authUrl = String.format(
-                "https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s&scope=%s&state=%s",
+                "https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s&scope=%s&state=%d",
                 gitHubConfig.getOauth().getClientId(),
                 gitHubConfig.getOauth().getRedirectUri(),
                 "read:user,repo,admin:repo_hook",
@@ -71,7 +71,7 @@ public class GitHubController {
 
             // GitHub App 설치 페이지로 리다이렉트
             String githubAppInstallUrl = String.format(
-                    "https://github.com/apps/psb3707/installations/new?state=%s",
+                    "https://github.com/apps/VecoApp/installations/new?state=%s",
                     state
             );
 
@@ -83,21 +83,4 @@ public class GitHubController {
         }
     }
 
-//    @Operation(
-//            summary = "GitHub App 설치 콜백",
-//            description = "GitHub App 설치 완료 후 호출되는 콜백 API입니다. " +
-//                    "GitHub에서 자동으로 호출하며, 설치 정보를 데이터베이스에 저장합니다.",
-//            hidden = true
-//    )
-//    @GetMapping("/installation/callback")
-//    public String appInstallationCallback(
-//            @Parameter(description = "팀 ID") @RequestParam("state") Long state,
-//            @Parameter(description = "GitHub App 설치 ID") @RequestParam("installation_id") Long installationId) {
-//        log.info("teamId : {}", state);
-//        log.info("installationId : {}", installationId);
-//
-//        gitHubService.saveInstallationInfo(state, installationId);
-//
-//        return "redirect:/";
-//    }
 }

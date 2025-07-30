@@ -15,6 +15,9 @@ public class ExternalRequestDTO {
 
     @Getter
     public static class ExternalCreateRequestDTO{
+        private String owner;
+        private String repo;
+        private Long installationId;
         private String title;
         private String content;
         private State state;

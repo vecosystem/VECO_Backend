@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/{teamId}/externals")
+@RequestMapping("/api/teams/{teamId}/externals")
 @Tag(name = "외부이슈 API")
 public class ExternalController {
 
@@ -83,7 +83,7 @@ public class ExternalController {
                     )
             )
     })
-    @GetMapping("/")
+    @GetMapping
     public ApiResponse<CursorPage<ExternalResponseDTO.ExternalDTO>> getExternals(
             @Parameter(description = "팀 ID", required = true) @PathVariable("teamId") Long teamId,
             @Parameter(description = "이슈 상태 (선택)", required = false) @RequestParam(value = "state", required = false) State state,
@@ -142,7 +142,7 @@ public class ExternalController {
                     )
             )
     })
-    @PostMapping("/")
+    @PostMapping
     public ApiResponse<ExternalResponseDTO.CreateResponseDTO> createExternal(
             @Parameter(description = "팀 ID", required = true) @PathVariable("teamId") Long teamId,
             @Valid @RequestBody ExternalRequestDTO.ExternalCreateRequestDTO requestDTO) {
@@ -215,7 +215,7 @@ public class ExternalController {
                     )
             )
     })
-    @DeleteMapping("/")
+    @DeleteMapping
     public ApiResponse<?> deleteExternal(@Valid @RequestBody ExternalRequestDTO.ExternalDeleteRequestDTO requestDTO) {
         externalService.deleteExternals(requestDTO);
         return ApiResponse.onSuccess(ExternalSuccessCode.DELETE);

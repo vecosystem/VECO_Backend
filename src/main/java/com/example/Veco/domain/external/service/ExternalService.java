@@ -35,12 +35,14 @@ import com.example.Veco.global.apiPayload.exception.VecoException;
 import com.example.Veco.global.apiPayload.page.CursorPage;
 import com.example.Veco.global.enums.ExtServiceType;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -58,9 +60,12 @@ public class ExternalService {
     // 유틸
     private final SlackUtil slackUtil;
     private final CommentRoomRepository commentRoomRepository;
+    private final GitHubIssueService gitHubIssueService;
 
     @Transactional
     public ExternalResponseDTO.CreateResponseDTO createExternal(Long teamId, ExternalRequestDTO.ExternalCreateRequestDTO request){
+
+        log.info("createExternal");
 
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new TeamException(TeamErrorCode._NOT_FOUND));
@@ -68,12 +73,17 @@ public class ExternalService {
         NumberSequenceResponseDTO sequenceDTO = numberSequenceService
                 .allocateNextNumber(team.getWorkSpace().getName(), teamId, Category.EXTERNAL);
 
+        Goal goal = null;
 
-        Goal goal = findGoalById(request.getGoalId());
+        if(request.getGoalId() != null){
+            goal = findGoalById(request.getGoalId());
+        }
 
         External external = ExternalConverter.toExternal(team, goal, request, sequenceDTO.getNextCode());
 
         externalRepository.save(external);
+
+        gitHubIssueService.createGitHubIssue(request);
 
         return ExternalConverter.createResponseDTO(external);
     }

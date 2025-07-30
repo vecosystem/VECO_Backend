@@ -1,7 +1,10 @@
 package com.example.Veco.domain.external.service;
 
 import com.example.Veco.domain.external.converter.ExternalConverter;
+import com.example.Veco.domain.external.converter.GitHubConverter;
 import com.example.Veco.domain.external.dto.GitHubWebhookPayload;
+import com.example.Veco.domain.external.dto.request.ExternalRequestDTO;
+import com.example.Veco.domain.external.dto.response.GitHubApiResponseDTO;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.external.entity.GitHubIssue;
 import com.example.Veco.domain.external.exception.ExternalException;
@@ -19,8 +22,11 @@ import com.example.Veco.domain.team.repository.TeamRepository;
 import com.example.Veco.domain.team.service.NumberSequenceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,7 +41,14 @@ public class GitHubIssueService {
     private final ExternalRepository externalRepository;
     private final NumberSequenceService numberSequenceService;
     private final GitHubInstallationRepository gitHubInstallationRepository;
-    private final TeamRepository teamRepository;
+    private final GitHubTokenService gitHubTokenService;
+    private final WebClient webClient = WebClient.builder()
+            .baseUrl("https://api.github.com")
+            .defaultHeader("Accept", "application/vnd.github+json")
+            .defaultHeader("X-GitHub-Api-Version", "2022-11-28")
+            .defaultHeader("User-Agent", "VecoApp/1.0")
+            .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(1024 * 1024)) // 1MB
+            .build();
 
     public void processIssueWebhook(GitHubWebhookPayload payload) {
 
@@ -62,6 +75,40 @@ public class GitHubIssueService {
                 log.info("Issue {} edited", issue.getNumber());
                 updateIssue(payload);
         }
+    }
+
+    public void createGitHubIssue(ExternalRequestDTO.ExternalCreateRequestDTO requestDTO) {
+       String token = gitHubTokenService.getInstallationToken(requestDTO.getInstallationId()).block();
+
+        log.info("token: {}", token);
+
+        try {
+            // ✅ .block()으로 실제 실행하고 결과 대기
+            GitHubApiResponseDTO.GitHubIssueResponseDTO issue = webClient.post()
+                    .uri("/repos/{owner}/{repo}/issues", requestDTO.getOwner(), requestDTO.getRepo())
+                    .header("Authorization", "Bearer " + token)
+                    .bodyValue(GitHubConverter.toIssueCreateDTO(requestDTO))
+                    .retrieve()
+                    .onStatus(HttpStatusCode::is4xxClientError, response -> {
+                        return response.bodyToMono(String.class)
+                                .flatMap(errorBody -> {
+                                    log.error("GitHub 이슈 생성 실패 (4xx): owner={}, repo={}, status={}, body={}",
+                                            requestDTO.getOwner(), requestDTO.getRepo(), response.statusCode(), errorBody);
+                                    return Mono.error(new RuntimeException("이슈 생성 실패: " + response.statusCode()));
+                                });
+                    })
+                    .bodyToMono(GitHubApiResponseDTO.GitHubIssueResponseDTO.class)
+                    .block();  // ✅ 실제 실행
+
+            log.info("GitHub 이슈 생성 성공: owner={}, repo={}, issueNumber={}",
+                    requestDTO.getOwner(), requestDTO.getRepo(), issue.getNumber());
+
+        } catch (Exception e) {
+            log.error("GitHub 이슈 생성 중 오류 발생: {}", e.getMessage(), e);
+            throw e;
+        }
+
+        log.info("done");
     }
 
     private void closeIssue(GitHubWebhookPayload payload) {

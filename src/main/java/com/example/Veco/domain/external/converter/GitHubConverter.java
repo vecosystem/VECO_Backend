@@ -1,7 +1,11 @@
 package com.example.Veco.domain.external.converter;
 
+import com.example.Veco.domain.external.dto.request.ExternalRequestDTO;
+import com.example.Veco.domain.external.dto.request.GitHubApiRequestDTO;
 import com.example.Veco.domain.external.dto.response.GitHubResponseDTO;
 import com.example.Veco.domain.mapping.GithubInstallation;
+
+import java.util.List;
 
 public class GitHubConverter {
 
@@ -9,6 +13,16 @@ public class GitHubConverter {
         return GitHubResponseDTO.GitHubAppInstallationDTO.builder()
                 .installationId(installation.getInstallationId())
                 .teamId(installation.getTeam().getId())
+                .build();
+    }
+
+    public static GitHubApiRequestDTO.IssueCreateRequestDTO toIssueCreateDTO(ExternalRequestDTO.ExternalCreateRequestDTO requestDTO) {
+        return GitHubApiRequestDTO.IssueCreateRequestDTO.builder()
+                .title(requestDTO.getTitle())
+                .body(requestDTO.getContent())
+                .assignees( new String[0])
+                .labels(new String[0])
+                .milestone(null)
                 .build();
     }
 }

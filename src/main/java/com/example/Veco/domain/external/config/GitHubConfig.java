@@ -25,7 +25,6 @@ public class GitHubConfig {
     public static class App {
         private String id;
         private String privateKeyPath;
-        private String webhookSecret;
     }
 
     @Getter @Setter

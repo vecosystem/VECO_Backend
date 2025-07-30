@@ -13,6 +13,8 @@ import com.example.Veco.global.apiPayload.exception.VecoException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Service
 @RequiredArgsConstructor
@@ -38,5 +40,14 @@ public class GitHubService {
         return GitHubConverter.toGitHubAppInstallationDTO(savedInstallationInfo);
     }
 
+    public Long getInstallationId(Long teamId) {
+        return gitHubInstallationRepository.findByTeamId(teamId)
+                .orElseThrow().getInstallationId();
+    }
+
+    public Mono<Long> getInstallationIdAsync(Long teamId) {
+        return Mono.fromCallable(() -> getInstallationId(teamId))
+                .subscribeOn(Schedulers.boundedElastic()); // DB 조회를 별도 스레드에서 실행
+    }
 
 }

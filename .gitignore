@@ -2,6 +2,8 @@
 *.yml
 *.properties
 
+*.pem
+
 HELP.md
 .gradle
 build/
