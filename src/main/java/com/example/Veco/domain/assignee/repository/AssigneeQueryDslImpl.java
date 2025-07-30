@@ -7,6 +7,7 @@ import com.example.Veco.global.enums.Category;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AssigneeQueryDslImpl implements AssigneeQueryDsl {
     private final JPAQueryFactory queryFactory;
+    private final QAssignee assignee = QAssignee.assignee;
 
     @Override
     public List<Assignee> findByMemberTeamsAndTypeAndTargetIds(List<MemberTeam> memberTeams, Category type, List<Long> targetIds) {
@@ -27,5 +29,16 @@ public class AssigneeQueryDslImpl implements AssigneeQueryDsl {
                         assignee.targetId.in(targetIds)
                 )
                 .fetch();
+    }
+
+    @Override
+    @Transactional
+    public void deleteAllByTypeAndTargetIds(Category type, List<Long> targetIds) {
+        queryFactory.delete(assignee)
+                .where(
+                        assignee.type.eq(type),
+                        assignee.targetId.in(targetIds)
+                )
+                .execute();
     }
 }

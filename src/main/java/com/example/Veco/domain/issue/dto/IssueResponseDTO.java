@@ -120,4 +120,11 @@ public class IssueResponseDTO {
     ) {
     }
 
+    @Builder
+    public record UpdateIssue(
+            Long issueId,
+            LocalDateTime updatedAt
+    ){}
+
+
 }

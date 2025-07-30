@@ -54,9 +54,6 @@ public class Issue extends BaseEntity {
     @JoinColumn(name = "team_id")
     private Team team;
 
-//    @Column(name = "issue_number", nullable = false)
-//    private Integer issue_number;
-
     // 연관 관계
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "goal_id")
@@ -64,4 +61,11 @@ public class Issue extends BaseEntity {
 
     // update
     public void updateGoal(Goal goal) { this.goal = goal; }
+    public void updateTitle(String title) { this.title = title; }
+    public void updateContent(String content) { this.content = content; }
+    public void updateState(State state) { this.state = state; }
+    public void updatePriority(Priority priority) { this.priority = priority; }
+    public void updateDeadlineStart(LocalDate deadlineStart) { this.deadlineStart = deadlineStart; }
+    public void updateDeadlineEnd(LocalDate deadlineEnd) { this.deadlineEnd = deadlineEnd; }
+
 }
