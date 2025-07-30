@@ -22,6 +22,7 @@ public class WorkspaceResponseDTO {
         private String name;
         private String profileUrl;
         private String workspaceUrl;
+        private List<WorkspaceMemberWithTeamsDto.TeamInfoDto> teams;
     }
 
     /**
@@ -62,7 +63,7 @@ public class WorkspaceResponseDTO {
     @Builder
     @Getter
     @NoArgsConstructor
-    @AllArgsConstructor
+                                                                                                                                                                                                                                                                                                @AllArgsConstructor
     public static class CreateTeamResponseDto {
         private Long teamId;
         private String teamName;
@@ -112,9 +113,9 @@ public class WorkspaceResponseDTO {
     public static class CreateWorkspaceResponseDto {
         private Long workspaceId;
         private String workspaceName;
+        private String workspaceUrl;
         private String inviteUrl;
         private String invitePassword;
         private Long defaultTeamId;
     }
-
 }

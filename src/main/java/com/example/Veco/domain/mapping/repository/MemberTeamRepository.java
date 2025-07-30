@@ -1,6 +1,8 @@
 package com.example.Veco.domain.mapping.repository;
 
 import com.example.Veco.domain.mapping.entity.MemberTeam;
+import com.example.Veco.domain.workspace.dto.TeamMemberCountDto;
+import com.example.Veco.domain.workspace.dto.WorkspaceResponseDTO;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,6 +22,9 @@ public interface MemberTeamRepository extends JpaRepository<MemberTeam, Long> {
 
     List<MemberTeam> findAllByTeamId(Long teamId);
 
-    @Query("SELECT mt.team.id, COUNT(mt.id) FROM MemberTeam mt WHERE mt.team.id IN :teamIds GROUP BY mt.team.id")
-    List<Object[]> countMembersByTeamIds(@Param("teamIds") List<Long> teamIds);
+    @Query("SELECT new com.example.Veco.domain.workspace.dto.TeamMemberCountDto(mt.team.id, COUNT(mt.id)) " +
+            "FROM MemberTeam mt " +
+            "WHERE mt.team.id IN :teamIds " +
+            "GROUP BY mt.team.id")
+    List<TeamMemberCountDto> countMembersByTeamIds(@Param("teamIds") List<Long> teamIds);
 }

@@ -111,7 +111,8 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
         String slug = slugGenerator.generate(request.getWorkspaceName());
         String token = inviteTokenGenerator.generate();
         String invitePassword = invitePasswordGenerator.generate();
-        String inviteUrl = "https://veco-eight.vercel.app/" + slug + "/invite?token=" + token;
+        String workspaceUrl = "https://veco-eight.vercel.app/" + slug;
+        String inviteUrl = workspaceUrl + "/invite?token=" + token;
 
         // 4. 워크스페이스 생성
         WorkSpace workSpace = WorkSpace.builder()
@@ -120,6 +121,7 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
                 .inviteToken(token)
                 .invitePassword(invitePassword)
                 .inviteUrl(inviteUrl)
+                .workspaceUrl(workspaceUrl)
                 .members(new ArrayList<>()) // 초기화
                 .teams(new ArrayList<>())   // 초기화
                 .build();
@@ -128,9 +130,9 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
         workSpace.getMembers().add(member);
         member.setWorkSpace(workSpace);
 
-        // 6. 기본 팀 생성 (별도 defaultTeamId 응답 없이 그냥 포함만 시킴)
+        // 6. 기본 팀 생성
         Team defaultTeam = Team.builder()
-                .name("전체 멤버")
+                .name(workSpace.getName()) // 워크스페이스 이름과 같은 디폴트 팀
                 .workSpace(workSpace)
                 .build();
 
@@ -145,6 +147,7 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
         // 7. 저장
         workspaceRepository.save(workSpace);
         teamRepository.save(defaultTeam);
+        memberRepository.save(member);
 
         // 8. 응답
         return WorkspaceResponseDTO.CreateWorkspaceResponseDto.builder()
@@ -153,6 +156,7 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
                 .inviteUrl(workSpace.getInviteUrl())
                 .invitePassword(workSpace.getInvitePassword())
                 .defaultTeamId(defaultTeam.getId())
+                .workspaceUrl(workSpace.getWorkspaceUrl())
                 .build();
     }
 

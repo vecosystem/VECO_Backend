@@ -7,6 +7,7 @@ import com.example.Veco.domain.member.repository.MemberRepository;
 import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.domain.team.repository.TeamRepository;
 import com.example.Veco.domain.workspace.converter.WorkspaceConverter;
+import com.example.Veco.domain.workspace.dto.TeamMemberCountDto;
 import com.example.Veco.domain.workspace.dto.WorkspaceRequestDTO;
 import com.example.Veco.domain.workspace.dto.WorkspaceResponseDTO;
 import com.example.Veco.domain.workspace.entity.WorkSpace;
@@ -68,13 +69,13 @@ public class WorkspaceQueryServiceImpl implements WorkspaceQueryService {
                 .collect(Collectors.toList());
 
         // 각 팀별 멤버 수 조회 (count)
-        List<Object[]> result = memberTeamRepository.countMembersByTeamIds(teamIds);
+        List<TeamMemberCountDto> result = memberTeamRepository.countMembersByTeamIds(teamIds);
 
         // 팀 ID → 멤버 수로 매핑
         Map<Long, Integer> memberCountMap = result.stream()
                 .collect(Collectors.toMap(
-                        r -> (Long) r[0], // teamId
-                        r -> ((Long) r[1]).intValue() // count
+                        TeamMemberCountDto::getTeamId,
+                        dto -> dto.getMemberCount().intValue()
                 ));
 
         // DTO로 변환하여 반환

@@ -6,6 +6,7 @@ import com.example.Veco.domain.workspace.dto.WorkspaceResponseDTO;
 import com.example.Veco.domain.workspace.entity.WorkSpace;
 import org.springframework.data.domain.Page;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -16,10 +17,19 @@ public class WorkspaceConverter {
      * Workspace 기본 정보 응답 DTO 변환
      */
     public static WorkspaceResponseDTO.WorkspaceResponseDto toWorkspaceResponse(WorkSpace workspace) {
+        List<WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto.TeamInfoDto> teamInfoList = workspace.getTeams().stream()
+                .map(team -> WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto.TeamInfoDto.builder()
+                        .teamId(team.getId())
+                        .teamName(team.getName())
+                        .teamProfileUrl(team.getProfileUrl())
+                        .build())
+                .toList();
+
         return WorkspaceResponseDTO.WorkspaceResponseDto.builder()
                 .name(workspace.getName())
                 .profileUrl(workspace.getProfileUrl())
                 .workspaceUrl(workspace.getWorkspaceUrl())
+                .teams(teamInfoList)
                 .build();
     }
 
@@ -31,6 +41,7 @@ public class WorkspaceConverter {
                 .teamId(team.getId())
                 .name(team.getName())
                 .memberCount(memberCount)
+                .createdAt(team.getCreatedAt())
                 .build();
     }
 
@@ -38,8 +49,7 @@ public class WorkspaceConverter {
      * 워크 스페이스 내 팀 리스트 조회 응답 DTO 변환
      * - 페이지네이션 된 Team + 각 팀별 멤버 수 Map
      */
-    public static WorkspaceResponseDTO.WorkspaceTeamListDto toWorkspaceTeamListDto(
-            Page<Team> teamPage, Map<Long, Integer> memberCountMap) {
+    public static WorkspaceResponseDTO.WorkspaceTeamListDto toWorkspaceTeamListDto(Page<Team> teamPage, Map<Long, Integer> memberCountMap) {
 
         List<WorkspaceResponseDTO.WorkspaceTeamDto> list = teamPage.getContent().stream()
                 .map(team -> toWorkspaceTeamDto(

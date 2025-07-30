@@ -10,10 +10,6 @@ import org.springframework.stereotype.Component;
 public class MemberConverter {
 
     public static MemberResponseDTO.ProfileResponseDto toProfileResponseDTO(Member member) {
-        if (member.getProfile() == null) {
-            throw new MemberHandler(MemberErrorStatus._PROFILE_NOT_FOUND);
-        }
-
         return MemberResponseDTO.ProfileResponseDto.builder()
                 .memberId(member.getId())
                 .name(member.getName())
