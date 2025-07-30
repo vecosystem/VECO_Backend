@@ -54,12 +54,16 @@ public class ExceptionAdvice {
         // 정의한 커스텀 메시지 로그에 기록
         log.error("[커스텀 Exception]: {}", e.getErrorReasonHttpStatus().getMessage());
 
+        // 에러 메시지 반환
+        Map<String, String> result = new HashMap<>();
+        result.put(e.getClass().getSimpleName(), e.getMessage());
+
         HttpStatus status = e.getErrorReasonHttpStatus().getHttpStatus();
         return ResponseEntity.status(status).body(
                 ApiResponse.onFailure(
                         e.getErrorReasonHttpStatus().getCode(),
                         e.getErrorReasonHttpStatus().getMessage(),
-                        null
+                        result
                 )
         );
     }
@@ -71,13 +75,17 @@ public class ExceptionAdvice {
         // 정의하지 않은 예외는 로그로 확인
         log.error("{}:{}", e.getClass().getSimpleName(), e.getMessage());
 
-        // 응답은 500으로 반환
+        // 에러 메시지 반환
+        Map<String, String> result = new HashMap<>();
+        result.put(e.getClass().getSimpleName(), e.getMessage());
+
+        // 응답은 500으로 반환: 결과에 로그 반환
         BaseErrorStatus status = ErrorStatus._INTERNAL_SERVER_ERROR;
         return ResponseEntity.status(status.getReasonHttpStatus().getHttpStatus()).body(
                 ApiResponse.onFailure(
                         status.getReasonHttpStatus().getCode(),
                         status.getReasonHttpStatus().getMessage(),
-                        null
+                        result
                 )
         );
     }
