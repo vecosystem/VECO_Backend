@@ -6,6 +6,8 @@ import com.example.Veco.domain.goal.entity.Goal;
 import com.example.Veco.domain.goal.repository.GoalRepository;
 import com.example.Veco.domain.issue.entity.Issue;
 import com.example.Veco.domain.issue.repository.IssueRepository;
+import com.example.Veco.domain.member.error.MemberErrorStatus;
+import com.example.Veco.domain.member.error.MemberHandler;
 import com.example.Veco.domain.member.repository.MemberRepository;
 import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.memberNotification.entity.MemberNotification;
@@ -16,6 +18,7 @@ import com.example.Veco.domain.notification.enums.FilterType;
 import com.example.Veco.domain.notification.exception.NotificationException;
 import com.example.Veco.domain.notification.exception.code.NotiErrorCode;
 import com.example.Veco.domain.reminder.service.ReminderService;
+import com.example.Veco.global.auth.user.AuthUser;
 import com.example.Veco.global.enums.Category;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -39,12 +42,13 @@ public class NotiQueryServiceImpl implements NotiQueryService {
     private final NotiConverter notiConverter;
     private final ReminderService reminderService;
 
-    public GroupedNotiList getNotiList(Long memberId, Category alarmType, String filter) {
-        Optional<Member> member = memberRepository.findById(memberId);
-        reminderService.handleReminder(member.orElse(null)); // 알림 동적 생성
+    public GroupedNotiList getNotiList(AuthUser user, Category alarmType, String filter) {
+        Member member = memberRepository.findBySocialUid(user.getSocialUid()).orElseThrow(() ->
+                new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND));
+        reminderService.handleReminder(member); // 알림 동적 생성
 
         LocalDate deadline = LocalDate.now();
-        List<MemberNotification> memberNotis = memberNotiRepository.findByMemberIdAndTypeAndNotDeleted(memberId, alarmType);
+        List<MemberNotification> memberNotis = memberNotiRepository.findByMemberAndTypeAndNotDeleted(member, alarmType);
         List<Long> typeIds = memberNotis.stream()
                 .map(mn -> mn.getNotification().getTypeId())
                 .collect(Collectors.toList());
