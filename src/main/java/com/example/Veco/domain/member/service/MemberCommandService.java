@@ -9,7 +9,7 @@ public interface MemberCommandService {
 
     Member saveMember(Member member);
     
-    Member updateProfileImage(MultipartFile file, Long memberId);
+    Member updateProfileImage(MultipartFile file, Member member);
 
-    void deleteProfileImage(Long memberId);
+    void deleteProfileImage(Member member);
 }

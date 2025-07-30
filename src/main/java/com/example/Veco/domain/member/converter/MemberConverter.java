@@ -2,6 +2,8 @@ package com.example.Veco.domain.member.converter;
 
 import com.example.Veco.domain.member.dto.MemberResponseDTO;
 import com.example.Veco.domain.member.entity.Member;
+import com.example.Veco.domain.member.error.MemberErrorStatus;
+import com.example.Veco.domain.member.error.MemberHandler;
 import org.springframework.stereotype.Component;
 
 @Component

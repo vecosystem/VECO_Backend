@@ -2,6 +2,7 @@ package com.example.Veco.domain.team.entity;
 
 
 import com.example.Veco.domain.common.BaseEntity;
+import com.example.Veco.domain.mapping.entity.MemberTeam;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.mapping.GithubInstallation;
 import com.example.Veco.domain.workspace.entity.WorkSpace;
@@ -32,10 +33,17 @@ public class Team extends BaseEntity {
     @Column(name = "goal_number")
     private Long goalNumber;
 
+    @Column(name = "team_order")
+    private int order;
+
     // 연관 관계
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "workspace_id")
     private WorkSpace workSpace;
+
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<MemberTeam> memberTeams = new ArrayList<>();
 
     @OneToOne(mappedBy = "team")
     private GithubInstallation githubInstallation;
@@ -44,7 +52,8 @@ public class Team extends BaseEntity {
     @Builder.Default
     private List<External> externals = new ArrayList<>();
 
-
     // update
     public void updateGoalNumber(Long goalNumber){ this.goalNumber = goalNumber; }
+
+    public void updateOrder(int order){ this.order = order; }
 }

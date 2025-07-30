@@ -1,4 +1,4 @@
-package com.example.Veco.domain.member.error;
+package com.example.Veco.domain.workspace.error;
 
 import com.example.Veco.global.apiPayload.ErrorReasonDTO;
 import com.example.Veco.global.apiPayload.code.BaseErrorStatus;
@@ -8,10 +8,9 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
-public enum MemberErrorStatus implements BaseErrorStatus {
-    _MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER4001", "해당 멤버가 없습니다."),
-    _PROFILE_NOT_FOUND(HttpStatus.NOT_FOUND, "PROFILE4001", "프로필 정보가 존재하지 않습니다."),
-    _FORBIDDEN(HttpStatus.FORBIDDEN, "MEMBER403_0", "접근이 금지되었습니다."),
+public enum WorkspaceErrorStatus implements BaseErrorStatus {
+    _WORKSPACE_NOT_FOUND(HttpStatus.NOT_FOUND, "WORKSPACE4001", "해당 워크스페이스가 없습니다."),
+    _WORKSPACE_DUPLICATED(HttpStatus.BAD_REQUEST, "WORKSPACE4002", "워크스페이스는 한 사람당 하나만 존재합니다.")
     ;
 
     private final HttpStatus httpStatus;
