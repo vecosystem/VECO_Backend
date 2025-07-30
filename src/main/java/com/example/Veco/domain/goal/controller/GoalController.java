@@ -6,13 +6,17 @@ import com.example.Veco.domain.goal.exception.code.GoalSuccessCode;
 import com.example.Veco.domain.goal.service.command.GoalCommandService;
 import com.example.Veco.domain.goal.service.query.GoalQueryService;
 import com.example.Veco.global.apiPayload.ApiResponse;
+import com.example.Veco.global.auth.user.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -118,9 +122,10 @@ public class GoalController {
     @PostMapping("/teams/{teamId}/goals")
     public ApiResponse<CreateGoal> createGoal(
             @PathVariable Long teamId,
-            @RequestBody GoalReqDTO.CreateGoal dto
+            @RequestBody GoalReqDTO.CreateGoal dto,
+            @AuthenticationPrincipal AuthUser user
     ){
-        return ApiResponse.onSuccess(GoalSuccessCode.CREATE, goalCommandService.createGoal(teamId, dto));
+        return ApiResponse.onSuccess(GoalSuccessCode.CREATE, goalCommandService.createGoal(teamId, dto, user));
     }
 
     // 목표 사진 첨부: 변경 가능성 O
@@ -138,7 +143,7 @@ public class GoalController {
     // PATCH
     // 목표 수정
     @Operation(
-            summary = "목표 수정 API By 김주헌 (개발 중)",
+            summary = "목표 수정 API By 김주헌",
             description = "목표를 수정합니다. " +
                     "수정할 내용을 추가하면 됩니다. 담당자, 이슈를 수정할 경우 수정된 리스트를 업로드하시면 됩니다. " +
                     "변경 사항이 없는 속성은 RequestBody에서 제거 후 요청하면 됩니다."
@@ -147,9 +152,10 @@ public class GoalController {
     public ApiResponse<UpdateGoal> updateGoal(
             @PathVariable Long teamId,
             @PathVariable Long goalId,
-            @RequestBody GoalReqDTO.UpdateGoal dto
+            @RequestBody GoalReqDTO.UpdateGoal dto,
+            @AuthenticationPrincipal AuthUser user
     ){
-        UpdateGoal result = goalCommandService.updateGoal(dto, teamId, goalId);
+        UpdateGoal result = goalCommandService.updateGoal(dto, teamId, goalId, user);
         if (result != null){
             return ApiResponse.onSuccess(GoalSuccessCode.UPDATE, result);
         } else {
@@ -161,14 +167,15 @@ public class GoalController {
     // 목표 삭제
     @Operation(
             summary = "목표 삭제 API By 김주헌",
-            description = "목표를 삭제합니다. (Soft Delete)"
+            description = "목표를 삭제합니다. (Soft Delete)" +
+                    "삭제할 목표 ID를 리스트 형태로 보내주시면 일괄 삭제 처리 가능합니다."
     )
-    @DeleteMapping("/teams/{teamId}/goals/{goalId}")
-    public ApiResponse<Void> deleteGoal(
+    @DeleteMapping("/teams/{teamId}/goals")
+    public ApiResponse<List<Long>> deleteGoal(
             @PathVariable Long teamId,
-            @PathVariable Long goalId
+            @RequestBody GoalReqDTO.DeleteGoal dto,
+            @AuthenticationPrincipal AuthUser user
     ){
-        goalCommandService.deleteGoal(teamId, goalId);
-        return ApiResponse.onSuccess(GoalSuccessCode.DELETE, null);
+        return ApiResponse.onSuccess(GoalSuccessCode.DELETE, goalCommandService.deleteGoal(teamId, dto, user));
     }
 }

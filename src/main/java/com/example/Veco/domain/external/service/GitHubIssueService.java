@@ -69,7 +69,7 @@ public class GitHubIssueService {
 
     private void closeIssue(GitHubWebhookPayload payload) {
         External external = externalRepository.findByGithubDataId(payload.getIssue().getId())
-                .orElseThrow(() -> new ExternalException(ExternalErrorCode.EXTERNAL_NOT_FOUND));
+                .orElseThrow(() -> new ExternalException(ExternalErrorCode.NOT_FOUND));
 
         external.closeIssue();
         externalRepository.save(external);
@@ -148,7 +148,7 @@ public class GitHubIssueService {
 
         Optional<GitHubIssue> existingIssue = gitHubIssueRepository.findById(issueData.getId());
         External external = externalRepository.findByGithubDataId(issueData.getId())
-                .orElseThrow(() -> new ExternalException(ExternalErrorCode.EXTERNAL_NOT_FOUND));
+                .orElseThrow(() -> new ExternalException(ExternalErrorCode.NOT_FOUND));
 
         external.updateExternalByGithubIssue(issueData);
 

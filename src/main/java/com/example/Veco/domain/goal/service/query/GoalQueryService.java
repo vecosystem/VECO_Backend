@@ -340,8 +340,7 @@ public class GoalQueryService {
 
         // 댓글 조회(댓글방 조회 -> 댓글 조회, 댓글 최신순): 없으면 []
         CommentRoom commentRooms = commentRoomRepository.findByRoomTypeAndTargetId(Category.GOAL, goalId);
-        List<Comment> comments = commentRepository.findAllByCommentRoomOrderByIdDesc(commentRooms)
-                .orElse(new ArrayList<>());
+        List<Comment> comments = commentRepository.findAllByCommentRoomOrderByIdDesc(commentRooms);
 
         // 조회한 요소들 DTO 변환
         return GoalConverter.toFullGoal(

@@ -23,6 +23,7 @@ import com.example.Veco.domain.member.repository.MemberRepository;
 import com.example.Veco.domain.team.exception.TeamException;
 import com.example.Veco.domain.team.exception.code.TeamErrorCode;
 import com.example.Veco.domain.team.repository.TeamRepository;
+import com.example.Veco.global.auth.user.AuthUser;
 import com.example.Veco.global.aws.util.S3Util;
 import com.example.Veco.global.redis.exception.RedisException;
 import com.example.Veco.global.redis.exception.code.RedisErrorCode;
@@ -62,13 +63,16 @@ public class GoalCommandService {
     // 목표 작성
     public CreateGoal createGoal(
             Long teamId,
-            GoalReqDTO.CreateGoal dto
+            GoalReqDTO.CreateGoal dto,
+            AuthUser user
     ) {
         // 담당자 존재 여부, 같은 팀 여부 검증 + 본인 포함 여부 확인 후 업데이트
         List<Long> memberIds = new ArrayList<>(dto.managersId());
         if (dto.isIncludeMe()) {
             // 인증 객체에서 가져오기
-            memberIds.add(1L);
+            Member member = memberRepository.findBySocialUid(user.getSocialUid()).orElseThrow(() ->
+                    new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND));
+            memberIds.add(member.getId());
         }
 
         // 사용자 존재 여부 검증
@@ -100,7 +104,7 @@ public class GoalCommandService {
         RLock lock = redissonClient.getLock("lock:goal:" + teamId);
         Long goalId;
         try {
-            boolean available = lock.tryLock(10, 1, TimeUnit.SECONDS);
+            boolean available = lock.tryLock(60, 15, TimeUnit.SECONDS);
             if (!available) {
                 throw new RedisException(RedisErrorCode.LOCK_TIMEOUT);
             }
@@ -133,10 +137,23 @@ public class GoalCommandService {
     public GoalResDTO.UpdateGoal updateGoal(
             GoalReqDTO.UpdateGoal dto,
             Long teamId,
-            Long goalId
+            Long goalId,
+            AuthUser user
     ){
-        // 사용자 - 목표 검증: 존재 여부, 같은 팀 여부 (임시)
-        validMemberAndGoal(teamId, goalId);
+        // 사용자 - 목표 검증: 존재 여부, 같은 팀 여부
+        Member member = memberRepository.findBySocialUid(user.getSocialUid())
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND));
+
+        memberTeamRepository.findByMemberIdAndTeamId(member.getId(), teamId)
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus._FORBIDDEN));
+
+        Goal goal = goalRepository.findById(goalId)
+                .orElseThrow(() -> new GoalException(GoalErrorCode.NOT_FOUND));
+
+        if (!goal.getTeam().getId().equals(teamId)) {
+            throw new GoalException(GoalErrorCode.FORBIDDEN);
+        }
+
 
         // 업데이트 실시: @Transactional
         boolean isRestore = goalTransactionalService.updateGoal(dto, goalId, teamId);
@@ -150,37 +167,33 @@ public class GoalCommandService {
 
     // 목표 삭제
     @Transactional
-    public void deleteGoal(
+    public List<Long> deleteGoal(
             Long teamId,
-            Long goalId
+            GoalReqDTO.DeleteGoal dto,
+            AuthUser user
     ){
 
-        // 사용자 - 목표 검증: 존재 여부, 같은 팀 여부
-        validMemberAndGoal(teamId, goalId);
+        // 모든 목표 조회
+        List<Goal> goals = goalRepository.findAllById(dto.goalIds());
 
-        // 삭제: 목표, 이슈, 담당자 / @Transactional
-        goalTransactionalService.deleteGoal(goalId);
+        Member member = memberRepository.findBySocialUid(user.getSocialUid())
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND));
+
+        // 쿼리 팀ID와 사용자의 팀이 같은지 확인
+        memberTeamRepository.findByMemberIdAndTeamId(member.getId(), teamId)
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus._FORBIDDEN));
+
+        // 목표의 팀ID와 쿼리의 팀ID가 일치하는 데이터만 삭제
+        List<Long> result = new ArrayList<>();
+        goals = goals.stream()
+                .filter(goal -> goal.getTeam().getId().equals(teamId))
+                .toList();
+
+        goals.forEach(goal -> result.add(goal.getId()));
+
+        goalRepository.deleteAll(goals);
+
+        return result;
     }
 
-    // 사용자 - 목표 검증: 존재 여부, 같은 팀 여부
-    private void validMemberAndGoal(Long teamId, Long goalId) {
-
-        // 삭제할 목표 존재 여부 검증
-        Goal goal = goalRepository.findById(goalId).orElseThrow(() ->
-                new GoalException(GoalErrorCode.NOT_FOUND));
-
-        // 팀 존재 여부 검증
-        if (!teamRepository.existsById(teamId)) {
-            throw new TeamException(TeamErrorCode._NOT_FOUND);
-        }
-
-        // 팀원 여부 확인: 인증 객체 추출 (임시)
-        MemberTeam member = memberTeamRepository.findByMemberIdAndTeamId(1L, teamId).orElseThrow(() ->
-                new MemberHandler(MemberErrorStatus._FORBIDDEN));
-
-        // 목표와 사용자가 같은 팀에 속하는지 검증
-        if (!goal.getTeam().equals(member.getTeam())) {
-            throw new GoalException(GoalErrorCode.FORBIDDEN);
-        }
-    }
 }
