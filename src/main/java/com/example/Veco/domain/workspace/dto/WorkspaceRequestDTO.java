@@ -1,5 +1,8 @@
 package com.example.Veco.domain.workspace.dto;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,5 +34,14 @@ public class WorkspaceRequestDTO {
     @AllArgsConstructor
     public static class TeamOrderRequestDto {
         private List<Long> teamIdList;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PreviewUrlRequestDto {
+        @NotBlank(message = "워크스페이스 이름을 입력해주세요.")
+        private String workspaceName;
     }
 }

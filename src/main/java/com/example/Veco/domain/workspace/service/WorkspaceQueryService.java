@@ -19,4 +19,6 @@ public interface WorkspaceQueryService {
     WorkspaceResponseDTO.WorkspaceTeamListDto getTeamListByWorkSpace(Pageable pageable, WorkSpace workspace);
 
     List<WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto> getWorkspaceMembers(Member loginMember);
+
+    String createPreviewUrl(String workspaceName);
 }

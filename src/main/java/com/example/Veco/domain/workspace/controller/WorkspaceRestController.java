@@ -1,5 +1,6 @@
 package com.example.Veco.domain.workspace.controller;
 
+import com.example.Veco.domain.external.config.GitHubConfig;
 import com.example.Veco.domain.member.converter.MemberConverter;
 import com.example.Veco.domain.member.dto.MemberResponseDTO;
 import com.example.Veco.domain.member.entity.Member;
@@ -18,8 +19,8 @@ import com.example.Veco.global.apiPayload.ApiResponse;
 import com.example.Veco.global.auth.oauth2.CustomOAuth2User;
 import com.example.Veco.global.auth.user.userdetails.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -41,4 +42,12 @@ import java.util.List;
 @Tag(name = "워크스페이스 API")
 public class WorkspaceRestController {
 
+    private final WorkspaceQueryService workspaceQueryService;
+
+    @PostMapping("/create-url")
+    @Operation(summary = "워크스페이스 이름에 맞는 url를 미리보기합니다.")
+    public ApiResponse<WorkspaceResponseDTO.PreviewUrlResponseDto> createWorkspaceUrl(@Valid @RequestBody WorkspaceRequestDTO.PreviewUrlRequestDto request) {
+        String previewUrl = workspaceQueryService.createPreviewUrl(request.getWorkspaceName());
+        return ApiResponse.onSuccess(WorkspaceConverter.toPreviewUrlResponseDto(previewUrl));
+    }
 }

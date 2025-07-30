@@ -98,4 +98,10 @@ public class WorkspaceResponseDTO {
             private String teamProfileUrl;
         }
     }
+
+    @Getter
+    @Builder
+    public static class PreviewUrlResponseDto {
+        private String inviteUrl;
+    }
 }

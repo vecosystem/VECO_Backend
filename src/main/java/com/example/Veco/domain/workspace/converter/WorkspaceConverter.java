@@ -75,4 +75,10 @@ public class WorkspaceConverter {
                         )
                         .build();
     }
+
+    public static WorkspaceResponseDTO.PreviewUrlResponseDto toPreviewUrlResponseDto(String previewUrl) {
+        return WorkspaceResponseDTO.PreviewUrlResponseDto.builder()
+                .inviteUrl(previewUrl)
+                .build();
+    }
 }

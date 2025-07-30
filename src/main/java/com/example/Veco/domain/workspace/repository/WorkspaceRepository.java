@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface WorkspaceRepository extends JpaRepository<WorkSpace, Long> {
 
+    boolean existsBySlug(String slug);
 }

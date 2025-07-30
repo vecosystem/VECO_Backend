@@ -14,8 +14,10 @@ import com.example.Veco.domain.workspace.error.WorkspaceErrorStatus;
 import com.example.Veco.domain.workspace.error.WorkspaceHandler;
 import com.example.Veco.domain.workspace.repository.WorkspaceQueryDslRepository;
 import com.example.Veco.domain.workspace.repository.WorkspaceRepository;
+import com.example.Veco.domain.workspace.util.SlugGenerator;
 import com.example.Veco.global.apiPayload.exception.VecoException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,7 @@ public class WorkspaceQueryServiceImpl implements WorkspaceQueryService {
     private final MemberTeamRepository memberTeamRepository;
     private final MemberRepository memberRepository;
     private final WorkspaceQueryDslRepository workspaceQueryDslRepository;
+    private final SlugGenerator slugGenerator;
 
     /**
      * 로그인한 멤버가 속한 워크스페이스 조회
@@ -84,5 +87,12 @@ public class WorkspaceQueryServiceImpl implements WorkspaceQueryService {
                 .orElseThrow(() -> new WorkspaceHandler(WorkspaceErrorStatus._WORKSPACE_NOT_FOUND));
 
         return workspaceQueryDslRepository.findWorkspaceMembersWithTeams(workspace);
+    }
+
+    @Override
+    public String createPreviewUrl(String workspaceName) {
+        String slug = slugGenerator.generate(workspaceName);
+
+        return "https://veco-eight.vercel.app/" + slug ;
     }
 }

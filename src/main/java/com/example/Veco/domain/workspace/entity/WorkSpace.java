@@ -35,6 +35,7 @@ public class WorkSpace extends BaseEntity {
 
     private String invitePassword;
     private String inviteUrl;
+    private String slug;
 
     @OneToMany(mappedBy = "workSpace")
     @Builder.Default
