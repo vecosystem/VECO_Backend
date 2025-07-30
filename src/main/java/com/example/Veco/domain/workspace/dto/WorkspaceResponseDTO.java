@@ -19,6 +19,7 @@ public class WorkspaceResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class WorkspaceResponseDto {
+        private Long workspaceId;
         private String name;
         private String profileUrl;
         private String workspaceUrl;

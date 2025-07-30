@@ -26,6 +26,7 @@ public class WorkspaceConverter {
                 .toList();
 
         return WorkspaceResponseDTO.WorkspaceResponseDto.builder()
+                .workspaceId(workspace.getId())
                 .name(workspace.getName())
                 .profileUrl(workspace.getProfileUrl())
                 .workspaceUrl(workspace.getWorkspaceUrl())
