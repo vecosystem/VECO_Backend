@@ -66,14 +66,14 @@ public class SlackUtil {
 
     // 메시지 전송
     public SlackResDTO.PostSlackMessage PostSlackMessage(
-            String accessToken, String slackDefaultChannelId
+            String accessToken, String slackDefaultChannelId, String content
     ){
         return client.post()
                 .uri("/chat.postMessage")
                 .header("Authorization", "Bearer " + accessToken)
                 .bodyValue(
                         "channel=" + slackDefaultChannelId+
-                        "&text=" + "test"
+                        "&text=" + content
                 )
                 .retrieve()
                 .bodyToMono(SlackResDTO.PostSlackMessage.class)

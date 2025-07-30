@@ -78,10 +78,16 @@ public class ExternalService {
         if (request.getExtServiceType().equals(ExtServiceType.SLACK) && link != null) {
             com.example.Veco.domain.external.entity.ExternalService exService = link.getExternalService();
             try {
+
+                // 메시지 틀
+                String content = team.getName() + "에서 " +
+                        external.getTitle() + "을(를) 생성했습니다.";
+
                 // 메시지 전송
                 SlackResDTO.PostSlackMessage messageResult = slackUtil.PostSlackMessage(
                         exService.getAccessToken(),
-                        exService.getSlackDefaultChannelId()
+                        exService.getSlackDefaultChannelId(),
+                        content
                 );
 
                 // 토큰 관련 문제라면
