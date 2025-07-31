@@ -3,6 +3,7 @@ package com.example.Veco.global.config;
 import com.example.Veco.global.auth.jwt.filter.JwtAuthFilter;
 import com.example.Veco.global.auth.jwt.util.JwtUtil;
 import com.example.Veco.global.auth.oauth2.handler.OAuth2SuccessHandler;
+import com.example.Veco.global.auth.oauth2.resolver.CustomAuthorizationRequestResolver;
 import com.example.Veco.global.auth.oauth2.service.OAuth2UserService;
 import com.example.Veco.global.auth.user.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
     private final OAuth2UserService customOAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private final CustomAuthorizationRequestResolver customAuthorizationRequestResolver;
     private final JwtUtil jwtUtil;
     private final CorsConfigurationSource corsConfigurationSource;
 
@@ -52,8 +54,9 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2Login(oauth2 -> oauth2
                         .authorizationEndpoint(config -> config
-                                .baseUri("/oauth2/authorization/google")
-                                .authorizationRequestRepository(new HttpSessionOAuth2AuthorizationRequestRepository()))
+                                .authorizationRequestRepository(new HttpSessionOAuth2AuthorizationRequestRepository())
+                                .authorizationRequestResolver(customAuthorizationRequestResolver)
+                        )
                         .successHandler(oAuth2SuccessHandler)
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                         .failureHandler((request, response, exception) -> {

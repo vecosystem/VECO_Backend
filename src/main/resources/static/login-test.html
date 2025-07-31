@@ -7,12 +7,18 @@
 <body>
 <h1>🔐 Google 로그인 테스트</h1>
 
-<button id="loginBtn">Google로 로그인</button>
+<button id="loginBtn-create">Google로 로그인 - 워크스페이스 생성</button>
+<button id="loginBtn-join">Google로 로그인 - 기존 워크스페이스 참여</button>
 
 <script>
-    document.getElementById("loginBtn").addEventListener("click", () => {
+    document.getElementById("loginBtn-create").addEventListener("click", () => {
         // 구글 OAuth2 로그인 시작
-        window.location.href = "/oauth2/authorization/google";
+        window.location.href = "/oauth2/authorization/google?flow=create";
+    })
+
+    document.getElementById("loginBtn-join").addEventListener("click", () => {
+        // 구글 OAuth2 로그인 시작
+        window.location.href = "/oauth2/authorization/google?flow=join";
     })
 </script>
 </body>
