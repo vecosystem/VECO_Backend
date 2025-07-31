@@ -1,5 +1,6 @@
 package com.example.Veco.domain.memberNotification.repository;
 
+import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.memberNotification.entity.MemberNotification;
 import com.example.Veco.domain.memberNotification.entity.QMemberNotification;
 import com.example.Veco.domain.notification.entity.QNotification;
@@ -34,13 +35,13 @@ public class MemberNotiQueryDslImpl implements MemberNotiQueryDsl {
     }
 
     @Override
-    public List<MemberNotification> findByMemberIdAndTypeAndNotDeleted(Long memberId, Category alarmType) {
+    public List<MemberNotification> findByMemberAndTypeAndNotDeleted(Member member, Category alarmType) {
         return queryFactory
                 .selectFrom(memberNotification)
                 .join(memberNotification.notification, notification)
                 .fetchJoin()
                 .where(
-                        memberNotification.member.id.eq(memberId),
+                        memberNotification.member.eq(member),
                         memberNotification.isDeleted.eq(false),
                         notification.type.eq(alarmType)
                 )
