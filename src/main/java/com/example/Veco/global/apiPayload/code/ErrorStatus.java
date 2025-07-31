@@ -16,6 +16,10 @@ public enum ErrorStatus implements BaseErrorStatus{
 
     EXTERNAL_NOT_FOUND(HttpStatus.NOT_FOUND, "EXTERNAL400", "해당하는 외부 이슈가 존재하지 않습니다."),
     GOAL_NOT_FOUND(HttpStatus.NOT_FOUND, "GOAL400", "해당하는 목표가 존재하지 않습니다."),
+
+    VALID_FAILED(HttpStatus.BAD_REQUEST,
+            "VALID400_1",
+            "잘못된 파라미터입니다."),
     ;
 
     private HttpStatus httpStatus;
