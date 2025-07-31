@@ -1,5 +1,7 @@
 package com.example.Veco.domain.issue.converter;
 
+import com.example.Veco.domain.goal.dto.response.GoalResDTO;
+import org.springframework.stereotype.Component;
 import com.example.Veco.domain.assignee.entity.Assignee;
 import com.example.Veco.domain.comment.entity.Comment;
 import com.example.Veco.domain.goal.entity.Goal;
@@ -8,6 +10,7 @@ import com.example.Veco.domain.issue.dto.IssueResponseDTO;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -140,6 +143,16 @@ public class IssueConverter {
         return IssueResponseDTO.Data.<T>builder()
                 .cnt(info.size())
                 .info(info)
+                .build();
+    }
+
+    public static IssueResponseDTO.UpdateIssue toUpdateIssue(
+            Long issueId,
+            LocalDateTime now
+    ){
+        return IssueResponseDTO.UpdateIssue.builder()
+                .issueId(issueId)
+                .updatedAt(now)
                 .build();
     }
 }

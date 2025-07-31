@@ -19,6 +19,9 @@ public enum IssueErrorCode implements BaseErrorStatus {
     CURSOR_INVALID(HttpStatus.BAD_REQUEST,
             "ISSUE400_0",
             "유효하지 않은 커서입니다."),
+    FORBIDDEN(HttpStatus.FORBIDDEN,
+            "ISSUE403_0",
+            "권한이 없습니다."),
     ;
 
     private final HttpStatus httpStatus;
