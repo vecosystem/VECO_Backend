@@ -4,6 +4,7 @@ import com.example.Veco.domain.comment.entity.CommentRoom;
 import com.example.Veco.domain.external.converter.ExternalConverter;
 import com.example.Veco.domain.external.dto.request.ExternalRequestDTO;
 import com.example.Veco.domain.external.dto.response.ExternalResponseDTO;
+import com.example.Veco.domain.external.dto.response.ExternalGroupedResponseDTO;
 import com.example.Veco.domain.external.dto.paging.ExternalSearchCriteria;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.external.repository.ExternalCustomRepository;
@@ -102,6 +103,11 @@ public class ExternalService {
 
     public CursorPage<ExternalResponseDTO.ExternalDTO> getExternalsWithPagination(ExternalSearchCriteria criteria, String cursor, int size){
         return externalCustomRepository.findExternalWithCursor(criteria, cursor, size);
+    }
+
+    public ExternalGroupedResponseDTO.ExternalGroupedPageResponse getExternalsWithGroupedPagination(ExternalSearchCriteria criteria, String cursor, int size){
+        return ((com.example.Veco.domain.external.repository.ExternalCursorRepository) externalCustomRepository)
+                .findExternalWithGroupedResponse(criteria, cursor, size);
     }
 
     @Transactional

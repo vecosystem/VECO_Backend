@@ -1,15 +1,12 @@
 package com.example.Veco.domain.external.repository;
 
-import com.example.Veco.domain.assignee.entity.QAssignee;
 import com.example.Veco.domain.external.converter.ExternalConverter;
 import com.example.Veco.domain.external.dto.paging.ExternalCursor;
 import com.example.Veco.domain.external.dto.response.ExternalResponseDTO;
+import com.example.Veco.domain.external.dto.response.ExternalGroupedResponseDTO;
 import com.example.Veco.domain.external.dto.paging.ExternalSearchCriteria;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.external.entity.QExternal;
-import com.example.Veco.domain.mapping.repository.AssigmentRepository;
-import com.example.Veco.domain.team.converter.AssigneeConverter;
-import com.example.Veco.domain.team.dto.AssigneeResponseDTO;
 import com.example.Veco.global.apiPayload.page.CursorPage;
 import com.example.Veco.global.enums.State;
 import com.querydsl.core.types.OrderSpecifier;
@@ -28,12 +25,9 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
 
     private final JPAQueryFactory queryFactory;
     private final QExternal external = QExternal.external;
-    private final QAssignee assignee = QAssignee.assignee;
-    private final AssigmentRepository assigmentRepository;
 
-    public ExternalCursorRepository(EntityManager entityManager, AssigmentRepository assigmentRepository) {
+    public ExternalCursorRepository(EntityManager entityManager) {
         this.queryFactory = new JPAQueryFactory(entityManager);
-        this.assigmentRepository = assigmentRepository;
     }
 
     // TODO : 메서드 테스트 필요
@@ -58,6 +52,8 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
             case STATE -> external.state.eq(criteria.getState());
             case PRIORITY -> external.priority.eq(criteria.getPriority());
             case ASSIGNEE -> external.assignments.any().assignee.id.eq(criteria.getAssigneeId());
+            case EXT_TYPE -> external.type.eq(criteria.getExtServiceType());
+            case GOAL -> external.goal.id.eq(criteria.getGoalId());
             case NONE -> null;
         };
         
@@ -164,6 +160,33 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
                 .when(external.state.eq(State.FINISH)).then(4)
                 .when(external.state.eq(State.REVIEW)).then(5)
                 .otherwise(6);
+    }
+
+    public ExternalGroupedResponseDTO.ExternalGroupedPageResponse findExternalWithGroupedResponse(ExternalSearchCriteria criteria, String cursor, int size) {
+        JPAQuery<External> query = queryFactory.selectFrom(external)
+                .leftJoin(external.assignments).fetchJoin()
+                .where(
+                        buildFilterConditions(criteria),
+                        buildCursorCondition(criteria, cursor)
+                )
+                .orderBy(buildOrderClause(criteria))
+                .limit(size + 1);
+
+        List<External> externals = query.fetch();
+        
+        boolean hasNext = externals.size() > size;
+        if(hasNext) {
+            externals = externals.subList(0, size);
+        }
+
+        String nextCursor = null;
+        if(hasNext && !externals.isEmpty()) {
+            External last = externals.getLast();
+            ExternalCursor externalCursor = createCursorFromExternal(last, criteria);
+            nextCursor = externalCursor.encode();
+        }
+
+        return ExternalConverter.toGroupedPageResponse(externals, hasNext, nextCursor, size);
     }
 
 }

@@ -3,6 +3,7 @@ package com.example.Veco.domain.external.converter;
 import com.example.Veco.domain.comment.entity.Comment;
 import com.example.Veco.domain.external.dto.request.ExternalRequestDTO;
 import com.example.Veco.domain.external.dto.response.ExternalResponseDTO;
+import com.example.Veco.domain.external.dto.response.ExternalGroupedResponseDTO;
 import com.example.Veco.domain.external.dto.GitHubWebhookPayload;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.goal.entity.Goal;
@@ -14,6 +15,8 @@ import com.example.Veco.global.enums.State;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ExternalConverter {
     public static External toExternal(Team team, Goal goal, ExternalRequestDTO.ExternalCreateRequestDTO dto, String externalCode){
@@ -165,6 +168,70 @@ public class ExternalConverter {
         return ExternalResponseDTO.CreateResponseDTO.builder()
                 .externalId(external.getId())
                 .createdAt(external.getCreatedAt())
+                .build();
+    }
+
+    public static ExternalGroupedResponseDTO.ExternalGroupedPageResponse toGroupedPageResponse(
+            List<External> externals, 
+            boolean hasNext, 
+            String nextCursor, 
+            int pageSize) {
+        
+        Map<State, List<External>> groupedByState = externals.stream()
+                .collect(Collectors.groupingBy(External::getState));
+
+        List<ExternalGroupedResponseDTO.FilteredExternalGroup> data = new ArrayList<>();
+        
+        for (State state : State.values()) {
+            List<External> stateExternals = groupedByState.getOrDefault(state, new ArrayList<>());
+            
+            List<ExternalGroupedResponseDTO.ExternalItemDTO> externalItems = stateExternals.stream()
+                    .map(ExternalConverter::toExternalItemDTO)
+                    .collect(Collectors.toList());
+
+            ExternalGroupedResponseDTO.FilteredExternalGroup group = ExternalGroupedResponseDTO.FilteredExternalGroup.builder()
+                    .filterName(state.name())
+                    .dataCnt(stateExternals.size())
+                    .externals(externalItems)
+                    .build();
+            
+            data.add(group);
+        }
+
+        return ExternalGroupedResponseDTO.ExternalGroupedPageResponse.builder()
+                .data(data)
+                .hasNext(hasNext)
+                .nextCursor(nextCursor)
+                .pageSize(pageSize)
+                .build();
+    }
+
+    private static ExternalGroupedResponseDTO.ExternalItemDTO toExternalItemDTO(External external) {
+        ExternalGroupedResponseDTO.DeadlineDTO deadline = ExternalGroupedResponseDTO.DeadlineDTO.builder()
+                .start(external.getStartDate() != null ? external.getStartDate().toString() : null)
+                .end(external.getEndDate() != null ? external.getEndDate().toString() : null)
+                .build();
+
+        List<ExternalGroupedResponseDTO.ManagerInfoDTO> managerInfos = external.getAssignments().stream()
+                .map(assignment -> ExternalGroupedResponseDTO.ManagerInfoDTO.builder()
+                        .profileUrl(assignment.getProfileUrl())
+                        .managerName(assignment.getAssigneeName())
+                        .build())
+                .collect(Collectors.toList());
+
+        ExternalGroupedResponseDTO.ManagersDTO managers = ExternalGroupedResponseDTO.ManagersDTO.builder()
+                .cnt(managerInfos.size())
+                .info(managerInfos)
+                .build();
+
+        return ExternalGroupedResponseDTO.ExternalItemDTO.builder()
+                .id(external.getId())
+                .name(external.getExternalCode())
+                .title(external.getTitle())
+                .state(external.getState())
+                .priority(external.getPriority().name())
+                .deadline(deadline)
+                .managers(managers)
                 .build();
     }
 }

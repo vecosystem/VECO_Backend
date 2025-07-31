@@ -5,6 +5,7 @@ import com.example.Veco.domain.external.dto.paging.ExternalSearchCriteria;
 import com.example.Veco.domain.external.dto.request.ExternalRequestDTO;
 import com.example.Veco.domain.external.dto.response.ExternalApiResponse;
 import com.example.Veco.domain.external.dto.response.ExternalResponseDTO;
+import com.example.Veco.domain.external.dto.response.ExternalGroupedResponseDTO;
 import com.example.Veco.domain.external.exception.code.ExternalSuccessCode;
 import com.example.Veco.domain.external.service.ExternalService;
 import com.example.Veco.global.apiPayload.ApiResponse;
@@ -84,7 +85,7 @@ public class ExternalController {
             )
     })
     @GetMapping
-    public ApiResponse<CursorPage<ExternalResponseDTO.ExternalDTO>> getExternals(
+    public ApiResponse<ExternalGroupedResponseDTO.ExternalGroupedPageResponse> getExternals(
             @Parameter(description = "팀 ID", required = true) @PathVariable("teamId") Long teamId,
             @Parameter(description = "이슈 상태 (선택)", required = false) @RequestParam(value = "state", required = false) State state,
             @Parameter(description = "우선순위 (선택)", required = false) @RequestParam(value = "priority", required = false) Priority priority,
@@ -98,7 +99,7 @@ public class ExternalController {
                 .priority(priority)
                 .assigneeId(assigneeId).build();
 
-        return ApiResponse.onSuccess(externalService.getExternalsWithPagination(searchCriteria, cursor, size));
+        return ApiResponse.onSuccess(externalService.getExternalsWithGroupedPagination(searchCriteria, cursor, size));
 
     }
 
