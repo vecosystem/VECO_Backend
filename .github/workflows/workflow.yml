@@ -25,7 +25,7 @@ jobs:
           echo "${{ secrets.APPLICATION_YML }}" > src/main/resources/application.yml
         shell: bash
         
-      - name: application.yml 추가
+      - name: 깃허브 Private Key 추가
         run: |
           mkdir -p src/main/resources
           echo "${{ secrets.PRIVATE_KEY_GITHUB }}" > src/main/resources/private-key.pem
