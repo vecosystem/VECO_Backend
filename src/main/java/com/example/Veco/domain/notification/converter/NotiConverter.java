@@ -1,5 +1,6 @@
 package com.example.Veco.domain.notification.converter;
 
+import com.example.Veco.domain.assignee.entity.Assignee;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.goal.entity.Goal;
 import com.example.Veco.domain.issue.entity.Issue;
@@ -79,9 +80,20 @@ public class NotiConverter {
                 .build();
     }
 
+    private List<ManagerInfo> toManagerInfoList(List<Assignee> assignees){
+        if (assignees == null) return Collections.emptyList();
+        return assignees.stream()
+                .map(assignee -> {
+                    return NotiResDTO.ManagerInfo.builder()
+                            .name(assignee.getMemberTeam().getMember().getName())
+                            .profileUrl(assignee.getMemberTeam().getMember().getProfile().getProfileImageUrl())
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
 
     // Issue DTO 리스트 반환
-    public IssuePreViewDTO toIssuePreViewDTO(Issue issue, MemberNotification memberNoti) {
+    public IssuePreViewDTO toIssuePreViewDTO(Issue issue, MemberNotification memberNoti, List<Assignee> assignees) {
         return NotiResDTO.IssuePreViewDTO.builder()
                 .alarmId(memberNoti.getId())
                 .name(issue.getName())
@@ -90,14 +102,24 @@ public class NotiConverter {
                 .state(issue.getState())
                 .priority(issue.getPriority())
                 .goalTitle(issue.getGoal().getTitle())
+                .managerList(toManagerInfoList(assignees))
                 .isRead(memberNoti.getIsRead())
                 .build();
     }
-    public List<IssuePreViewDTO> toIssuePreviewDTOs(List<Issue> list, Map<Long, MemberNotification> notiMap) {
-        return list.stream()
-                .map(issue -> toIssuePreViewDTO(issue, notiMap.get(issue.getId())))
+    public List<IssuePreViewDTO> toIssuePreviewDTOs(
+            List<Issue> issueList,
+            Map<Long, MemberNotification> notiMap,
+            Map<Long, List<Assignee>> assigneeMap
+    ) {
+        return issueList.stream()
+                .map(issue -> toIssuePreViewDTO(
+                        issue,
+                        notiMap.get(issue.getId()),
+                        assigneeMap.getOrDefault(issue.getId(), Collections.emptyList())
+                ))
                 .collect(Collectors.toList());
     }
+
 
     // Issue 그룹핑
     public GroupedNotiList<IssuePreViewDTO> toIssuePreviewListByState(List<IssuePreViewDTO> list, LocalDate deadline) {
@@ -113,7 +135,7 @@ public class NotiConverter {
     }
 
     // Goal DTO 리스트 반환
-    public GoalPreViewDTO toGoalPreViewDTO(Goal goal, MemberNotification memberNoti) {
+    public GoalPreViewDTO toGoalPreViewDTO(Goal goal, MemberNotification memberNoti, List<Assignee> assignees) {
 
         return GoalPreViewDTO.builder()
                 .alarmId(memberNoti.getId())
@@ -122,12 +144,21 @@ public class NotiConverter {
                 .title(goal.getTitle())
                 .state(goal.getState())
                 .priority(goal.getPriority())
+                .managerList(toManagerInfoList(assignees))
                 .isRead(memberNoti.getIsRead())
                 .build();
     }
-    public List<GoalPreViewDTO> toGoalPreviewDTOs(List<Goal> list, Map<Long, MemberNotification> notiMap) {
+    public List<GoalPreViewDTO> toGoalPreviewDTOs(
+            List<Goal> list,
+            Map<Long, MemberNotification> notiMap,
+            Map<Long, List<Assignee>> assigneeMap
+    ) {
         return list.stream()
-                .map(goal -> toGoalPreViewDTO(goal, notiMap.get(goal.getId())))
+                .map(goal -> toGoalPreViewDTO(
+                        goal,
+                        notiMap.get(goal.getId()),
+                        assigneeMap.getOrDefault(goal.getId(), Collections.emptyList())
+                ))
                 .collect(Collectors.toList());
     }
 
@@ -143,7 +174,7 @@ public class NotiConverter {
 
 
     // External DTO 리스트 반환
-    public ExternalPreViewDTO toExternalPreViewDTO(External external, MemberNotification memberNoti) {
+    public ExternalPreViewDTO toExternalPreViewDTO(External external, MemberNotification memberNoti,  List<Assignee> assignees) {
 
         return ExternalPreViewDTO.builder()
                 .alarmId(memberNoti.getId())
@@ -153,13 +184,22 @@ public class NotiConverter {
                 .state(external.getState())
                 .priority(external.getPriority())
                 .goalTitle(external.getGoal().getTitle())
+                .managerList(toManagerInfoList(assignees))
                 .extServiceType(external.getType())
                 .isRead(memberNoti.getIsRead())
                 .build();
     }
-    public List<ExternalPreViewDTO> toExternalPreviewDTOs(List<External> list, Map<Long, MemberNotification> notiMap) {
+    public List<ExternalPreViewDTO> toExternalPreviewDTOs(
+            List<External> list,
+            Map<Long, MemberNotification> notiMap,
+            Map<Long, List<Assignee>> assigneeMap
+    ) {
         return list.stream()
-                .map(external -> toExternalPreViewDTO(external, notiMap.get(external.getId())))
+                .map(external -> toExternalPreViewDTO(
+                        external,
+                        notiMap.get(external.getId()),
+                        assigneeMap.getOrDefault(external.getId(), Collections.emptyList())
+                ))
                 .collect(Collectors.toList());
     }
 

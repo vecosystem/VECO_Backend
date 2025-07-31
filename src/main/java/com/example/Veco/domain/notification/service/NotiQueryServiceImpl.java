@@ -1,5 +1,7 @@
 package com.example.Veco.domain.notification.service;
 
+import com.example.Veco.domain.assignee.entity.Assignee;
+import com.example.Veco.domain.assignee.repository.AssigneeRepository;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.external.repository.ExternalRepository;
 import com.example.Veco.domain.goal.entity.Goal;
@@ -26,7 +28,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -39,6 +40,7 @@ public class NotiQueryServiceImpl implements NotiQueryService {
     private final IssueRepository issueRepository;
     private final GoalRepository goalRepository;
     private final ExternalRepository externalRepository;
+    private final AssigneeRepository assigneeRepository;
     private final NotiConverter notiConverter;
     private final ReminderService reminderService;
 
@@ -65,12 +67,17 @@ public class NotiQueryServiceImpl implements NotiQueryService {
     private GroupedNotiList handleIssue(List<Long> typeIds, List<MemberNotification> memberNotis,
                                         FilterType filter, LocalDate deadline) {
         List<Issue> issues = issueRepository.findByIdIn(typeIds);
+        List<Assignee> assignees = assigneeRepository.findByIssueIdIn(typeIds);
+        Map<Long, List<Assignee>> assigneeMap = assignees.stream()
+                .filter(a -> a.getIssue() != null)
+                .collect(Collectors.groupingBy(a -> a.getIssue().getId()));
+
         Map<Long, MemberNotification> memberNotiMap = memberNotis.stream()
                 .collect(Collectors.toMap(
                         mn -> mn.getNotification().getTypeId(),
                         Function.identity()
                 ));
-        List<IssuePreViewDTO> previews = notiConverter.toIssuePreviewDTOs(issues, memberNotiMap);
+        List<IssuePreViewDTO> previews = notiConverter.toIssuePreviewDTOs(issues, memberNotiMap, assigneeMap);
 
         return switch (filter) {
             case PRIORITY -> notiConverter.toIssuePreviewListByPriority(previews, deadline);
@@ -82,12 +89,17 @@ public class NotiQueryServiceImpl implements NotiQueryService {
     private GroupedNotiList handleGoal(List<Long> typeIds, List<MemberNotification> memberNotis,
                                        FilterType filter, LocalDate deadline) {
         List<Goal> goals = goalRepository.findByIdIn(typeIds);
+        List<Assignee> assignees = assigneeRepository.findByGoalIdIn(typeIds);
+        Map<Long, List<Assignee>> assigneeMap = assignees.stream()
+                .filter(a -> a.getGoal() != null)
+                .collect(Collectors.groupingBy(a -> a.getGoal().getId()));
+
         Map<Long, MemberNotification> memberNotiMap = memberNotis.stream()
                 .collect(Collectors.toMap(
                         mn -> mn.getNotification().getTypeId(),
                         Function.identity()
                 ));
-        List<GoalPreViewDTO> previews = notiConverter.toGoalPreviewDTOs(goals, memberNotiMap);
+        List<GoalPreViewDTO> previews = notiConverter.toGoalPreviewDTOs(goals, memberNotiMap, assigneeMap);
 
         return filter == FilterType.PRIORITY
                 ? notiConverter.toGoalPreviewListByPriority(previews, deadline)
@@ -97,12 +109,17 @@ public class NotiQueryServiceImpl implements NotiQueryService {
     private GroupedNotiList handleExternal(List<Long> typeIds, List<MemberNotification> memberNotis,
                                            FilterType filter, LocalDate deadline) {
         List<External> externals = externalRepository.findByIdIn(typeIds);
+        List<Assignee> assignees = assigneeRepository.findByExternalIdIn(typeIds);
+        Map<Long, List<Assignee>> assigneeMap = assignees.stream()
+                .filter(a -> a.getExternal() != null)
+                .collect(Collectors.groupingBy(a -> a.getExternal().getId()));
+
         Map<Long, MemberNotification> memberNotiMap = memberNotis.stream()
                 .collect(Collectors.toMap(
                         mn -> mn.getNotification().getTypeId(),
                         Function.identity()
                 ));
-        List<ExternalPreViewDTO> previews = notiConverter.toExternalPreviewDTOs(externals, memberNotiMap);
+        List<ExternalPreViewDTO> previews = notiConverter.toExternalPreviewDTOs(externals, memberNotiMap, assigneeMap);
 
         return switch (filter) {
             case PRIORITY -> notiConverter.toExternalPreviewListByPriority(previews, deadline);

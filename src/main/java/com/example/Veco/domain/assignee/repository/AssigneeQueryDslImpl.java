@@ -3,6 +3,9 @@ package com.example.Veco.domain.assignee.repository;
 import com.example.Veco.domain.assignee.entity.Assignee;
 import com.example.Veco.domain.assignee.entity.QAssignee;
 import com.example.Veco.domain.mapping.entity.MemberTeam;
+import com.example.Veco.domain.mapping.entity.QMemberTeam;
+import com.example.Veco.domain.member.entity.QMember;
+import com.example.Veco.domain.profile.entity.QProfile;
 import com.example.Veco.global.enums.Category;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +31,51 @@ public class AssigneeQueryDslImpl implements AssigneeQueryDsl {
                         assignee.type.eq(type),
                         assignee.targetId.in(targetIds)
                 )
+                .fetch();
+    }
+
+    @Override
+    public List<Assignee> findByIssueIdIn(List<Long> issueIds) {
+        QAssignee assignee = QAssignee.assignee;
+        QMemberTeam memberTeam = QMemberTeam.memberTeam;
+        QMember member = QMember.member;
+        QProfile profile = QProfile.profile;
+
+        return queryFactory.selectFrom(assignee)
+                .leftJoin(assignee.memberTeam, memberTeam).fetchJoin()
+                .leftJoin(memberTeam.member, member).fetchJoin()
+                .leftJoin(member.profile, profile).fetchJoin()
+                .where(assignee.issue.id.in(issueIds))
+                .fetch();
+    }
+
+    @Override
+    public List<Assignee> findByGoalIdIn(List<Long> goalIds) {
+        QAssignee assignee = QAssignee.assignee;
+        QMemberTeam memberTeam = QMemberTeam.memberTeam;
+        QMember member = QMember.member;
+        QProfile profile = QProfile.profile;
+
+        return queryFactory.selectFrom(assignee)
+                .leftJoin(assignee.memberTeam, memberTeam).fetchJoin()
+                .leftJoin(memberTeam.member, member).fetchJoin()
+                .leftJoin(member.profile, profile).fetchJoin()
+                .where(assignee.goal.id.in(goalIds))
+                .fetch();
+    }
+
+    @Override
+    public List<Assignee> findByExternalIdIn(List<Long> externalIds) {
+        QAssignee assignee = QAssignee.assignee;
+        QMemberTeam memberTeam = QMemberTeam.memberTeam;
+        QMember member = QMember.member;
+        QProfile profile = QProfile.profile;
+
+        return queryFactory.selectFrom(assignee)
+                .leftJoin(assignee.memberTeam, memberTeam).fetchJoin()
+                .leftJoin(memberTeam.member, member).fetchJoin()
+                .leftJoin(member.profile, profile).fetchJoin()
+                .where(assignee.external.id.in(externalIds))
                 .fetch();
     }
 

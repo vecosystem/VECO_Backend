@@ -34,6 +34,15 @@ public class NotiResDTO {
         }
     }
 
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ManagerInfo {
+        private String profileUrl;
+        private String name;
+    }
+
     @Builder
     @Getter
     @NoArgsConstructor
@@ -46,6 +55,7 @@ public class NotiResDTO {
         private State state;
         private Priority priority;
         private String goalTitle;
+        private List<ManagerInfo> managerList;
         private boolean isRead;
     }
 
@@ -60,6 +70,7 @@ public class NotiResDTO {
         private String title;
         private State state;
         private Priority priority;
+        private List<ManagerInfo> managerList;
         private boolean isRead;
     }
 
@@ -75,6 +86,7 @@ public class NotiResDTO {
         private State state;
         private Priority priority;
         private String goalTitle;
+        private List<ManagerInfo> managerList;
         private ExtServiceType extServiceType;
         private boolean isRead;
     }
