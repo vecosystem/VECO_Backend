@@ -1,4 +1,4 @@
-package com.example.Veco.domain.external.dto;
+package com.example.Veco.domain.external.dto.paging;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

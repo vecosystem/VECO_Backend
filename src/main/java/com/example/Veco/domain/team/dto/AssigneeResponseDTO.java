@@ -7,12 +7,13 @@ import lombok.NoArgsConstructor;
 
 public class AssigneeResponseDTO {
 
+
+
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
     public static class AssigneeDTO {
-        private Long id;
         private String assigneeName;
         private String profileUrl;
     }
