@@ -10,6 +10,7 @@ import com.example.Veco.domain.external.exception.code.ExternalSuccessCode;
 import com.example.Veco.domain.external.service.ExternalService;
 import com.example.Veco.global.apiPayload.ApiResponse;
 import com.example.Veco.global.apiPayload.page.CursorPage;
+import com.example.Veco.global.enums.ExtServiceType;
 import com.example.Veco.global.enums.Priority;
 import com.example.Veco.global.enums.State;
 import io.swagger.v3.oas.annotations.Operation;
@@ -90,6 +91,8 @@ public class ExternalController {
             @Parameter(description = "이슈 상태 (선택)", required = false) @RequestParam(value = "state", required = false) State state,
             @Parameter(description = "우선순위 (선택)", required = false) @RequestParam(value = "priority", required = false) Priority priority,
             @Parameter(description = "담당자 ID (선택)", required = false) @RequestParam(value = "assigneeId", required = false) Long assigneeId,
+            @Parameter(description = "목표 ID (선택)", required = false) @RequestParam(value = "goalId", required = false) Long goalId,
+            @Parameter(description = "외부 연동 툴", required = false) @RequestParam(value = "extType", required = false) ExtServiceType extType,
             @Parameter(description = "페이징 커서 (다음 페이지 조회용)", required = false) @RequestParam(value = "cursor", required = false) String cursor,
             @Parameter(description = "페이지 크기 (기본값: 50)", required = false) @RequestParam(value = "size", defaultValue = "50") Integer size) {
 
@@ -97,6 +100,8 @@ public class ExternalController {
                 .teamId(teamId)
                 .state(state)
                 .priority(priority)
+                .goalId(goalId)
+                .extServiceType(extType)
                 .assigneeId(assigneeId).build();
 
         return ApiResponse.onSuccess(externalService.getExternalsWithGroupedPagination(searchCriteria, cursor, size));
