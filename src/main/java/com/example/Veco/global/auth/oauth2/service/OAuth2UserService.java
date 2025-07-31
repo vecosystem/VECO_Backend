@@ -3,6 +3,7 @@ package com.example.Veco.global.auth.oauth2.service;
 import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.member.enums.Provider;
 import com.example.Veco.domain.member.repository.MemberRepository;
+import com.example.Veco.domain.profile.entity.Profile;
 import com.example.Veco.global.auth.oauth2.CustomOAuth2User;
 import com.example.Veco.global.auth.oauth2.dto.OAuth2Attribute;
 import com.example.Veco.global.auth.oauth2.userinfo.OAuth2UserInfo;
@@ -45,12 +46,17 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         String email = oAuth2UserInfo.getEmail();
         String name = oAuth2UserInfo.getName();
 
+        Profile profile = Profile.builder()
+                .name(name)
+                .build();
+
         Member member = memberRepository.findBySocialUid(socialId)
                 .orElse(Member.builder()
                         .email(email)
                         .name(name)
                         .provider(provider)
                         .socialUid(socialId)
+                        .profile(profile)
                         .build()
                 );
 
