@@ -48,7 +48,9 @@ public class SettingRestController {
      * 유저 프로필 조회 API
      */
     @GetMapping("/setting/my-profile")
-    @Operation(summary = "유저의 프로필을 조회합니다.")
+    @Operation(
+            summary = "유저의 프로필을 조회합니다.",
+            description = "profileImage가 null일 경우 기본 이미지를 사용해주세요.")
     public ApiResponse<MemberResponseDTO.ProfileResponseDto> getProfile(
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
