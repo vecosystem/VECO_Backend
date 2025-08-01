@@ -55,6 +55,7 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
         Team team = teamRepository.save(Team.builder()
                 .name(request.getTeamName())
                 .workSpace(workspace)
+                .goalNumber(1L)
                 .build());
 
         // 2. 요청으로 전달된 멤버 ID 리스트로 멤버 조회
