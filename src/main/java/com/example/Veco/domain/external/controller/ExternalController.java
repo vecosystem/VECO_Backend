@@ -45,7 +45,7 @@ public class ExternalController {
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "404", 
+                    responseCode = "404",
                     description = "외부이슈를 찾을 수 없음",
                     content = @Content(
                             schema = @Schema(implementation = ApiResponse.class),
@@ -69,12 +69,12 @@ public class ExternalController {
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200", 
+                    responseCode = "200",
                     description = "외부이슈 목록 조회 성공",
                     content = @Content(schema = @Schema(implementation = ExternalCursorPageResponse.class))
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "400", 
+                    responseCode = "400",
                     description = "잘못된 요청 파라미터",
                     content = @Content(
                             schema = @Schema(implementation = ApiResponse.class),
@@ -115,12 +115,12 @@ public class ExternalController {
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200", 
+                    responseCode = "200",
                     description = "외부이슈 생성 성공",
                     content = @Content(schema = @Schema(implementation = ApiResponse.class))
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "400", 
+                    responseCode = "400",
                     description = "잘못된 요청 데이터",
                     content = @Content(
                             schema = @Schema(implementation = ApiResponse.class),
@@ -131,7 +131,7 @@ public class ExternalController {
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "404", 
+                    responseCode = "404",
                     description = "팀 또는 목표를 찾을 수 없음",
                     content = @Content(
                             schema = @Schema(implementation = ApiResponse.class),
@@ -163,12 +163,12 @@ public class ExternalController {
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200", 
+                    responseCode = "200",
                     description = "외부이슈 수정 성공",
                     content = @Content(schema = @Schema(implementation = ApiResponse.class))
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "400", 
+                    responseCode = "400",
                     description = "잘못된 요청 데이터",
                     content = @Content(
                             schema = @Schema(implementation = ApiResponse.class),
@@ -179,7 +179,7 @@ public class ExternalController {
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "404", 
+                    responseCode = "404",
                     description = "외부이슈를 찾을 수 없음",
                     content = @Content(
                             schema = @Schema(implementation = ApiResponse.class),
@@ -205,12 +205,12 @@ public class ExternalController {
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200", 
+                    responseCode = "200",
                     description = "외부이슈 삭제 성공",
                     content = @Content(schema = @Schema(implementation = ApiResponse.class))
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "400", 
+                    responseCode = "400",
                     description = "잘못된 요청 데이터",
                     content = @Content(
                             schema = @Schema(implementation = ApiResponse.class),
@@ -230,5 +230,10 @@ public class ExternalController {
     @GetMapping("/external-name")
     public ApiResponse<?> getExternalName(@PathVariable("teamId") Long teamId) {
         return ApiResponse.onSuccess(externalService.getExternalName(teamId));
+    }
+
+    @GetMapping("/links")
+    public ApiResponse<ExternalResponseDTO.LinkInfoResponseDTO> getExternalLinks(@PathVariable("teamId") Long teamId) {
+        return ApiResponse.onSuccess(externalService.getExternalServices(teamId));
     }
 }

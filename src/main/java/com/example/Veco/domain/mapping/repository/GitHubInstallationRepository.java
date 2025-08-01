@@ -12,4 +12,6 @@ public interface GitHubInstallationRepository extends JpaRepository<GithubInstal
     Optional<GithubInstallation> findByInstallationId(@Param("installationId") Long installationId);
 
     Optional<GithubInstallation> findByTeamId(Long teamId);
+
+    boolean existsByTeamId(Long teamId);
 }

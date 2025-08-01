@@ -12,9 +12,11 @@ import com.example.Veco.domain.external.repository.ExternalRepository;
 import com.example.Veco.domain.goal.entity.Goal;
 import com.example.Veco.domain.goal.repository.GoalRepository;
 import com.example.Veco.domain.mapping.Assignment;
+import com.example.Veco.domain.mapping.GithubInstallation;
 import com.example.Veco.domain.mapping.entity.Link;
 import com.example.Veco.domain.mapping.repository.AssigmentRepository;
 import com.example.Veco.domain.mapping.repository.CommentRoomRepository;
+import com.example.Veco.domain.mapping.repository.GitHubInstallationRepository;
 import com.example.Veco.domain.mapping.repository.LinkRepository;
 import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.member.repository.MemberRepository;
@@ -42,6 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -62,6 +65,7 @@ public class ExternalService {
     private final SlackUtil slackUtil;
     private final CommentRoomRepository commentRoomRepository;
     private final GitHubIssueService gitHubIssueService;
+    private final GitHubInstallationRepository githubInstallationRepository;
 
     @Transactional
     public ExternalResponseDTO.CreateResponseDTO createExternal(Long teamId, ExternalRequestDTO.ExternalCreateRequestDTO request){
@@ -142,6 +146,17 @@ public class ExternalService {
                 numberSequenceService.reserveNextNumber(team.getWorkSpace().getName(), teamId, Category.EXTERNAL);
 
         return numberSequenceResponseDTO.getNextCode();
+    }
+
+    public ExternalResponseDTO.LinkInfoResponseDTO getExternalServices(Long teamId) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new TeamException(TeamErrorCode._NOT_FOUND));
+
+        Boolean isLinkedWithSlack = linkRepository.findByWorkspace(team.getWorkSpace()).isPresent();
+
+        Boolean isLinkedWithGitHub = githubInstallationRepository.findByTeamId(teamId).isPresent();
+
+        return ExternalConverter.linkInfoResponseDTO(isLinkedWithSlack, isLinkedWithGitHub);
     }
 
     private void modifyAssignment(Long externalId, ExternalRequestDTO.ExternalUpdateRequestDTO request, External external) {

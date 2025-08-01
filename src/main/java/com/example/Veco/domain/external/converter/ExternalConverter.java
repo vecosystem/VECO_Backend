@@ -234,4 +234,11 @@ public class ExternalConverter {
                 .managers(managers)
                 .build();
     }
+
+    public static ExternalResponseDTO.LinkInfoResponseDTO linkInfoResponseDTO(Boolean linkedGitHub, Boolean linkedSlack) {
+        return ExternalResponseDTO.LinkInfoResponseDTO.builder()
+                .linkedWithGithub(linkedGitHub)
+                .linkedWithSlack(linkedSlack)
+                .build();
+    }
 }
