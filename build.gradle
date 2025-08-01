@@ -47,6 +47,7 @@ dependencies {
 
 	// Swagger
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:2.7.0'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
 
 	// QueryDSL : OpenFeign
 	implementation "io.github.openfeign.querydsl:querydsl-jpa:6.1"
@@ -70,24 +71,16 @@ dependencies {
 	// Redisson: 분산 락
 	implementation 'org.redisson:redisson-spring-boot-starter:3.50.0'
 
-		// WebClient
-		implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	// WebClient
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
-		// PEM 파일 파싱을 위한 PKIX 라이브러리
-		implementation 'org.bouncycastle:bcpkix-jdk18on:1.77'
+	// PEM 파일 파싱을 위한 PKIX 라이브러리
+	implementation 'org.bouncycastle:bcpkix-jdk18on:1.77'
 
-
-		// AWS (S3)
-		implementation platform('io.awspring.cloud:spring-cloud-aws-dependencies:3.3.0')
-		implementation 'io.awspring.cloud:spring-cloud-aws-starter'
-		implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
 	// AWS (S3)
 	implementation platform('io.awspring.cloud:spring-cloud-aws-dependencies:3.3.0')
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter'
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
-
-	// WebClient
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
 	// Retry
 	implementation 'org.springframework.retry:spring-retry:2.0.4'
