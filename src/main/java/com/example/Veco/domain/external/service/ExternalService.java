@@ -1,18 +1,27 @@
 package com.example.Veco.domain.external.service;
 
+import com.example.Veco.domain.comment.entity.CommentRoom;
 import com.example.Veco.domain.external.converter.ExternalConverter;
-import com.example.Veco.domain.external.dto.ExternalRequestDTO;
-import com.example.Veco.domain.external.dto.ExternalResponseDTO;
-import com.example.Veco.domain.external.dto.ExternalSearchCriteria;
+import com.example.Veco.domain.external.dto.request.ExternalRequestDTO;
+import com.example.Veco.domain.external.dto.response.ExternalResponseDTO;
+import com.example.Veco.domain.external.dto.response.ExternalGroupedResponseDTO;
+import com.example.Veco.domain.external.dto.paging.ExternalSearchCriteria;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.external.repository.ExternalCustomRepository;
 import com.example.Veco.domain.external.repository.ExternalRepository;
 import com.example.Veco.domain.goal.entity.Goal;
 import com.example.Veco.domain.goal.repository.GoalRepository;
 import com.example.Veco.domain.mapping.Assignment;
+import com.example.Veco.domain.mapping.entity.Link;
 import com.example.Veco.domain.mapping.repository.AssigmentRepository;
+import com.example.Veco.domain.mapping.repository.CommentRoomRepository;
+import com.example.Veco.domain.mapping.repository.LinkRepository;
 import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.member.repository.MemberRepository;
+import com.example.Veco.domain.slack.dto.SlackResDTO;
+import com.example.Veco.domain.slack.exception.SlackException;
+import com.example.Veco.domain.slack.exception.code.SlackErrorCode;
+import com.example.Veco.domain.slack.util.SlackUtil;
 import com.example.Veco.domain.team.converter.AssigneeConverter;
 import com.example.Veco.domain.team.dto.AssigneeResponseDTO;
 import com.example.Veco.domain.team.dto.NumberSequenceResponseDTO;
@@ -25,13 +34,16 @@ import com.example.Veco.domain.team.service.NumberSequenceService;
 import com.example.Veco.global.apiPayload.code.ErrorStatus;
 import com.example.Veco.global.apiPayload.exception.VecoException;
 import com.example.Veco.global.apiPayload.page.CursorPage;
+import com.example.Veco.global.enums.ExtServiceType;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -44,37 +56,58 @@ public class ExternalService {
     private final TeamRepository teamRepository;
     private final GoalRepository goalRepository;
     private final MemberRepository memberRepository;
+    private final LinkRepository linkRepository;
+
+    // 유틸
+    private final SlackUtil slackUtil;
+    private final CommentRoomRepository commentRoomRepository;
+    private final GitHubIssueService gitHubIssueService;
 
     @Transactional
-    public Long createExternal(Long teamId, ExternalRequestDTO.ExternalCreateRequestDTO request){
+    public ExternalResponseDTO.CreateResponseDTO createExternal(Long teamId, ExternalRequestDTO.ExternalCreateRequestDTO request){
 
-        NumberSequenceResponseDTO sequenceDTO = numberSequenceService
-                .allocateNextNumber(request.getWorkSpaceName(), teamId, Category.EXTERNAL);
+        log.info("createExternal");
 
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new TeamException(TeamErrorCode._NOT_FOUND));
 
-        Goal goal = findGoalById(request.getGoalId());
+        NumberSequenceResponseDTO sequenceDTO = numberSequenceService
+                .allocateNextNumber(team.getWorkSpace().getName(), teamId, Category.EXTERNAL);
+
+        Goal goal = null;
+
+        if(request.getGoalId() != null){
+            goal = findGoalById(request.getGoalId());
+        }
 
         External external = ExternalConverter.toExternal(team, goal, request, sequenceDTO.getNextCode());
 
-        return externalRepository.save(external).getId();
+        externalRepository.save(external);
+
+        gitHubIssueService.createGitHubIssue(request);
+
+        return ExternalConverter.createResponseDTO(external);
     }
 
-    public ExternalResponseDTO.ExternalDTO getExternalById(Long externalId) {
+    public ExternalResponseDTO.ExternalInfoDTO getExternalById(Long externalId) {
 
         List<Assignment> assignments = assigmentRepository.findByExternalId(externalId);
 
+        CommentRoom commentRoom = commentRoomRepository
+                .findByRoomTypeAndTargetId(com.example.Veco.global.enums.Category.EXTERNAL, externalId);
+
         External external = findExternalById(externalId);
 
-        List<AssigneeResponseDTO.AssigneeDTO> assigneeDTOS = assignments.stream()
-                .map(AssigneeConverter::toAssigneeResponseDTO).toList();
-
-        return ExternalConverter.toExternalDTO(external, assigneeDTOS);
+        return ExternalConverter.toExternalInfoDTO(external, external.getAssignments(), commentRoom.getComments());
     }
 
     public CursorPage<ExternalResponseDTO.ExternalDTO> getExternalsWithPagination(ExternalSearchCriteria criteria, String cursor, int size){
         return externalCustomRepository.findExternalWithCursor(criteria, cursor, size);
+    }
+
+    public ExternalGroupedResponseDTO.ExternalGroupedPageResponse getExternalsWithGroupedPagination(ExternalSearchCriteria criteria, String cursor, int size){
+        return ((com.example.Veco.domain.external.repository.ExternalCursorRepository) externalCustomRepository)
+                .findExternalWithGroupedResponse(criteria, cursor, size);
     }
 
     @Transactional
@@ -83,10 +116,10 @@ public class ExternalService {
     }
 
     @Transactional
-    public void updateExternal(Long externalId, ExternalRequestDTO.ExternalUpdateRequestDTO request) {
+    public ExternalResponseDTO.UpdateResponseDTO updateExternal(Long externalId, ExternalRequestDTO.ExternalUpdateRequestDTO request) {
         External external = findExternalById(externalId);
 
-        if (request.getAssigneeIds() != null) {
+        if (request.getManagersId() != null) {
             modifyAssignment(externalId, request, external);
         }
 
@@ -97,12 +130,24 @@ public class ExternalService {
         }
 
         external.updateExternal(request);
+
+        return ExternalConverter.updateResponseDTO(external);
+    }
+
+    public String getExternalName(Long teamId) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new TeamException(TeamErrorCode._NOT_FOUND));
+
+        NumberSequenceResponseDTO numberSequenceResponseDTO =
+                numberSequenceService.reserveNextNumber(team.getWorkSpace().getName(), teamId, Category.EXTERNAL);
+
+        return numberSequenceResponseDTO.getNextCode();
     }
 
     private void modifyAssignment(Long externalId, ExternalRequestDTO.ExternalUpdateRequestDTO request, External external) {
         assigmentRepository.deleteByExternalId(externalId);
 
-        List<Member> members = memberRepository.findAllByIdIn(request.getAssigneeIds());
+        List<Member> members = memberRepository.findAllByIdIn(request.getManagersId());
 
         List<Assignment> assignments = new ArrayList<>();
 

@@ -1,22 +1,66 @@
 package com.example.Veco.domain.issue.controller;
 
+import com.example.Veco.domain.issue.dto.IssueReqDTO;
 import com.example.Veco.domain.issue.dto.IssueResponseDTO;
+
 import com.example.Veco.domain.issue.exception.code.IssueSuccessCode;
 import com.example.Veco.domain.issue.service.IssueQueryService;
+import com.example.Veco.domain.issue.service.command.IssueCommandService;
 import com.example.Veco.global.apiPayload.ApiResponse;
+import com.example.Veco.global.auth.user.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-@Tag(name="이슈 API")
+@Tag(name = "이슈 API")
 public class IssueController {
 
     private final IssueQueryService issueQueryService;
+
+    private final IssueCommandService issueCommandService;
+
+    // PATCH : 이슈 수정
+    @Operation(
+            summary = "이슈 수정 API",
+            description = "이슈를 수정합니다. " +
+                    "변경 사항이 없는 속성은 RequestBody에서 제거 후 요청해주시면 됩니다."
+    )
+    @PatchMapping("/teams/{teamId}/issues/{issueId}")
+    public ApiResponse<IssueResponseDTO.UpdateIssue> updateIssue(
+            @AuthenticationPrincipal AuthUser user,
+            @PathVariable Long teamId,
+            @PathVariable Long issueId,
+            @RequestBody IssueReqDTO.UpdateIssue issueDto
+    ){
+        IssueResponseDTO.UpdateIssue result = issueCommandService.updateIssue(user, issueDto, teamId, issueId);
+        if (result != null){
+            return ApiResponse.onSuccess(IssueSuccessCode.UPDATE, result);
+        } else {
+            return ApiResponse.onSuccess(IssueSuccessCode.NO_CONTENT, null);
+        }
+    }
+
+    @Operation(
+            summary = "이슈 삭제 API",
+            description = "이슈를 삭제합니다. " +
+                    "삭제할 이슈 ID를 리스트 형태로 보내주시면 일괄 삭제 처리 가능합니다."
+    )
+    @DeleteMapping("/teams/{teamId}/issues")
+    public ApiResponse<List<Long>> deleteIssue(
+            @AuthenticationPrincipal AuthUser user,
+            @PathVariable Long teamId,
+            @RequestBody IssueReqDTO.DeleteIssue dto
+    ){
+        return ApiResponse.onSuccess(IssueSuccessCode.DELETE, issueCommandService.deleteIssue(user,teamId, dto));
+    }
 
     @Operation(
             summary = "팀 내 모든 이슈 조회 API",
@@ -47,5 +91,4 @@ public class IssueController {
     ) {
         return ApiResponse.onSuccess(IssueSuccessCode.OK, issueQueryService.getIssueDetailById(issueId));
     }
-
 }

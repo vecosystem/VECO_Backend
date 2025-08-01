@@ -1,9 +1,16 @@
 package com.example.Veco.domain.external.controller;
 
-import com.example.Veco.domain.external.dto.*;
+import com.example.Veco.domain.external.dto.paging.ExternalCursorPageResponse;
+import com.example.Veco.domain.external.dto.paging.ExternalSearchCriteria;
+import com.example.Veco.domain.external.dto.request.ExternalRequestDTO;
+import com.example.Veco.domain.external.dto.response.ExternalApiResponse;
+import com.example.Veco.domain.external.dto.response.ExternalResponseDTO;
+import com.example.Veco.domain.external.dto.response.ExternalGroupedResponseDTO;
+import com.example.Veco.domain.external.exception.code.ExternalSuccessCode;
 import com.example.Veco.domain.external.service.ExternalService;
 import com.example.Veco.global.apiPayload.ApiResponse;
 import com.example.Veco.global.apiPayload.page.CursorPage;
+import com.example.Veco.global.enums.ExtServiceType;
 import com.example.Veco.global.enums.Priority;
 import com.example.Veco.global.enums.State;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,12 +22,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/{teamId}/externals")
+@RequestMapping("/api/teams/{teamId}/externals")
 @Tag(name = "외부이슈 API")
 public class ExternalController {
 
@@ -51,9 +57,9 @@ public class ExternalController {
             )
     })
     @GetMapping("/{externalId}")
-    public ResponseEntity<ApiResponse<ExternalResponseDTO.ExternalDTO>> getExternal(
+    public ApiResponse<ExternalResponseDTO.ExternalInfoDTO> getExternal(
             @Parameter(description = "외부이슈 ID", required = true) @PathVariable Long externalId) {
-        return ResponseEntity.ok(ApiResponse.onSuccess(externalService.getExternalById(externalId)));
+        return ApiResponse.onSuccess(externalService.getExternalById(externalId));
     }
 
     @Operation(
@@ -79,12 +85,14 @@ public class ExternalController {
                     )
             )
     })
-    @GetMapping("/")
-    public ResponseEntity<ApiResponse<CursorPage<ExternalResponseDTO.ExternalDTO>>> getExternals(
+    @GetMapping
+    public ApiResponse<ExternalGroupedResponseDTO.ExternalGroupedPageResponse> getExternals(
             @Parameter(description = "팀 ID", required = true) @PathVariable("teamId") Long teamId,
             @Parameter(description = "이슈 상태 (선택)", required = false) @RequestParam(value = "state", required = false) State state,
             @Parameter(description = "우선순위 (선택)", required = false) @RequestParam(value = "priority", required = false) Priority priority,
             @Parameter(description = "담당자 ID (선택)", required = false) @RequestParam(value = "assigneeId", required = false) Long assigneeId,
+            @Parameter(description = "목표 ID (선택)", required = false) @RequestParam(value = "goalId", required = false) Long goalId,
+            @Parameter(description = "외부 연동 툴", required = false) @RequestParam(value = "extType", required = false) ExtServiceType extType,
             @Parameter(description = "페이징 커서 (다음 페이지 조회용)", required = false) @RequestParam(value = "cursor", required = false) String cursor,
             @Parameter(description = "페이지 크기 (기본값: 50)", required = false) @RequestParam(value = "size", defaultValue = "50") Integer size) {
 
@@ -92,9 +100,11 @@ public class ExternalController {
                 .teamId(teamId)
                 .state(state)
                 .priority(priority)
+                .goalId(goalId)
+                .extServiceType(extType)
                 .assigneeId(assigneeId).build();
 
-        return ResponseEntity.ok(ApiResponse.onSuccess(externalService.getExternalsWithPagination(searchCriteria, cursor, size)));
+        return ApiResponse.onSuccess(externalService.getExternalsWithGroupedPagination(searchCriteria, cursor, size));
 
     }
 
@@ -138,13 +148,12 @@ public class ExternalController {
                     )
             )
     })
-    @PostMapping("/")
-    public ResponseEntity<ApiResponse<?>> createExternal(
+    @PostMapping
+    public ApiResponse<ExternalResponseDTO.CreateResponseDTO> createExternal(
             @Parameter(description = "팀 ID", required = true) @PathVariable("teamId") Long teamId,
             @Valid @RequestBody ExternalRequestDTO.ExternalCreateRequestDTO requestDTO) {
-        Long externalId = externalService.createExternal(teamId, requestDTO);
 
-        return ResponseEntity.ok(ApiResponse.onSuccess(externalId));
+        return ApiResponse.onSuccess(externalService.createExternal(teamId, requestDTO));
     }
 
     @Operation(
@@ -182,11 +191,11 @@ public class ExternalController {
             )
     })
     @PatchMapping("/{externalId}")
-    public ResponseEntity<ApiResponse<?>> modifyExternal(
+    public ApiResponse<ExternalResponseDTO.UpdateResponseDTO> modifyExternal(
             @Parameter(description = "외부이슈 ID", required = true) @PathVariable Long externalId,
             @Valid @RequestBody ExternalRequestDTO.ExternalUpdateRequestDTO requestDTO) {
-        externalService.updateExternal(externalId, requestDTO);
-        return ResponseEntity.ok(ApiResponse.onSuccessWithNullResult());
+
+        return ApiResponse.onSuccess(externalService.updateExternal(externalId, requestDTO));
     }
 
     @Operation(
@@ -212,9 +221,14 @@ public class ExternalController {
                     )
             )
     })
-    @DeleteMapping("/")
-    public ResponseEntity<ApiResponse<?>> deleteExternal(@Valid @RequestBody ExternalRequestDTO.ExternalDeleteRequestDTO requestDTO) {
+    @DeleteMapping
+    public ApiResponse<?> deleteExternal(@Valid @RequestBody ExternalRequestDTO.ExternalDeleteRequestDTO requestDTO) {
         externalService.deleteExternals(requestDTO);
-        return ResponseEntity.ok(ApiResponse.onSuccessWithNullResult());
+        return ApiResponse.onSuccess(ExternalSuccessCode.DELETE);
+    }
+
+    @GetMapping("/external-name")
+    public ApiResponse<?> getExternalName(@PathVariable("teamId") Long teamId) {
+        return ApiResponse.onSuccess(externalService.getExternalName(teamId));
     }
 }

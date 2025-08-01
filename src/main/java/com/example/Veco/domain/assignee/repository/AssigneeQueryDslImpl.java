@@ -3,10 +3,14 @@ package com.example.Veco.domain.assignee.repository;
 import com.example.Veco.domain.assignee.entity.Assignee;
 import com.example.Veco.domain.assignee.entity.QAssignee;
 import com.example.Veco.domain.mapping.entity.MemberTeam;
+import com.example.Veco.domain.mapping.entity.QMemberTeam;
+import com.example.Veco.domain.member.entity.QMember;
+import com.example.Veco.domain.profile.entity.QProfile;
 import com.example.Veco.global.enums.Category;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AssigneeQueryDslImpl implements AssigneeQueryDsl {
     private final JPAQueryFactory queryFactory;
+    private final QAssignee assignee = QAssignee.assignee;
 
     @Override
     public List<Assignee> findByMemberTeamsAndTypeAndTargetIds(List<MemberTeam> memberTeams, Category type, List<Long> targetIds) {
@@ -27,5 +32,61 @@ public class AssigneeQueryDslImpl implements AssigneeQueryDsl {
                         assignee.targetId.in(targetIds)
                 )
                 .fetch();
+    }
+
+    @Override
+    public List<Assignee> findByIssueIdIn(List<Long> issueIds) {
+        QAssignee assignee = QAssignee.assignee;
+        QMemberTeam memberTeam = QMemberTeam.memberTeam;
+        QMember member = QMember.member;
+        QProfile profile = QProfile.profile;
+
+        return queryFactory.selectFrom(assignee)
+                .leftJoin(assignee.memberTeam, memberTeam).fetchJoin()
+                .leftJoin(memberTeam.member, member).fetchJoin()
+                .leftJoin(member.profile, profile).fetchJoin()
+                .where(assignee.issue.id.in(issueIds))
+                .fetch();
+    }
+
+    @Override
+    public List<Assignee> findByGoalIdIn(List<Long> goalIds) {
+        QAssignee assignee = QAssignee.assignee;
+        QMemberTeam memberTeam = QMemberTeam.memberTeam;
+        QMember member = QMember.member;
+        QProfile profile = QProfile.profile;
+
+        return queryFactory.selectFrom(assignee)
+                .leftJoin(assignee.memberTeam, memberTeam).fetchJoin()
+                .leftJoin(memberTeam.member, member).fetchJoin()
+                .leftJoin(member.profile, profile).fetchJoin()
+                .where(assignee.goal.id.in(goalIds))
+                .fetch();
+    }
+
+    @Override
+    public List<Assignee> findByExternalIdIn(List<Long> externalIds) {
+        QAssignee assignee = QAssignee.assignee;
+        QMemberTeam memberTeam = QMemberTeam.memberTeam;
+        QMember member = QMember.member;
+        QProfile profile = QProfile.profile;
+
+        return queryFactory.selectFrom(assignee)
+                .leftJoin(assignee.memberTeam, memberTeam).fetchJoin()
+                .leftJoin(memberTeam.member, member).fetchJoin()
+                .leftJoin(member.profile, profile).fetchJoin()
+                .where(assignee.external.id.in(externalIds))
+                .fetch();
+    }
+
+    @Override
+    @Transactional
+    public void deleteAllByTypeAndTargetIds(Category type, List<Long> targetIds) {
+        queryFactory.delete(assignee)
+                .where(
+                        assignee.type.eq(type),
+                        assignee.targetId.in(targetIds)
+                )
+                .execute();
     }
 }

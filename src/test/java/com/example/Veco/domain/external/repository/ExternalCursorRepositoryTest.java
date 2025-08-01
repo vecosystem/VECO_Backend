@@ -1,7 +1,7 @@
 package com.example.Veco.domain.external.repository;
 
-import com.example.Veco.domain.external.dto.ExternalResponseDTO;
-import com.example.Veco.domain.external.dto.ExternalSearchCriteria;
+import com.example.Veco.domain.external.dto.response.ExternalResponseDTO;
+import com.example.Veco.domain.external.dto.paging.ExternalSearchCriteria;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.member.repository.MemberRepository;
@@ -58,27 +58,29 @@ class ExternalCursorRepositoryTest {
         memberRepository.save(testMember);
     }
 
-    @DisplayName("상태별 우선순위 정렬 테스트: NONE -> TODO -> IN_PROGRESS -> DONE -> REVIEW")
+    @DisplayName("상태별 우선순위 정렬 테스트: NONE -> TODO -> IN_PROGRESS -> FINISH -> REVIEW")
     @Test
     void testStatePriorityOrder() {
         // given
         createExternalWithState("NONE_External", State.NONE);
         createExternalWithState("TODO_External", State.TODO);
         createExternalWithState("IN_PROGRESS_External", State.IN_PROGRESS);
-        createExternalWithState("DONE_External", State.FINISH);
+        createExternalWithState("FINISH_External", State.FINISH);
         createExternalWithState("REVIEW_External", State.REVIEW);
 
-        ExternalSearchCriteria criteria = ExternalSearchCriteria.builder().build();
+        ExternalSearchCriteria criteria = ExternalSearchCriteria.builder()
+                .teamId(testTeam.getId())
+                .build();
 
         // when
-        CursorPage<ExternalResponseDTO.ExternalDTO> result = 
+        CursorPage<ExternalResponseDTO.ExternalDTO> result =
             externalCursorRepository.findExternalWithCursor(criteria, null, 10);
 
         // then
         List<ExternalResponseDTO.ExternalDTO> externals = result.getData();
         assertThat(externals).hasSize(5);
         
-        // 상태 순서 확인: NONE -> TODO -> IN_PROGRESS -> DONE -> REVIEW
+        // 상태 순서 확인: NONE -> TODO -> IN_PROGRESS -> FINISH -> REVIEW
         assertThat(externals.get(0).getState()).isEqualTo(State.NONE);
         assertThat(externals.get(1).getState()).isEqualTo(State.TODO);
         assertThat(externals.get(2).getState()).isEqualTo(State.IN_PROGRESS);
@@ -94,10 +96,12 @@ class ExternalCursorRepositoryTest {
             createExternalWithState("NONE_External_" + i, State.NONE);
         }
 
-        ExternalSearchCriteria criteria = ExternalSearchCriteria.builder().build();
+        ExternalSearchCriteria criteria = ExternalSearchCriteria.builder()
+                .teamId(testTeam.getId())
+                .build();
 
         // when
-        CursorPage<ExternalResponseDTO.ExternalDTO> result = 
+        CursorPage<ExternalResponseDTO.ExternalDTO> result =
             externalCursorRepository.findExternalWithCursor(criteria, null, 50);
 
         // then
@@ -115,11 +119,12 @@ class ExternalCursorRepositoryTest {
         createExternalWithState("IN_PROGRESS_External", State.IN_PROGRESS);
 
         ExternalSearchCriteria criteria = ExternalSearchCriteria.builder()
+                .teamId(testTeam.getId())
                 .state(State.TODO)
                 .build();
 
         // when
-        CursorPage<ExternalResponseDTO.ExternalDTO> result = 
+        CursorPage<ExternalResponseDTO.ExternalDTO> result =
             externalCursorRepository.findExternalWithCursor(criteria, null, 10);
 
         // then
@@ -138,11 +143,12 @@ class ExternalCursorRepositoryTest {
         createExternalWithPriority("NORNAL_External", Priority.NORMAL);
 
         ExternalSearchCriteria criteria = ExternalSearchCriteria.builder()
+                .teamId(testTeam.getId())
                 .priority(Priority.HIGH)
                 .build();
 
         // when
-        CursorPage<ExternalResponseDTO.ExternalDTO> result = 
+        CursorPage<ExternalResponseDTO.ExternalDTO> result =
             externalCursorRepository.findExternalWithCursor(criteria, null, 10);
 
         // then
@@ -159,10 +165,12 @@ class ExternalCursorRepositoryTest {
             createExternalWithState("NONE_External_" + i, State.NONE);
         }
 
-        ExternalSearchCriteria criteria = ExternalSearchCriteria.builder().build();
+        ExternalSearchCriteria criteria = ExternalSearchCriteria.builder()
+                .teamId(testTeam.getId())
+                .build();
 
         // when - 첫 번째 페이지 (5개)
-        CursorPage<ExternalResponseDTO.ExternalDTO> firstPage = 
+        CursorPage<ExternalResponseDTO.ExternalDTO> firstPage =
             externalCursorRepository.findExternalWithCursor(criteria, null, 5);
 
         // then - 첫 번째 페이지 검증
@@ -171,7 +179,7 @@ class ExternalCursorRepositoryTest {
         assertThat(firstPage.getNextCursor()).isNotNull();
 
         // when - 두 번째 페이지
-        CursorPage<ExternalResponseDTO.ExternalDTO> secondPage = 
+        CursorPage<ExternalResponseDTO.ExternalDTO> secondPage =
             externalCursorRepository.findExternalWithCursor(criteria, firstPage.getNextCursor(), 5);
 
         // then - 두 번째 페이지 검증
@@ -194,11 +202,12 @@ class ExternalCursorRepositoryTest {
     void testEmptyResult() {
         // given - 데이터 없음
         ExternalSearchCriteria criteria = ExternalSearchCriteria.builder()
+                .teamId(testTeam.getId())
                 .state(State.REVIEW)
                 .build();
 
         // when
-        CursorPage<ExternalResponseDTO.ExternalDTO> result = 
+        CursorPage<ExternalResponseDTO.ExternalDTO> result =
             externalCursorRepository.findExternalWithCursor(criteria, null, 10);
 
         // then
@@ -220,7 +229,8 @@ class ExternalCursorRepositoryTest {
                 .team(testTeam)
                 .build();
         
-        externalRepository.save(external);
+        externalRepository.saveAndFlush(external);
+        entityManager.clear();
     }
 
     private void createExternalWithPriority(String name, Priority priority) {
@@ -236,6 +246,7 @@ class ExternalCursorRepositoryTest {
                 .team(testTeam)
                 .build();
         
-        externalRepository.save(external);
+        externalRepository.saveAndFlush(external);
+        entityManager.clear();
     }
 }

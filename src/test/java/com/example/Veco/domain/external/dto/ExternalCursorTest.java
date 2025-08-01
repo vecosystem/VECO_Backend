@@ -1,5 +1,6 @@
 package com.example.Veco.domain.external.dto;
 
+import com.example.Veco.domain.external.dto.paging.ExternalCursor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

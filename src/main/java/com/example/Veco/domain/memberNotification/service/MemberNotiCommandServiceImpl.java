@@ -1,7 +1,14 @@
 package com.example.Veco.domain.memberNotification.service;
 
+import com.example.Veco.domain.member.entity.Member;
+import com.example.Veco.domain.member.error.MemberErrorStatus;
+import com.example.Veco.domain.member.error.MemberHandler;
+import com.example.Veco.domain.member.repository.MemberRepository;
 import com.example.Veco.domain.memberNotification.entity.MemberNotification;
+import com.example.Veco.domain.memberNotification.exception.MemberNotiException;
+import com.example.Veco.domain.memberNotification.exception.code.MemberNotiErrorCode;
 import com.example.Veco.domain.memberNotification.repository.MemberNotiRepository;
+import com.example.Veco.global.auth.user.AuthUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,24 +19,28 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MemberNotiCommandServiceImpl implements MemberNotiCommandService {
 
+    private final MemberRepository memberRepository;
     private final MemberNotiRepository memberNotiRepository;
 
     @Override
     @Transactional
-    public void markAsRead(Long memberId, Long alarmId) {
+    public void markAsRead(AuthUser user, Long alarmId) {
+        memberRepository.findBySocialUid(user.getSocialUid()).orElseThrow(() ->
+                new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND));
         MemberNotification memberNotification = memberNotiRepository
                 .findById(alarmId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 알림이 존재하지 않습니다.")); // FIXME
-        // TODO : 사용자 검증
+                .orElseThrow(() -> new MemberNotiException(MemberNotiErrorCode.NOT_FOUND));
         memberNotification.markAsRead();
     }
 
     @Override
     @Transactional
-    public void deleteMemberNotifications(Long memberId, List<Long> memberNotiIds) {
+    public void deleteMemberNotifications(AuthUser user, List<Long> memberNotiIds) {
+        Member member = memberRepository.findBySocialUid(user.getSocialUid()).orElseThrow(() ->
+                new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND));
         List<MemberNotification> notifications = memberNotiRepository.findAllById(memberNotiIds);
         notifications.stream()
-                .filter(noti -> noti.getMember().getId().equals(memberId))
+                .filter(noti -> noti.getMember().equals(member))
                 .forEach(MemberNotification::markAsDeleted);
     }
 

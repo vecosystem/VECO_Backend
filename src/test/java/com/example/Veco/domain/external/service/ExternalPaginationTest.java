@@ -1,7 +1,7 @@
 package com.example.Veco.domain.external.service;
 
-import com.example.Veco.domain.external.dto.ExternalResponseDTO;
-import com.example.Veco.domain.external.dto.ExternalSearchCriteria;
+import com.example.Veco.domain.external.dto.response.ExternalResponseDTO;
+import com.example.Veco.domain.external.dto.paging.ExternalSearchCriteria;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.external.repository.ExternalRepository;
 import com.example.Veco.domain.member.entity.Member;
@@ -65,10 +65,12 @@ class ExternalPaginationTest {
         createExternalWithState("DONE_External", State.FINISH);
         createExternalWithState("REVIEW_External", State.REVIEW);
 
-        ExternalSearchCriteria criteria = ExternalSearchCriteria.builder().build();
+        ExternalSearchCriteria criteria = ExternalSearchCriteria.builder()
+                .teamId(testTeam.getId())
+                .build();
 
         // when
-        CursorPage<ExternalResponseDTO.ExternalDTO> result = 
+        CursorPage<ExternalResponseDTO.ExternalDTO> result =
             externalService.getExternalsWithPagination(criteria, null, 10);
 
         // then
@@ -91,10 +93,12 @@ class ExternalPaginationTest {
             createExternalWithState("NONE_External_" + i, State.NONE);
         }
 
-        ExternalSearchCriteria criteria = ExternalSearchCriteria.builder().build();
+        ExternalSearchCriteria criteria = ExternalSearchCriteria.builder()
+                .teamId(testTeam.getId())
+                .build();
 
         // when
-        CursorPage<ExternalResponseDTO.ExternalDTO> result = 
+        CursorPage<ExternalResponseDTO.ExternalDTO> result =
             externalService.getExternalsWithPagination(criteria, null, 50);
 
         // then
@@ -114,10 +118,11 @@ class ExternalPaginationTest {
 
         ExternalSearchCriteria criteria = ExternalSearchCriteria.builder()
                 .state(State.TODO)
+                .teamId(testTeam.getId())
                 .build();
 
         // when
-        CursorPage<ExternalResponseDTO.ExternalDTO> result = 
+        CursorPage<ExternalResponseDTO.ExternalDTO> result =
             externalService.getExternalsWithPagination(criteria, null, 10);
 
         // then
@@ -137,10 +142,11 @@ class ExternalPaginationTest {
 
         ExternalSearchCriteria criteria = ExternalSearchCriteria.builder()
                 .priority(Priority.HIGH)
+                .teamId(testTeam.getId())
                 .build();
 
         // when
-        CursorPage<ExternalResponseDTO.ExternalDTO> result = 
+        CursorPage<ExternalResponseDTO.ExternalDTO> result =
             externalService.getExternalsWithPagination(criteria, null, 10);
 
         // then
@@ -157,10 +163,12 @@ class ExternalPaginationTest {
             createExternalWithState("NONE_External_" + i, State.NONE);
         }
 
-        ExternalSearchCriteria criteria = ExternalSearchCriteria.builder().build();
+        ExternalSearchCriteria criteria = ExternalSearchCriteria.builder()
+                .teamId(testTeam.getId())
+                .build();
 
         // when - 첫 번째 페이지 (5개)
-        CursorPage<ExternalResponseDTO.ExternalDTO> firstPage = 
+        CursorPage<ExternalResponseDTO.ExternalDTO> firstPage =
             externalService.getExternalsWithPagination(criteria, null, 5);
 
         // then - 첫 번째 페이지 검증
@@ -169,7 +177,7 @@ class ExternalPaginationTest {
         assertThat(firstPage.getNextCursor()).isNotNull();
 
         // when - 두 번째 페이지
-        CursorPage<ExternalResponseDTO.ExternalDTO> secondPage = 
+        CursorPage<ExternalResponseDTO.ExternalDTO> secondPage =
             externalService.getExternalsWithPagination(criteria, firstPage.getNextCursor(), 5);
 
         // then - 두 번째 페이지 검증
