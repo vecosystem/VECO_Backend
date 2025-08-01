@@ -24,6 +24,7 @@ import java.util.List;
 @Tag(name = "목표 API")
 public class GoalController {
 
+    // 리포지토리
     private final GoalCommandService goalCommandService;
     private final GoalQueryService goalQueryService;
 
@@ -111,6 +112,19 @@ public class GoalController {
             Long teamId
     ){
         return ApiResponse.onSuccess(GoalSuccessCode.OK, goalQueryService.getGoalName(teamId));
+    }
+
+    // 삭제된 목표 리스트 조회
+    @Operation(
+            summary = "삭제된 목표 리스트 조회 API By 김주헌",
+            description = "삭제된 목표들을 조회합니다." +
+                    "기준이 될 팀 ID를 쿼리로 보내주세요."
+    )
+    @GetMapping("/deleted-goals")
+    public ApiResponse<List<GoalInfo>> getDeletedGoals(
+            @RequestParam Long teamId
+    ){
+        return ApiResponse.onSuccess(goalQueryService.getDeletedGoals(teamId));
     }
 
     // POST

@@ -380,4 +380,18 @@ public class GoalQueryService {
                 new TeamException(TeamErrorCode._NOT_FOUND));
         return team.getWorkSpace().getName()+"-g"+team.getGoalNumber();
     }
+
+    // 삭제된 목표 리스트 조회
+    public List<GoalInfo> getDeletedGoals(
+            Long teamId
+    ) {
+
+        List<Goal> result = goalRepository.findAllByTeamIdAndDeleted(teamId);
+
+        if (result.isEmpty()){
+            throw new GoalException(GoalErrorCode.NOT_FOUND_DELETE_GOALS);
+        }
+
+        return result.stream().map(GoalConverter::toGoalInfo).toList();
+    }
 }

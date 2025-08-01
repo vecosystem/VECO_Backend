@@ -24,7 +24,10 @@ public enum GoalErrorCode implements BaseErrorStatus {
             "커서값이 잘못되었습니다."),
     QUERY_INVALID(HttpStatus.BAD_REQUEST,
             "GOAL400_1",
-            "query값이 잘못되었습니다.")
+            "query값이 잘못되었습니다."),
+    NOT_FOUND_DELETE_GOALS(HttpStatus.NOT_FOUND,
+            "GOAL404_2",
+            "해당 팀에 삭제된 목표가 존재하지 않습니다.")
     ;
 
     private final HttpStatus httpStatus;
