@@ -1,5 +1,6 @@
 package com.example.Veco.domain.workspace.service;
 
+import com.example.Veco.domain.mapping.converter.MemberTeamConverter;
 import com.example.Veco.domain.mapping.entity.MemberTeam;
 import com.example.Veco.domain.mapping.repository.MemberTeamRepository;
 import com.example.Veco.domain.member.entity.Member;
@@ -20,12 +21,12 @@ import com.example.Veco.domain.workspace.repository.WorkspaceRepository;
 import com.example.Veco.domain.workspace.util.InvitePasswordGenerator;
 import com.example.Veco.domain.workspace.util.InviteTokenGenerator;
 import com.example.Veco.domain.workspace.util.SlugGenerator;
+import com.example.Veco.global.auth.user.userdetails.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -119,6 +120,7 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
                 .name(request.getWorkspaceName())
                 .slug(slug)
                 .inviteToken(token)
+                // 평문대신 BCrypto 사용해서 암호화 한뒤 저장해야 함
                 .invitePassword(invitePassword)
                 .inviteUrl(inviteUrl)
                 .workspaceUrl(workspaceUrl)
@@ -134,6 +136,7 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
         Team defaultTeam = Team.builder()
                 .name(workSpace.getName()) // 워크스페이스 이름과 같은 디폴트 팀
                 .workSpace(workSpace)
+                .goalNumber(1L)
                 .build();
 
         MemberTeam memberTeam = MemberTeam.builder()
@@ -158,6 +161,45 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
                 .defaultTeamId(defaultTeam.getId())
                 .workspaceUrl(workSpace.getWorkspaceUrl())
                 .build();
+    }
+
+
+    // 워크스페이스 참여
+    @Override
+    public WorkspaceResponseDTO.JoinWorkspace joinWorkspace(
+            WorkspaceRequestDTO.JoinWorkspace dto,
+            CustomUserDetails user
+    ) {
+
+        // 사용자 조회
+        Member member = memberRepository.findBySocialUid(user.getSocialUid())
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND));
+
+        // 워크스페이스 조회: 초대 토큰을 이용해서 조회
+        WorkSpace workSpace = workspaceRepository.findByInviteToken(dto.token())
+                .orElseThrow(() -> new WorkspaceHandler(WorkspaceErrorStatus._WORKSPACE_NOT_FOUND));
+
+        // 사용자가 이미 워크스페이스에 속해있는지 검증
+        if (member.getWorkSpace() != null) {
+            throw new WorkspaceHandler(WorkspaceErrorStatus._WORKSPACE_DUPLICATED);
+        }
+
+        // 연동 전, 암호 확인
+        if (!workSpace.getInvitePassword().equals(dto.password())){
+            throw new WorkspaceHandler(WorkspaceErrorStatus._INVALIDED_PASSWORD);
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+
+        // 사용자 - 워크스페이스 연동
+        member.setWorkSpace(workSpace);
+
+        // 사용자 - 기본 팀 연동
+        Team team = teamRepository.findFirstByWorkSpaceOrderById(workSpace);
+        MemberTeam memberTeam = MemberTeamConverter.toMemberTeam(member, team);
+        memberTeamRepository.save(memberTeam);
+
+        return WorkspaceConverter.toJoinWorkspace(workSpace.getId(), now);
     }
 
 }

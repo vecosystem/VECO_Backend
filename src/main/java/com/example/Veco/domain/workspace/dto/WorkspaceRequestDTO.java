@@ -1,7 +1,5 @@
 package com.example.Veco.domain.workspace.dto;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,6 +33,12 @@ public class WorkspaceRequestDTO {
     public static class TeamOrderRequestDto {
         private List<Long> teamIdList;
     }
+
+    // 워크스페이스 참여
+    public record JoinWorkspace(
+            String token,
+            String password
+    ){}
 
     @Builder
     @Getter
