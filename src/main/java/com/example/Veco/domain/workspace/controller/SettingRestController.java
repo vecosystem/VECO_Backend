@@ -33,7 +33,7 @@ import java.util.List;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/workspace")
+@RequestMapping("/api/workspace")
 @Tag(name = "Setting API")
 public class SettingRestController {
 
