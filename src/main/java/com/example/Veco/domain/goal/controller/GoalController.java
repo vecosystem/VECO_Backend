@@ -114,9 +114,9 @@ public class GoalController {
         return ApiResponse.onSuccess(GoalSuccessCode.OK, goalQueryService.getGoalName(teamId));
     }
 
-    // 삭제된 목표 리스트 조회
+    // 삭제된 목표 조회
     @Operation(
-            summary = "삭제된 목표 리스트 조회 API By 김주헌",
+            summary = "삭제된 목표 조회 API By 김주헌",
             description = "삭제된 목표들을 조회합니다." +
                     "기준이 될 팀 ID를 쿼리로 보내주세요."
     )
@@ -152,6 +152,18 @@ public class GoalController {
             @RequestParam MultipartFile file
     ){
         return ApiResponse.onSuccess(GoalSuccessCode.IMAGE_UPLOAD, goalCommandService.uploadFile(file));
+    }
+
+    // 삭제된 목표 복원
+    @Operation(
+            summary = "삭제된 목표 복원 API By 김주헌",
+            description = "삭제된 목표를 복원합니다."
+    )
+    @PostMapping("/goals/restore")
+    public ApiResponse<List<GoalInfo>> restoreGoals(
+            @RequestBody GoalReqDTO.DeleteGoal dto
+    ){
+        return ApiResponse.onSuccess(goalCommandService.restoreGoals(dto));
     }
 
     // PATCH
