@@ -39,6 +39,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -196,4 +197,22 @@ public class GoalCommandService {
         return result;
     }
 
+    // 삭제된 목표 복원
+    @Transactional
+    public List<GoalResDTO.GoalInfo> restoreGoals(
+            GoalReqDTO.DeleteGoal dto
+    ) {
+        // 삭제된 목표들 조회
+        List<Goal> result = goalRepository.findDeletedGoalsById(dto.goalIds());
+
+        if (result.isEmpty()){
+            throw new GoalException(GoalErrorCode.NOT_A_DELETED);
+        }
+
+        for (Goal goal : result) {
+            goal.restore();
+        }
+
+        return result.stream().map(GoalConverter::toGoalInfo).collect(Collectors.toList());
+    }
 }

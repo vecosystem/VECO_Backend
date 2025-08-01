@@ -31,7 +31,7 @@ public class GoalReqDTO {
             List<Long> issuesId
     ){}
 
-    // 목표 삭제
+    // 목표 삭제, 목표 복원
     public record DeleteGoal(
             List<Long> goalIds
     ){}

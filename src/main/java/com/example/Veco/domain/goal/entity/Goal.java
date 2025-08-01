@@ -76,4 +76,5 @@ public class Goal extends BaseEntity {
     public void updatePriority(Priority priority) { this.priority = priority; }
     public void updateDeadlineStart(LocalDate deadlineStart) { this.deadlineStart = deadlineStart; }
     public void updateDeadlineEnd(LocalDate deadlineEnd) { this.deadlineEnd = deadlineEnd; }
+    public void restore(){ this.deletedAt = null; }
 }
