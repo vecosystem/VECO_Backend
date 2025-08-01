@@ -8,6 +8,9 @@ import java.util.List;
 
 public interface AssigneeQueryDsl {
     List<Assignee> findByMemberTeamsAndTypeAndTargetIds(List<MemberTeam> memberTeams, Category type, List<Long> targetIds);
+    List<Assignee> findByIssueIdIn(List<Long> issueIds);
+    List<Assignee> findByGoalIdIn(List<Long> goalIds);
+    List<Assignee> findByExternalIdIn(List<Long> externalIds);
     void deleteAllByTypeAndTargetIds(Category type, List<Long> targetIds);
 }
 
