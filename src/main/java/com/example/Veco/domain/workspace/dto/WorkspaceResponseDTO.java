@@ -23,7 +23,7 @@ public class WorkspaceResponseDTO {
         private String name;
         private String profileUrl;
         private String workspaceUrl;
-        private List<WorkspaceMemberWithTeamsDto.TeamInfoDto> teams;
+        private Long defaultTeamId;
     }
 
     /**
@@ -104,7 +104,7 @@ public class WorkspaceResponseDTO {
     @Getter
     @Builder
     public static class PreviewUrlResponseDto {
-        private String inviteUrl;
+        private String workspaceUrl;
     }
 
     @Getter

@@ -17,20 +17,12 @@ public class WorkspaceConverter {
      * Workspace 기본 정보 응답 DTO 변환
      */
     public static WorkspaceResponseDTO.WorkspaceResponseDto toWorkspaceResponse(WorkSpace workspace) {
-        List<WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto.TeamInfoDto> teamInfoList = workspace.getTeams().stream()
-                .map(team -> WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto.TeamInfoDto.builder()
-                        .teamId(team.getId())
-                        .teamName(team.getName())
-                        .teamProfileUrl(team.getProfileUrl())
-                        .build())
-                .toList();
-
         return WorkspaceResponseDTO.WorkspaceResponseDto.builder()
                 .workspaceId(workspace.getId())
                 .name(workspace.getName())
                 .profileUrl(workspace.getProfileUrl())
                 .workspaceUrl(workspace.getWorkspaceUrl())
-                .teams(teamInfoList)
+                .defaultTeamId(workspace.getTeams().get(0).getId())
                 .build();
     }
 
@@ -89,7 +81,7 @@ public class WorkspaceConverter {
 
     public static WorkspaceResponseDTO.PreviewUrlResponseDto toPreviewUrlResponseDto(String previewUrl) {
         return WorkspaceResponseDTO.PreviewUrlResponseDto.builder()
-                .inviteUrl(previewUrl)
+                .workspaceUrl(previewUrl)
                 .build();
     }
 }
