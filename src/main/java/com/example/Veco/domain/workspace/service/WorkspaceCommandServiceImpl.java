@@ -97,11 +97,7 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
     }
 
     @Override
-    public WorkspaceResponseDTO.CreateWorkspaceResponseDto createWorkspace(Long memberId, WorkspaceRequestDTO.CreateWorkspaceRequestDto request) {
-        // 1. 멤버 조회
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND));
-
+    public WorkspaceResponseDTO.CreateWorkspaceResponseDto createWorkspace(Member member, WorkspaceRequestDTO.CreateWorkspaceRequestDto request) {
         // 2. 이미 워크스페이스가 있으면 예외
         if (member.getWorkSpace() != null) {
             throw new WorkspaceHandler(WorkspaceErrorStatus._WORKSPACE_DUPLICATED);
@@ -145,9 +141,13 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
         defaultTeam.getMemberTeams().add(memberTeam);
 
         // 7. 저장
-        workspaceRepository.save(workSpace);
-        teamRepository.save(defaultTeam);
-        memberRepository.save(member);
+        try {
+            workspaceRepository.save(workSpace);
+            teamRepository.save(defaultTeam);
+            memberRepository.save(member);
+        } catch (Exception e) {
+            throw new WorkspaceHandler(WorkspaceErrorStatus._WORKSPACE_SAVE_FAILED);
+        }
 
         // 8. 응답
         return WorkspaceResponseDTO.CreateWorkspaceResponseDto.builder()
@@ -159,5 +159,4 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
                 .workspaceUrl(workSpace.getWorkspaceUrl())
                 .build();
     }
-
 }
