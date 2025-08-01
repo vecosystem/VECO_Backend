@@ -98,6 +98,7 @@ public class NotiConverter {
                 .alarmId(memberNoti.getId())
                 .name(issue.getName())
                 .typeId(issue.getId())
+                .teamId(issue.getTeam().getId())
                 .title(issue.getTitle())
                 .state(issue.getState())
                 .priority(issue.getPriority())
@@ -141,6 +142,7 @@ public class NotiConverter {
                 .alarmId(memberNoti.getId())
                 .name(goal.getName())
                 .typeId(goal.getId())
+                .teamId(goal.getTeam().getId())
                 .title(goal.getTitle())
                 .state(goal.getState())
                 .priority(goal.getPriority())
@@ -180,12 +182,13 @@ public class NotiConverter {
                 .alarmId(memberNoti.getId())
                 .name(external.getName())
                 .typeId(external.getId())
+                .teamId(external.getTeam().getId())
                 .title(external.getTitle())
                 .state(external.getState())
                 .priority(external.getPriority())
                 .goalTitle(external.getGoal().getTitle())
                 .managerList(toManagerInfoList(assignees))
-                .extServiceType(external.getType())
+                .externalTool(external.getType())
                 .isRead(memberNoti.getIsRead())
                 .build();
     }
@@ -217,7 +220,7 @@ public class NotiConverter {
     }
     public GroupedNotiList<ExternalPreViewDTO> toExternalPreviewListByExternal(List<ExternalPreViewDTO> list, LocalDate deadline) {
         List<ExtServiceType> order = Arrays.asList(ExtServiceType.NONE, ExtServiceType.SLACK, ExtServiceType.GITHUB, ExtServiceType.NOTION);
-        return buildGroupedList(Category.EXTERNAL, deadline, groupByEnum(list, ExternalPreViewDTO::getExtServiceType, order, ExternalPreViewDTO::getAlarmId), list.size());
+        return buildGroupedList(Category.EXTERNAL, deadline, groupByEnum(list, ExternalPreViewDTO::getExternalTool, order, ExternalPreViewDTO::getAlarmId), list.size());
     }
 
 }

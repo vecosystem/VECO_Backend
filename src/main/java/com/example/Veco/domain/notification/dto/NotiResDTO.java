@@ -51,6 +51,7 @@ public class NotiResDTO {
         private Long alarmId;  //memberNotificationId
         private String name;
         private Long typeId;
+        private Long teamId;
         private String title;
         private State state;
         private Priority priority;
@@ -67,6 +68,7 @@ public class NotiResDTO {
         private Long alarmId; //memberNotificationId
         private String name;
         private Long typeId;
+        private Long teamId;
         private String title;
         private State state;
         private Priority priority;
@@ -82,12 +84,13 @@ public class NotiResDTO {
         private Long alarmId;
         private String name;
         private Long typeId;
+        private Long teamId;
         private String title;
         private State state;
         private Priority priority;
         private String goalTitle;
         private List<ManagerInfo> managerList;
-        private ExtServiceType extServiceType;
+        private ExtServiceType externalTool;
         private boolean isRead;
     }
 
