@@ -20,8 +20,8 @@ public class WorkspaceResponseDTO {
     @AllArgsConstructor
     public static class WorkspaceResponseDto {
         private Long workspaceId;
-        private String name;
-        private String profileUrl;
+        private String workspaceName; // name -> workspaceName
+        private String workspaceImageUrl; // profileUrl -> workspaceProfileImageUrl
         private String workspaceUrl;
         private Long defaultTeamId;
     }
@@ -51,8 +51,8 @@ public class WorkspaceResponseDTO {
     @AllArgsConstructor
     public static class WorkspaceTeamDto {
         private Long teamId;
-        private String name;
-        private String profileUrl;
+        private String teamName;
+        private String teamImageUrl; // profileUrl > teamImageUrl
         private int memberCount;
         private LocalDateTime createdAt;
     }
@@ -78,7 +78,7 @@ public class WorkspaceResponseDTO {
         @AllArgsConstructor
         public static class MemberDto {
             private Long memberId;
-            private String memberName;
+            private String name;
         }
     }
 
@@ -88,7 +88,7 @@ public class WorkspaceResponseDTO {
         private Long memberId;
         private String email;
         private String name;
-        private String profileUrl;
+        private String profileImageUrl; // 멤버는 name, profileImageUrl
         private List<TeamInfoDto> teams;
         private LocalDateTime joinedAt;
 
@@ -97,7 +97,7 @@ public class WorkspaceResponseDTO {
         public static class TeamInfoDto {
             private Long teamId;
             private String teamName;
-            private String teamProfileUrl;
+            private String teamImageUrl;
         }
     }
 

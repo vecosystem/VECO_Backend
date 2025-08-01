@@ -21,7 +21,7 @@ public class MemberResponseDTO {
         private String email;
 
         @Nullable
-        private String profileImage; //url 반환, 실제 요청은 form-data
+        private String profileImageUrl; //url 반환, 실제 요청은 form-data // profileUrl -> profileImageUrl
     }
 
     @Builder
@@ -38,6 +38,6 @@ public class MemberResponseDTO {
     @AllArgsConstructor
     public static class MemberProfileImageResponseDto {
         private Long memberId;
-        private String imageUrl;
+        private String profileImageUrl; // profileImageUrl
     }
 }

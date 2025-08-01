@@ -28,7 +28,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     public Member updateProfileImage(MultipartFile file, Member member) {
         // 프로필 존재 확인
         if (member.getProfile() == null) {
-            throw new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND);
+            throw new MemberHandler(MemberErrorStatus._PROFILE_NOT_FOUND);
         }
 
         // 파일 유효성 검사
@@ -50,13 +50,15 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     public void deleteProfileImage(Member member) {
         //프로필 존재 확인
         if (member.getProfile() == null) {
-            throw new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND);
+            throw new MemberHandler(MemberErrorStatus._PROFILE_NOT_FOUND);
+        }
+
+        if (member.getProfile().getProfileImageUrl() == null) {
+            throw new S3Exception(MemberErrorStatus._PROFILE_IMAGE_NOT_FOUND);
         }
 
         String imageUrl = member.getProfile().getProfileImageUrl();
-        if (imageUrl != null && !imageUrl.isEmpty()) {
-            s3Util.deleteFile(imageUrl);
-        }
+        s3Util.deleteFile(imageUrl);
 
         member.getProfile().updateProfileImageUrl(null);
     }

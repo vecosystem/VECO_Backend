@@ -14,14 +14,14 @@ public class MemberConverter {
                 .memberId(member.getId())
                 .name(member.getName())
                 .email(member.getEmail())
-                .profileImage(member.getProfile().getProfileImageUrl())
+                .profileImageUrl(member.getProfile().getProfileImageUrl())
                 .build();
     }
 
     public static MemberResponseDTO.MemberProfileImageResponseDto toMemberProfileImageResponseDTO(Member member) {
         return MemberResponseDTO.MemberProfileImageResponseDto.builder()
                 .memberId(member.getId())
-                .imageUrl(member.getProfile().getProfileImageUrl())
+                .profileImageUrl(member.getProfile().getProfileImageUrl())
                 .build();
     }
 }
