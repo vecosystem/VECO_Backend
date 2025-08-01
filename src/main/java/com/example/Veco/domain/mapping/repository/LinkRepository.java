@@ -9,4 +9,6 @@ import java.util.Optional;
 
 public interface LinkRepository extends JpaRepository<Link, Long> {
     Optional<Link> findLinkByWorkspaceAndExternalService_ServiceType(WorkSpace workspace, ExtServiceType externalServiceServiceType);
+
+    Optional<Link> findByWorkspace(WorkSpace workspace);
 }

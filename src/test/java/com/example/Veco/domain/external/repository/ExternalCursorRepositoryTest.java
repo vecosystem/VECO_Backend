@@ -225,7 +225,7 @@ class ExternalCursorRepositoryTest {
                 .member(testMember)
                 .priority(Priority.NORMAL)
                 .type(ExtServiceType.GITHUB)
-                .external_code(name + "_CODE")
+                .externalCode(name + "_CODE")
                 .team(testTeam)
                 .build();
         
@@ -242,7 +242,7 @@ class ExternalCursorRepositoryTest {
                 .member(testMember)
                 .priority(priority)
                 .type(ExtServiceType.GITHUB)
-                .external_code(name + "_CODE")
+                .externalCode(name + "_CODE")
                 .team(testTeam)
                 .build();
         

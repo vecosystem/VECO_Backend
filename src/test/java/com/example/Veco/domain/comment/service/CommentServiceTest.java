@@ -105,7 +105,6 @@ class CommentServiceTest {
                 .title("Test Issue")
                 .content("Test Issue Content")
                 .name("Test Issue Name")
-                .issue_number(1)
                 .build();
         issueRepository.save(testIssue);
         
@@ -120,8 +119,8 @@ class CommentServiceTest {
         // 테스트용 외부 이슈 생성
         testExternal = External.builder()
                 .title("Test External")
-                .content("Test External Content")
-                .external_number(2)
+                .description("Test External Content")
+                .externalCode("test-external-code")
                 .externalCode("TEST-EXT-001")
                 .name("Test External Name")
                 .build();

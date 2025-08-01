@@ -65,6 +65,15 @@ public class ExternalResponseDTO {
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
+    public static class LinkInfoResponseDTO {
+        private Boolean linkedWithGithub;
+        private Boolean linkedWithSlack;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
     public static class ExternalDTO {
         @Schema(description = "이슈 ID", example = "1")
         private Long id;
