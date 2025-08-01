@@ -34,7 +34,7 @@ public class Team extends BaseEntity {
     private Long goalNumber;
 
     @Column(name = "team_order")
-    private int order;
+    private Integer order;
 
     // 연관 관계
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -55,5 +55,5 @@ public class Team extends BaseEntity {
     // update
     public void updateGoalNumber(Long goalNumber){ this.goalNumber = goalNumber; }
 
-    public void updateOrder(int order){ this.order = order; }
+    public void updateOrder(Integer order){ this.order = order; }
 }
