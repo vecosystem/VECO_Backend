@@ -3,6 +3,7 @@ package com.example.Veco.domain.workspace.service;
 import com.example.Veco.domain.workspace.dto.WorkspaceRequestDTO;
 import com.example.Veco.domain.workspace.dto.WorkspaceResponseDTO;
 import com.example.Veco.domain.workspace.entity.WorkSpace;
+import com.example.Veco.global.auth.user.userdetails.CustomUserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,4 +16,6 @@ public interface WorkspaceCommandService {
     void updateTeamOrder(WorkSpace workspace, List<Long> teamIdList);
 
     WorkspaceResponseDTO.CreateWorkspaceResponseDto createWorkspace(Long memberId, WorkspaceRequestDTO.CreateWorkspaceRequestDto request);
+
+    WorkspaceResponseDTO.JoinWorkspace joinWorkspace(WorkspaceRequestDTO.JoinWorkspace dto, CustomUserDetails user);
 }

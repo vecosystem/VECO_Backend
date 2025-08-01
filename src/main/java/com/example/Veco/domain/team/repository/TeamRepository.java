@@ -12,4 +12,6 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
     Optional<Team> findTeamById(Long id);
 
     Page<Team> findAllByWorkSpace(WorkSpace workspace, Pageable pageable);
+
+    Team findFirstByWorkSpaceOrderById(WorkSpace workSpace);
 }

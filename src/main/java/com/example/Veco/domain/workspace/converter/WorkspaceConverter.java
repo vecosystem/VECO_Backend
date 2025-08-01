@@ -6,7 +6,7 @@ import com.example.Veco.domain.workspace.dto.WorkspaceResponseDTO;
 import com.example.Veco.domain.workspace.entity.WorkSpace;
 import org.springframework.data.domain.Page;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -77,6 +77,17 @@ public class WorkspaceConverter {
                                 .collect(Collectors.toList())
                         )
                         .build();
+    }
+
+    // 워크스페이스 참여
+    public static WorkspaceResponseDTO.JoinWorkspace toJoinWorkspace(
+            Long id,
+            LocalDateTime now
+    ){
+        return WorkspaceResponseDTO.JoinWorkspace.builder()
+                .workspaceId(id)
+                .joinedAt(now)
+                .build();
     }
 
     public static WorkspaceResponseDTO.PreviewUrlResponseDto toPreviewUrlResponseDto(String previewUrl) {

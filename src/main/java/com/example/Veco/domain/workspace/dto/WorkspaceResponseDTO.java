@@ -82,6 +82,13 @@ public class WorkspaceResponseDTO {
         }
     }
 
+    // 워크스페이스 참여
+    @Builder
+    public record JoinWorkspace(
+            Long workspaceId,
+            LocalDateTime joinedAt
+    ){}
+
     @Getter
     @Builder
     public static class WorkspaceMemberWithTeamsDto {
