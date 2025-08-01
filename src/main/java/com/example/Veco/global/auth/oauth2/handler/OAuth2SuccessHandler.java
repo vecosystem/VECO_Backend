@@ -1,17 +1,15 @@
 package com.example.Veco.global.auth.oauth2.handler;
 
-import com.example.Veco.domain.member.enums.MemberRole;
 import com.example.Veco.domain.member.service.MemberCommandService;
-import com.example.Veco.global.apiPayload.ApiResponse;
-import com.example.Veco.global.auth.jwt.converter.TokenConverter;
-import com.example.Veco.global.auth.jwt.dto.TokenDTO;
 import com.example.Veco.global.auth.oauth2.CustomOAuth2User;
+import com.example.Veco.global.auth.oauth2.exception.OAuth2Exeception;
+import com.example.Veco.global.auth.oauth2.exception.code.OAuth2ErrorCode;
 import com.example.Veco.global.auth.user.userdetails.CustomUserDetails;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,8 +20,7 @@ import com.example.Veco.global.auth.jwt.util.JwtUtil;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.util.Date;
+
 
 import com.example.Veco.domain.member.entity.Member;
 import org.springframework.stereotype.Component;
@@ -39,6 +36,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+
+        String flow = getFlow(request);
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
@@ -57,24 +56,27 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 new UsernamePasswordAuthenticationToken(customUserDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
+        member.updateRefreshToken(refreshToken);
+        memberCommandService.saveMember(member);
         // 최초 로그인
-        if (userDetails.getMember().getRole() == null || userDetails.getMember().getRole() == MemberRole.GUEST) {
-            Member updatedMember = member.toBuilder()
-                    .role(MemberRole.USER)
-                    .refreshToken(refreshToken)
-                    .build();
-            memberCommandService.saveMember(updatedMember);
-
-            redirectURL = UriComponentsBuilder.fromUriString("https://veco-eight.vercel.app/onboarding")
-                    .build()
-                    .encode(StandardCharsets.UTF_8)
-                    .toUriString();
+        if (userDetails.getMember().getWorkSpace() == null) {
+            // 워크스페이스 생성
+            if (flow.equals("create")) {
+                redirectURL = UriComponentsBuilder.fromUriString("https://veco-eight.vercel.app/onboarding/workspace")
+                        .build()
+                        .encode(StandardCharsets.UTF_8)
+                        .toUriString();
+                // 워크스페이스 참여
+            } else if (flow.equals("join")) {
+                redirectURL = UriComponentsBuilder.fromUriString("https://veco-eight.vercel.app/onboarding/input-pw")
+                        .build()
+                        .encode(StandardCharsets.UTF_8)
+                        .toUriString();
+            } else {
+                throw new OAuth2Exeception(OAuth2ErrorCode.OAUTH2_INVALID_STATE);
+            }
+            // 기존 회원
         } else {
-            Member updatedMember = member.toBuilder()
-                    .refreshToken(refreshToken)
-                    .build();
-            memberCommandService.saveMember(updatedMember);
-
             redirectURL = UriComponentsBuilder.fromUriString("https://veco-eight.vercel.app/workspace")
                     .build()
                     .encode(StandardCharsets.UTF_8)
@@ -82,5 +84,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         }
 
         getRedirectStrategy().sendRedirect(request, response, redirectURL);
+    }
+
+    public String getFlow(HttpServletRequest request) {
+
+        HttpSession session = request.getSession();
+        String flow = (String) session.getAttribute("flow");
+        session.removeAttribute("flow");
+
+        return flow != null ? flow : "create";
     }
 }

@@ -4,6 +4,7 @@ import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.member.repository.MemberRepository;
 import com.example.Veco.global.auth.jwt.exception.code.JwtErrorCode;
 import com.example.Veco.global.auth.user.userdetails.CustomUserDetails;
+import com.example.Veco.global.redis.util.RedisUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import com.example.Veco.global.auth.jwt.exception.CustomJwtException;
@@ -30,6 +31,7 @@ public class JwtUtil {
     private final Duration accessExpiration;
     private final Duration refreshExpiration;
     private final MemberRepository memberRepository;
+    private final RedisUtil redisUtil;
 
     // 토큰 접두사: Redis 전용
     private final String BLACK_LIST_PREFIX = "token_blacklist:";
@@ -37,12 +39,14 @@ public class JwtUtil {
     public JwtUtil(
             @Value("${spring.jwt.secret}") String secretKey,
             @Value("${spring.jwt.token.access-expiration}") long accessExpiration,
-            @Value("${spring.jwt.token.refresh-expiration}") long refreshExpiration, MemberRepository memberRepository
+            @Value("${spring.jwt.token.refresh-expiration}") long refreshExpiration, MemberRepository memberRepository,
+            RedisUtil redisUtil
     ) {
         this.secretKey = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
         this.accessExpiration = Duration.ofMillis(accessExpiration);
         this.refreshExpiration = Duration.ofMillis(refreshExpiration);
         this.memberRepository = memberRepository;
+        this.redisUtil = redisUtil;
     }
 
     // AccessToken 생성
@@ -86,13 +90,47 @@ public class JwtUtil {
      * @param token 유효한지 확인할 토큰
      * @return True, False 반환합니다
      */
-    public boolean isValid(String token) {
+    public boolean isRefreshTokenValid(String token) {
         try {
             getClaims(token);
             return true;
         } catch (CustomJwtException e) {
             return false;
         }
+    }
+
+    public boolean isAccessTokenValid(String token) {
+        try {
+            // 토큰이 블랙리스트에 존재하는지 확인
+            if (isBlackList(token)){
+                return false;
+            }
+            getClaims(token);
+            return true;
+        } catch (CustomJwtException e) {
+            return false;
+        }
+    }
+
+    /** 토큰 블랙리스트 설정 (Redis)
+     * @param token 블랙리스트에 넣을 토큰 -> token_blacklist : token
+     */
+    public void setBlackList(String token) {
+        // 토큰 유효기간 확인
+        Date exp = getTokenExpiration(token);
+        // 블랙리스트 유효기간 설정: 현재 시간 - 만료기간 + 1분
+        Duration duration = Duration.between(Instant.now(), exp.toInstant())
+                .plus(Duration.ofMinutes(1));
+        redisUtil.save(BLACK_LIST_PREFIX+token, "", duration);
+    }
+
+    /** 토큰 블랙리스트에 존재하는지 확인 (Redis)
+     *
+     * @param token 존재 여부 확인할 토큰
+     * @return True, False를 반환합니다
+     */
+    public boolean isBlackList(String token) {
+        return redisUtil.hasKey(BLACK_LIST_PREFIX+token);
     }
 
     // 토큰 생성
@@ -115,11 +153,17 @@ public class JwtUtil {
 
     // 토큰 정보 가져오기
     private Jws<Claims> getClaims(String token) throws CustomJwtException {
-        return Jwts.parser()
+        Jws<Claims> claims = Jwts.parser()
                 .verifyWith(secretKey)
                 .clockSkewSeconds(60)
                 .build()
                 .parseSignedClaims(token);
+
+        if (claims.getPayload().getExpiration().before(new Date())) {
+            throw new CustomJwtException(JwtErrorCode.JWT_EXPIRED_TOKEN);
+        }
+
+        return claims;
     }
 
     public Member getMemberByToken(String token) {
@@ -182,6 +226,16 @@ public class JwtUtil {
         refreshTokenCookie.setMaxAge(maxAge);
         // HTTPS 사용하면 허용
 //            refreshTokenCookie.setSecure(true);
+        return refreshTokenCookie;
+    }
+
+    public Cookie expireRefreshTokenCookie() {
+        // 만료된 refresh 토큰 쿠키 생성
+        Cookie refreshTokenCookie = new Cookie("refreshToken", "");
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setMaxAge(0);
+
         return refreshTokenCookie;
     }
 }

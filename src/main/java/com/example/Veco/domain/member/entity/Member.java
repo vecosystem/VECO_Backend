@@ -51,4 +51,8 @@ public class Member extends BaseEntity {
     @JoinColumn(name = "profile_id")
     private Profile profile;
 
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
 }

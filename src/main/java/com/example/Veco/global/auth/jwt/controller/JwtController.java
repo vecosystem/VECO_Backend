@@ -6,6 +6,7 @@ import com.example.Veco.global.auth.jwt.dto.TokenDTO;
 import com.example.Veco.global.auth.jwt.dto.TokenPair;
 import com.example.Veco.global.auth.jwt.exception.CustomJwtException;
 import com.example.Veco.global.auth.jwt.exception.code.JwtErrorCode;
+import com.example.Veco.global.auth.jwt.exception.code.JwtSuccessCode;
 import com.example.Veco.global.auth.jwt.service.JwtService;
 import com.example.Veco.global.auth.jwt.util.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,6 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,5 +57,23 @@ public class JwtController {
             log.error("토큰 재발급 실패: {}", e.getMessage());
             throw new CustomJwtException(JwtErrorCode.JWT_INVALID_TOKEN);
         }
+    }
+
+    @PostMapping("/logout")
+    @Operation(
+            summary = "로그아웃 api",
+            description = "리프레쉬 토큰을 쿠키에서 삭제하고, 액세스 토큰을 블랙리스트에 등록합니다."
+    )
+    public ApiResponse<Void> logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        // 토큰 블랙리스트 처리
+        String token = request.getHeader("Authorization")
+                .replace("Bearer ", "");
+        jwtUtil.setBlackList(token);
+
+        // 리프레쉬 토큰 쿠키 삭제
+        Cookie refreshTokenCookie = jwtUtil.expireRefreshTokenCookie();
+        response.addCookie(refreshTokenCookie);
+
+        return ApiResponse.onSuccess(JwtSuccessCode.OK, null);
     }
 }
