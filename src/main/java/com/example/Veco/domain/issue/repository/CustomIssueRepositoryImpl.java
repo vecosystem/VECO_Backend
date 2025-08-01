@@ -1,9 +1,9 @@
 package com.example.Veco.domain.issue.repository;
 
+import com.example.Veco.domain.assignee.entity.Assignee;
 import com.example.Veco.domain.assignee.entity.QAssignee;
 import com.example.Veco.domain.goal.entity.QGoal;
 import com.example.Veco.domain.issue.dto.IssueResponseDTO;
-import com.example.Veco.domain.issue.entity.Issue;
 import com.example.Veco.domain.issue.entity.QIssue;
 import com.example.Veco.domain.issue.exception.IssueException;
 import com.example.Veco.domain.issue.exception.code.IssueErrorCode;
@@ -17,10 +17,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -132,7 +130,7 @@ public class CustomIssueRepositoryImpl implements CustomIssueRepository {
     }
 
     @Override
-    public Map<Long, List<IssueResponseDTO.ManagerInfo>> findManagerInfoByTeamId(
+    public Map<Long, List<Assignee>> findManagerInfoByTeamId(
             Long teamId
     ) {
         // 객체 생성
@@ -140,22 +138,14 @@ public class CustomIssueRepositoryImpl implements CustomIssueRepository {
         QAssignee assignee = QAssignee.assignee;
         QMember member = QMember.member;
 
-        Map<Long, List<IssueResponseDTO.ManagerInfo>> result = queryFactory
+        Map<Long, List<Assignee>> result = queryFactory
                 .from(issue)
                 .leftJoin(assignee).on(assignee.type.eq(Category.ISSUE)
                         .and(assignee.targetId.eq(issue.id)))
-                .leftJoin(member).on(member.eq(assignee.memberTeam.member))
+                .leftJoin(member).on(member.id.eq(assignee.memberTeam.member.id))
                 .transform(
                         GroupBy.groupBy(issue.id).as(
-                                GroupBy.list(
-                                        Projections.constructor(
-                                                IssueResponseDTO.ManagerInfo.class,
-                                                member.id,
-                                                issue.id,
-                                                member.profile.profileImageUrl,
-                                                member.name
-                                        )
-                                )
+                                GroupBy.list(assignee)
                         )
                 );
 

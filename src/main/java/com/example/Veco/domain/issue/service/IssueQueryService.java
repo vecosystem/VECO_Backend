@@ -80,15 +80,13 @@ public class IssueQueryService {
         // 우선순위: 없음 → 긴급 → 높음 → 보통 → 낮음
         // 담당자: 사전순(프론트에서 처리)
         List<IssueResponseDTO.FilteringIssue<IssueResponseDTO.IssueWithManagers>> filterResult = new ArrayList<>();
-
-        Map<Long, List<IssueResponseDTO.ManagerInfo>> managerInfos = issueRepository.findManagerInfoByTeamId(teamId);
+        Map<Long, List<Assignee>> assignees = issueRepository.findManagerInfoByTeamId(teamId);
         List<IssueResponseDTO.IssueWithManagers> issueWithManagers = new ArrayList<>();
 
-        List<Assignee> assignees = assigneeRepository.findAllByTypeAndMemberTeam_Team_id(Category.ISSUE, teamId);
-
-        // 조회한 이슈와 매니저 정보를 결합
         result.forEach(issue -> {
-            issueWithManagers.add(IssueConverter.toIssueWithManagers(issue, IssueConverter.toSimpleManagerInfos(assignees)));
+            List<Assignee> issueManagers = assignees.getOrDefault(issue.id(), Collections.emptyList());
+
+            issueWithManagers.add(IssueConverter.toIssueWithManagers(issue, IssueConverter.toSimpleManagerInfos(issueManagers)));
         });
 
         switch (query.toLowerCase()) {

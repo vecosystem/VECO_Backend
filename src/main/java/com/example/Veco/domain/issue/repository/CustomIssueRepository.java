@@ -1,5 +1,6 @@
 package com.example.Veco.domain.issue.repository;
 
+import com.example.Veco.domain.assignee.entity.Assignee;
 import com.example.Veco.domain.issue.dto.IssueResponseDTO;
 import com.querydsl.core.types.Predicate;
 
@@ -25,7 +26,7 @@ public interface CustomIssueRepository {
             Long teamId
     );
 
-    Map<Long, List<IssueResponseDTO.ManagerInfo>> findManagerInfoByTeamId(
+    Map<Long, List<Assignee>> findManagerInfoByTeamId(
             Long teamId
     );
 }
