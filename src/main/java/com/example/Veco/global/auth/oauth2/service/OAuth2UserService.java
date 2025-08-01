@@ -4,6 +4,7 @@ import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.member.enums.Provider;
 import com.example.Veco.domain.member.repository.MemberRepository;
 import com.example.Veco.domain.profile.entity.Profile;
+import com.example.Veco.domain.profile.repository.ProfileRepository;
 import com.example.Veco.global.auth.oauth2.CustomOAuth2User;
 import com.example.Veco.global.auth.oauth2.dto.OAuth2Attribute;
 import com.example.Veco.global.auth.oauth2.userinfo.OAuth2UserInfo;
@@ -16,15 +17,20 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 @Slf4j
+@Transactional
 public class OAuth2UserService extends DefaultOAuth2UserService {
     private final MemberRepository memberRepository;
+    private final ProfileRepository profileRepository;
+
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -46,19 +52,30 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         String email = oAuth2UserInfo.getEmail();
         String name = oAuth2UserInfo.getName();
 
-        Profile profile = Profile.builder()
-                .name(name)
-                .build();
+        Optional<Member> optionalMember = memberRepository.findBySocialUid(socialId);
 
-        Member member = memberRepository.findBySocialUid(socialId)
-                .orElse(Member.builder()
-                        .email(email)
-                        .name(name)
-                        .provider(provider)
-                        .socialUid(socialId)
-                        .profile(profile)
-                        .build()
-                );
+        Member member;
+        if (optionalMember.isPresent()) {
+            member = optionalMember.get();
+        } else {
+            Profile profile = Profile.builder()
+                    .name(name)
+                    .build();
+
+            profileRepository.save(profile);
+
+            member = Member.builder()
+                    .email(email)
+                    .name(name)
+                    .nickname(name)
+                    .provider(provider)
+                    .socialUid(socialId)
+                    .profile(profile)
+                    .build();
+
+            member = memberRepository.save(member);
+        }
+
 
         return new CustomOAuth2User(Collections.singleton(new SimpleGrantedAuthority("user")),
                 attributes, oAuth2Attribute.getNameAttributeKey(), member);
