@@ -9,6 +9,10 @@
 
 <button id="loginBtn-create">Google로 로그인 - 워크스페이스 생성</button>
 <button id="loginBtn-join">Google로 로그인 - 기존 워크스페이스 참여</button>
+<button id="reissue">액세스 토큰 발급</button>
+<!--테스트용 액세스 토큰 입력창-->
+<input type="text" id="accessToken" placeholder="액세스 토큰을 입력하세요">
+<button id="logoutBtn">로그아웃</button>
 
 <script>
     document.getElementById("loginBtn-create").addEventListener("click", () => {
@@ -19,6 +23,46 @@
     document.getElementById("loginBtn-join").addEventListener("click", () => {
         // 구글 OAuth2 로그인 시작
         window.location.href = "/oauth2/authorization/google?flow=join";
+    })
+
+    document.getElementById("reissue").addEventListener("click", () => {
+        // 액세스 토큰 재발급 요청
+        fetch("/api/token/reissue", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            credentials: "include" // 쿠키를 포함하여 요청
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error("토큰 재발급 실패");
+                }
+            })
+            .then(data => {
+                console.log("새로운 액세스 토큰:", data.result.accessToken);
+                document.getElementById("accessToken").value = data.result.accessToken;
+            })
+            .catch(error => {
+                console.error("에러 발생:", error);
+            });
+    })
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+        // 로그아웃 처리 /api/token/logout으로 post 요청
+        // input에 입력된 액세스 토큰을 사용하여 로그아웃
+        const accessToken = document.getElementById("accessToken").value;
+        fetch("/api/token/logout", {
+            method: "POST",
+            headers: {
+                // 헤더에 액세스 토큰
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + accessToken
+            },
+            credentials: "include" // 쿠키를 포함하여 요청
+        })
     })
 </script>
 </body>

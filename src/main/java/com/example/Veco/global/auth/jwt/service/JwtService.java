@@ -33,7 +33,7 @@ public class JwtService {
     }
 
     public TokenPair reissueAccessToken(String refreshToken) throws CustomJwtException {
-        if (!jwtUtil.isValid(refreshToken)) {
+        if (!jwtUtil.isRefreshTokenValid(refreshToken)) {
             log.error("유효하지 않은 RefreshToken: {}", refreshToken);
             throw new CustomJwtException(JwtErrorCode.JWT_INVALID_TOKEN);
         }
