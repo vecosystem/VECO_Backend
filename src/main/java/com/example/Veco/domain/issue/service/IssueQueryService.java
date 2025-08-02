@@ -249,9 +249,11 @@ public class IssueQueryService {
     public String getIssueName(
             Long teamId
     ) {
-        // 현재 목표 숫자 조회
+        // 현재 이슈 숫자 조회
         Team team = teamRepository.findById(teamId).orElseThrow(()->
                 new TeamException(TeamErrorCode._NOT_FOUND));
-        return team.getWorkSpace().getName()+"-i"+team.getIssueNumber();
+
+        Long issueNumber = team.getIssueNumber() != null ? team.getIssueNumber() : 1L;
+        return team.getWorkSpace().getName()+"-i"+issueNumber;
     }
 }
