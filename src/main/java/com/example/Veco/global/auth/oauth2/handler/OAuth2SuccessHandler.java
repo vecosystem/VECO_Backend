@@ -85,7 +85,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 //                    .toUriString();
 //        }
 
-        redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/onboarding/workspace")
+        redirectURL = UriComponentsBuilder.fromUriString("https://localhost:5173/onboarding/workspace")
                         .build()
                         .encode(StandardCharsets.UTF_8)
                         .toUriString();
