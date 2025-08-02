@@ -70,8 +70,6 @@ public class ExternalService {
     @Transactional
     public ExternalResponseDTO.CreateResponseDTO createExternal(Long teamId, ExternalRequestDTO.ExternalCreateRequestDTO request){
 
-        log.info("createExternal");
-
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new TeamException(TeamErrorCode._NOT_FOUND));
 
@@ -88,21 +86,22 @@ public class ExternalService {
 
         externalRepository.save(external);
 
-        gitHubIssueService.createGitHubIssue(request);
+        if(request.getExtServiceType() == ExtServiceType.GITHUB){
+            gitHubIssueService.createGitHubIssue(request);
+        }
 
         return ExternalConverter.createResponseDTO(external);
     }
 
     public ExternalResponseDTO.ExternalInfoDTO getExternalById(Long externalId) {
 
-        List<Assignment> assignments = assigmentRepository.findByExternalId(externalId);
-
         CommentRoom commentRoom = commentRoomRepository
                 .findByRoomTypeAndTargetId(com.example.Veco.global.enums.Category.EXTERNAL, externalId);
 
         External external = findExternalById(externalId);
 
-        return ExternalConverter.toExternalInfoDTO(external, external.getAssignments(), commentRoom.getComments());
+        return ExternalConverter.toExternalInfoDTO(external, external.getAssignments(),
+                commentRoom != null ? commentRoom.getComments() : null);
     }
 
     public CursorPage<ExternalResponseDTO.ExternalDTO> getExternalsWithPagination(ExternalSearchCriteria criteria, String cursor, int size){
@@ -116,7 +115,14 @@ public class ExternalService {
 
     @Transactional
     public void deleteExternals(ExternalRequestDTO.ExternalDeleteRequestDTO request) {
-        externalRepository.deleteAllById(request.getExternalIds());
+        externalRepository.findByIdIn(request.getExternalIds());
+    }
+
+    @Transactional
+    public void softDeleteExternals(ExternalRequestDTO.ExternalDeleteRequestDTO request) {
+        List<External> externals = externalRepository.findByIdIn(request.getExternalIds());
+
+        externals.forEach(External::softDelete);
     }
 
     @Transactional
@@ -124,7 +130,7 @@ public class ExternalService {
         External external = findExternalById(externalId);
 
         if (request.getManagersId() != null) {
-            modifyAssignment(externalId, request, external);
+            modifyAssignment(external, request);
         }
 
         if(request.getGoalId() != null){
@@ -156,15 +162,13 @@ public class ExternalService {
 
         Boolean isLinkedWithGitHub = githubInstallationRepository.findByTeamId(teamId).isPresent();
 
-        return ExternalConverter.linkInfoResponseDTO(isLinkedWithSlack, isLinkedWithGitHub);
+        return ExternalConverter.linkInfoResponseDTO(isLinkedWithGitHub, isLinkedWithSlack);
     }
 
-    private void modifyAssignment(Long externalId, ExternalRequestDTO.ExternalUpdateRequestDTO request, External external) {
-        assigmentRepository.deleteByExternalId(externalId);
+    private void modifyAssignment(External external, ExternalRequestDTO.ExternalUpdateRequestDTO request) {
+        assigmentRepository.deleteByExternalId(external.getId());
 
         List<Member> members = memberRepository.findAllByIdIn(request.getManagersId());
-
-        List<Assignment> assignments = new ArrayList<>();
 
         members.forEach(member -> {
             Assignment assignment = Assignment.builder()
@@ -175,10 +179,10 @@ public class ExternalService {
                     .assignee(member)
                     .build();
 
-            assignments.add(assignment);
+            external.addAssignment(assignment); // 양방향 연관관계 매핑
         });
 
-        assigmentRepository.saveAll(assignments);
+        externalRepository.save(external);
     }
 
     private External findExternalById(Long externalId) {

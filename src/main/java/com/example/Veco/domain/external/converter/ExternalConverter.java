@@ -25,7 +25,6 @@ public class ExternalConverter {
                 .name(externalCode)
                 .startDate(dto.getDeadline() != null ? dto.getDeadline().getStart() : null)
                 .endDate(dto.getDeadline() != null ? dto.getDeadline().getEnd() : null)
-                .externalCode(externalCode)
                 .type(dto.getExtServiceType())
                 .priority(dto.getPriority())
                 .title(dto.getTitle())
@@ -52,17 +51,19 @@ public class ExternalConverter {
 
         List<ExternalResponseDTO.CommentResponseDTO> commentResponseDTOS = new ArrayList<>();
 
-        comments.forEach(comment -> {
+        if(comments != null){
+            comments.forEach(comment -> {
 
-            ExternalResponseDTO.CommentResponseDTO commentDTO = ExternalResponseDTO.CommentResponseDTO.builder()
-                    .profileUrl(comment.getMember().getProfile().getProfileImageUrl())
-                    .nickname(comment.getMember().getNickname())
-                    .createdAt(comment.getCreatedAt())
-                    .content(comment.getContent())
-                    .build();
+                ExternalResponseDTO.CommentResponseDTO commentDTO = ExternalResponseDTO.CommentResponseDTO.builder()
+                        .profileUrl(comment.getMember().getProfile().getProfileImageUrl())
+                        .nickname(comment.getMember().getNickname())
+                        .createdAt(comment.getCreatedAt())
+                        .content(comment.getContent())
+                        .build();
 
-            commentResponseDTOS.add(commentDTO);
-        });
+                commentResponseDTOS.add(commentDTO);
+            });
+        }
 
         ExternalResponseDTO.ExternalCommentResponseDTO commentResponseDTO = ExternalResponseDTO.ExternalCommentResponseDTO.builder()
                 .cnt(commentResponseDTOS.size())
@@ -71,14 +72,16 @@ public class ExternalConverter {
 
         List<ExternalResponseDTO.AssigneeInfoDTO> assigneeResponseDTOS = new ArrayList<>();
 
-        assignees.forEach(assignee -> {
-            ExternalResponseDTO.AssigneeInfoDTO assigneeInfoDTO = ExternalResponseDTO.AssigneeInfoDTO.builder()
-                    .profileUrl(assignee.getProfileUrl())
-                    .nickname(assignee.getAssigneeName())
-                    .build();
+        if(assignees != null){
+            assignees.forEach(assignee -> {
+                ExternalResponseDTO.AssigneeInfoDTO assigneeInfoDTO = ExternalResponseDTO.AssigneeInfoDTO.builder()
+                        .profileUrl(assignee.getProfileUrl())
+                        .nickname(assignee.getAssigneeName())
+                        .build();
 
-            assigneeResponseDTOS.add(assigneeInfoDTO);
-        });
+                assigneeResponseDTOS.add(assigneeInfoDTO);
+            });
+        }
 
         ExternalResponseDTO.AssigneeResponseDTO assigneeResponseDTO = ExternalResponseDTO.AssigneeResponseDTO.builder()
                 .cnt(assigneeResponseDTOS.size())
@@ -91,10 +94,10 @@ public class ExternalConverter {
                 .startDate(external.getStartDate())
                 .endDate(external.getEndDate())
                 .content(external.getDescription())
-                .name(external.getExternalCode())
+                .name(external.getName())
                 .priority(external.getPriority())
-                .goalId(external.getGoal().getId())
-                .goalTitle(external.getGoal().getTitle())
+                .goalId(external.getGoal()!= null ? external.getGoal().getId() : null)
+                .goalTitle(external.getGoal()!= null ? external.getGoal().getTitle() : null)
                 .deadlines(deadline)
                 .title(external.getTitle())
                 .state(external.getState())
@@ -131,7 +134,7 @@ public class ExternalConverter {
         return ExternalResponseDTO.ExternalDTO.builder()
                 .id(external.getId())
                 .content(external.getDescription())
-                .name(external.getExternalCode())
+                .name(external.getName())
                 .priority(external.getPriority())
                 .goalId(external.getGoal() != null ? external.getGoal().getId() : null)
                 .goalTitle(external.getGoal() != null ? external.getGoal().getTitle() : null)
@@ -148,8 +151,7 @@ public class ExternalConverter {
                 .title(payload.getIssue().getTitle())
                 .githubDataId(payload.getIssue().getId())
                 .description(payload.getIssue().getBody())
-                .externalCode(externalCode)
-                .name("GitHub Issue")
+                .name(externalCode)
                 .team(team)
                 .type(ExtServiceType.GITHUB)
                 .state(State.NONE)
@@ -226,7 +228,7 @@ public class ExternalConverter {
 
         return ExternalGroupedResponseDTO.ExternalItemDTO.builder()
                 .id(external.getId())
-                .name(external.getExternalCode())
+                .name(external.getName())
                 .title(external.getTitle())
                 .state(external.getState())
                 .priority(external.getPriority().name())
