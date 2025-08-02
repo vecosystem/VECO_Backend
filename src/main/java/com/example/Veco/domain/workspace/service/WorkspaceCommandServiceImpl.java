@@ -74,7 +74,7 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
                         .build())
                 .toList();
 
-        // 5. 멤버-팀 관계 저장
+        // 5. 멤버~팀 관계 저장
         memberTeamRepository.saveAll(memberTeams);
 
         // 6. 응답 DTO 생성 후 반환
