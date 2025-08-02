@@ -18,6 +18,10 @@ import com.example.Veco.domain.issue.exception.IssueException;
 import com.example.Veco.domain.issue.exception.code.IssueErrorCode;
 import com.example.Veco.domain.issue.repository.IssueRepository;
 import com.example.Veco.domain.mapping.repository.CommentRoomRepository;
+import com.example.Veco.domain.team.entity.Team;
+import com.example.Veco.domain.team.exception.TeamException;
+import com.example.Veco.domain.team.exception.code.TeamErrorCode;
+import com.example.Veco.domain.team.repository.TeamRepository;
 import com.example.Veco.global.enums.Category;
 import com.example.Veco.global.enums.Priority;
 import com.example.Veco.global.enums.State;
@@ -40,6 +44,7 @@ public class IssueQueryService {
     private final GoalRepository goalRepository;
     private final CommentRoomRepository commentRoomRepository;
     private final CommentRepository commentRepository;
+    private final TeamRepository teamRepository;
 
     public IssueResponseDTO.Pageable<IssueResponseDTO.FilteringIssue<IssueResponseDTO.IssueWithManagers>> getIssuesByTeamId(
             Long teamId,
@@ -239,5 +244,14 @@ public class IssueQueryService {
                 goal,
                 IssueConverter.toCommentInfos(comments)
         );
+    }
+
+    public String getIssueName(
+            Long teamId
+    ) {
+        // 현재 목표 숫자 조회
+        Team team = teamRepository.findById(teamId).orElseThrow(()->
+                new TeamException(TeamErrorCode._NOT_FOUND));
+        return team.getWorkSpace().getName()+"-i"+team.getIssueNumber();
     }
 }
