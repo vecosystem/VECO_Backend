@@ -1,17 +1,34 @@
 package com.example.Veco.domain.notification.controller;
 
+import com.example.Veco.domain.goal.entity.Goal;
+import com.example.Veco.domain.goal.exception.GoalException;
+import com.example.Veco.domain.goal.exception.code.GoalErrorCode;
+import com.example.Veco.domain.issue.converter.IssueConverter;
+import com.example.Veco.domain.issue.dto.IssueReqDTO;
+import com.example.Veco.domain.issue.dto.IssueResponseDTO;
+import com.example.Veco.domain.mapping.entity.MemberTeam;
+import com.example.Veco.domain.member.entity.Member;
+import com.example.Veco.domain.member.error.MemberErrorStatus;
+import com.example.Veco.domain.member.error.MemberHandler;
 import com.example.Veco.domain.notification.dto.NotiResDTO.*;
 import com.example.Veco.domain.notification.exception.code.NotiSuccessCode;
 import com.example.Veco.domain.notification.service.NotiQueryService;
+import com.example.Veco.domain.team.exception.TeamException;
+import com.example.Veco.domain.team.exception.code.TeamErrorCode;
 import com.example.Veco.global.apiPayload.ApiResponse;
 import com.example.Veco.global.auth.user.AuthUser;
 import com.example.Veco.global.enums.Category;
+import com.example.Veco.global.redis.exception.RedisException;
+import com.example.Veco.global.redis.exception.code.RedisErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.RLock;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+
 
 @RestController
 @RequiredArgsConstructor

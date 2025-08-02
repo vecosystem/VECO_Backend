@@ -33,6 +33,9 @@ public class Team extends BaseEntity {
     @Column(name = "goal_number")
     private Long goalNumber;
 
+    @Column(name = "issue_number")
+    private Long issueNumber;
+
     @Column(name = "team_order")
     private Integer order;
 
@@ -54,6 +57,6 @@ public class Team extends BaseEntity {
 
     // update
     public void updateGoalNumber(Long goalNumber){ this.goalNumber = goalNumber; }
-
+    public void updateIssueNumber(Long issueNumber){ this.issueNumber = issueNumber; }
     public void updateOrder(Integer order){ this.order = order; }
 }
