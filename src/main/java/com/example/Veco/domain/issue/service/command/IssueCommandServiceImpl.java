@@ -38,9 +38,9 @@ public class IssueCommandServiceImpl implements IssueCommandService {
     private final IssueRepository issueRepository;
     private final AssigneeRepository assigneeRepository;
     private final GoalRepository goalRepository;
+    private final IssueTransactionalService issueTransactionalService;
 
     @Override
-    @Transactional
     public IssueResponseDTO.UpdateIssue updateIssue(AuthUser user, IssueReqDTO.UpdateIssue dto, Long teamId, Long issueId
     ){
         Member member = memberRepository.findBySocialUid(user.getSocialUid())
@@ -53,54 +53,7 @@ public class IssueCommandServiceImpl implements IssueCommandService {
             throw new IssueException(IssueErrorCode.FORBIDDEN);
         }
 
-        boolean isRestore = false;
-
-        if (dto.title() != null) {
-            issue.updateTitle(dto.title());
-            isRestore = true;
-        }
-
-        if (dto.content() != null) {
-            issue.updateContent(dto.content());
-            isRestore = true;
-        }
-
-        if (dto.state() != null) {
-            issue.updateState(dto.state());
-            isRestore = true;
-        }
-
-        if (dto.priority() != null) {
-            issue.updatePriority(dto.priority());
-            isRestore = true;
-        }
-
-        if (dto.managersId() != null) {
-
-            assigneeRepository.deleteAllByTypeAndTargetId(Category.ISSUE, issueId);
-
-            List<MemberTeam> memberTeamList = memberTeamRepository
-                    .findAllByMemberIdInAndTeamId(dto.managersId(), teamId);
-            memberTeamList.forEach(
-                    value -> assigneeRepository.save(
-                            AssigneeConverter.toIssueAssignee(value, Category.ISSUE, issue)
-                    )
-            );
-            isRestore = true;
-        }
-
-        if (dto.deadline() != null) {
-            issue.updateDeadlineStart(dto.deadline().start());
-            issue.updateDeadlineEnd(dto.deadline().end());
-            isRestore = true;
-        }
-
-        if (dto.goalId() != null) {
-            Goal goal = goalRepository.findById(dto.goalId())
-                    .orElseThrow(() -> new GoalException(GoalErrorCode.NOT_FOUND));
-                    issue.updateGoal(goal);
-            isRestore = true;
-        }
+        boolean isRestore = issueTransactionalService.updateIssue(dto, issueId, teamId);
         if (!isRestore) {
             return null;
         } else {
