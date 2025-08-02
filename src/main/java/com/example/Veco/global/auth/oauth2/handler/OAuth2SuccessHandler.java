@@ -60,29 +60,35 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         member.updateRefreshToken(refreshToken);
         memberCommandService.saveMember(member);
         // 최초 로그인
-        if (userDetails.getMember().getWorkSpace() == null) {
-            // 워크스페이스 생성
-            if (flow.equals("create")) {
-                redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/onboarding/workspace")
+        // TODO: 테스트용 주석 처리, 이후 해제 필요
+//        if (userDetails.getMember().getWorkSpace() == null) {
+//            // 워크스페이스 생성
+//            if (flow.equals("create")) {
+//                redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/onboarding/workspace")
+//                        .build()
+//                        .encode(StandardCharsets.UTF_8)
+//                        .toUriString();
+//                // 워크스페이스 참여
+//            } else if (flow.equals("join")) {
+//                redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/onboarding/input-pw")
+//                        .build()
+//                        .encode(StandardCharsets.UTF_8)
+//                        .toUriString();
+//            } else {
+//                throw new OAuth2Exeception(OAuth2ErrorCode.OAUTH2_INVALID_STATE);
+//            }
+//            // 기존 회원
+//        } else {
+//            redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/workspace")
+//                    .build()
+//                    .encode(StandardCharsets.UTF_8)
+//                    .toUriString();
+//        }
+
+        redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/onboarding/workspace")
                         .build()
                         .encode(StandardCharsets.UTF_8)
                         .toUriString();
-                // 워크스페이스 참여
-            } else if (flow.equals("join")) {
-                redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/onboarding/input-pw")
-                        .build()
-                        .encode(StandardCharsets.UTF_8)
-                        .toUriString();
-            } else {
-                throw new OAuth2Exeception(OAuth2ErrorCode.OAUTH2_INVALID_STATE);
-            }
-            // 기존 회원
-        } else {
-            redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/workspace")
-                    .build()
-                    .encode(StandardCharsets.UTF_8)
-                    .toUriString();
-        }
 
         getRedirectStrategy().sendRedirect(request, response, redirectURL);
     }
