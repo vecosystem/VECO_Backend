@@ -1,5 +1,6 @@
 package com.example.Veco.domain.workspace.service;
 
+import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.workspace.dto.WorkspaceRequestDTO;
 import com.example.Veco.domain.workspace.dto.WorkspaceResponseDTO;
 import com.example.Veco.domain.workspace.entity.WorkSpace;
@@ -15,7 +16,7 @@ public interface WorkspaceCommandService {
 
     void updateTeamOrder(WorkSpace workspace, List<Long> teamIdList);
 
-    WorkspaceResponseDTO.CreateWorkspaceResponseDto createWorkspace(Long memberId, WorkspaceRequestDTO.CreateWorkspaceRequestDto request);
-
     WorkspaceResponseDTO.JoinWorkspace joinWorkspace(WorkspaceRequestDTO.JoinWorkspace dto, CustomUserDetails user);
+
+    WorkspaceResponseDTO.CreateWorkspaceResponseDto createWorkspace(Member member, WorkspaceRequestDTO.CreateWorkspaceRequestDto request);
 }

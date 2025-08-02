@@ -48,7 +48,9 @@ public class SettingRestController {
      * 유저 프로필 조회 API
      */
     @GetMapping("/setting/my-profile")
-    @Operation(summary = "유저의 프로필을 조회합니다.")
+    @Operation(
+            summary = "유저의 프로필을 조회합니다.",
+            description = "profileImage가 null일 경우 기본 이미지를 사용해주세요.")
     public ApiResponse<MemberResponseDTO.ProfileResponseDto> getProfile(
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
@@ -136,7 +138,7 @@ public class SettingRestController {
     @Operation(summary = "워크스페이스 안에 팀을 생성합니다.")
     public ApiResponse<WorkspaceResponseDTO.CreateTeamResponseDto> createTeam(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @io.swagger.v3.oas.annotations.parameters.RequestBody WorkspaceRequestDTO.CreateTeamRequestDto request // 팀 이름 + 멤버 ID 리스트
+            @RequestBody WorkspaceRequestDTO.CreateTeamRequestDto request // 팀 이름 + 멤버 ID 리스트
     ) {
 
         String socialUid = userDetails.getSocialUid();

@@ -43,9 +43,9 @@ public class WorkspaceRestController {
     @Operation(summary = "워크스페이스를 생성합니다.")
     public ApiResponse<WorkspaceResponseDTO.CreateWorkspaceResponseDto> createWorkspace(@AuthenticationPrincipal CustomUserDetails userDetails, @Valid @RequestBody WorkspaceRequestDTO.CreateWorkspaceRequestDto request) {
         String socialUid = userDetails.getSocialUid();
-        Long memberId = memberQueryService.getMemberBySocialUid(socialUid).getId();
+        Member member = memberQueryService.getMemberBySocialUid(socialUid);
 
-         return ApiResponse.onSuccess(workspaceCommandService.createWorkspace(memberId, request));
+         return ApiResponse.onSuccess(workspaceCommandService.createWorkspace(member, request));
     }
 
     // 워크스페이스 참여

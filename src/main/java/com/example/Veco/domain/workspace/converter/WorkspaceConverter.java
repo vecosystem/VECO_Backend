@@ -19,8 +19,8 @@ public class WorkspaceConverter {
     public static WorkspaceResponseDTO.WorkspaceResponseDto toWorkspaceResponse(WorkSpace workspace) {
         return WorkspaceResponseDTO.WorkspaceResponseDto.builder()
                 .workspaceId(workspace.getId())
-                .name(workspace.getName())
-                .profileUrl(workspace.getProfileUrl())
+                .workspaceName(workspace.getName())
+                .workspaceImageUrl(workspace.getProfileUrl())
                 .workspaceUrl(workspace.getWorkspaceUrl())
                 .defaultTeamId(workspace.getTeams().get(0).getId())
                 .build();
@@ -32,7 +32,7 @@ public class WorkspaceConverter {
     public static WorkspaceResponseDTO.WorkspaceTeamDto toWorkspaceTeamDto(Team team, int memberCount) {
         return WorkspaceResponseDTO.WorkspaceTeamDto.builder()
                 .teamId(team.getId())
-                .name(team.getName())
+                .teamName(team.getName())
                 .memberCount(memberCount)
                 .createdAt(team.getCreatedAt())
                 .build();
@@ -72,7 +72,7 @@ public class WorkspaceConverter {
                         members.stream()
                                 .map(member -> WorkspaceResponseDTO.CreateTeamResponseDto.MemberDto.builder()
                                         .memberId(member.getId())
-                                        .memberName(member.getName())
+                                        .name(member.getName())
                                         .build())
                                 .collect(Collectors.toList())
                         )

@@ -7,6 +7,7 @@ import com.example.Veco.domain.member.enums.Provider;
 import com.example.Veco.domain.profile.entity.Profile;
 import com.example.Veco.domain.workspace.entity.WorkSpace;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Entity
@@ -23,10 +24,12 @@ public class Member extends BaseEntity {
     private Long id;
 
     @Column(name = "name")
+    @NotNull
     private String name;
 
     private String nickname;
 
+    @NotNull
     private String email;
 
     @Column(name = "provider")
@@ -48,7 +51,7 @@ public class Member extends BaseEntity {
     private WorkSpace workSpace;
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "profile_id")
+    @JoinColumn(name = "profile_id", nullable = true)
     private Profile profile;
 
     public void updateRefreshToken(String refreshToken) {
