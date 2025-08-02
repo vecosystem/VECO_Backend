@@ -192,12 +192,16 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
         LocalDateTime now = LocalDateTime.now();
 
         // 사용자 - 워크스페이스 연동
-        member.setWorkSpace(workSpace);
+        member.updateWorkspace(workSpace);
 
         // 사용자 - 기본 팀 연동
         Team team = teamRepository.findFirstByWorkSpaceOrderById(workSpace);
-        MemberTeam memberTeam = MemberTeamConverter.toMemberTeam(member, team);
-        memberTeamRepository.save(memberTeam);
+
+        // 사용자 - 팀 중복 여부 확인, 없을때만 생성
+        if (!memberTeamRepository.existsByMemberIdAndTeamId(member.getId(), team.getId())) {
+            MemberTeam memberTeam = MemberTeamConverter.toMemberTeam(member, team);
+            memberTeamRepository.save(memberTeam);
+        }
 
         return WorkspaceConverter.toJoinWorkspace(workSpace.getId(), now);
     }
