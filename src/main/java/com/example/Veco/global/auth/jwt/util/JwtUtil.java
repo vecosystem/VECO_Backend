@@ -222,7 +222,7 @@ public class JwtUtil {
 
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
-                .secure(true)
+//                .secure(true)
                 .sameSite("None")
                 .path("/")
                 .maxAge(maxAge)
@@ -235,7 +235,7 @@ public class JwtUtil {
         // 만료된 refresh 토큰 쿠키 생성
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", "")
                 .httpOnly(true)
-                .secure(true)
+//                .secure(true)
                 .sameSite("None")
                 .path("/")
                 .maxAge(0)
