@@ -16,7 +16,6 @@ import com.example.Veco.domain.workspace.service.WorkspaceQueryService;
 import com.example.Veco.global.apiPayload.ApiResponse;
 import com.example.Veco.global.auth.user.userdetails.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;

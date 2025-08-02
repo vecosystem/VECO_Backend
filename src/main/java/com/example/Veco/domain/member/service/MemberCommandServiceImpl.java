@@ -37,7 +37,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         }
 
         // S3 업로드 및 URL 생성
-        String uploadedPath = s3Util.uploadFile(List.of(file), "profile/").get(0);
+        String uploadedPath = s3Util.uploadFile(file, null);
         String imageUrl = s3Util.getImageUrl(uploadedPath);
 
         // DB 업데이트
