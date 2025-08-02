@@ -1,9 +1,11 @@
 package com.example.Veco.domain.member.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.Nullable;
 
 import java.util.Map;
 
@@ -17,7 +19,9 @@ public class MemberResponseDTO {
         private Long memberId;
         private String name;
         private String email;
-        private String profileImage; //url 반환, 실제 요청은 form-data
+
+        @Nullable
+        private String profileImageUrl; //url 반환, 실제 요청은 form-data // profileUrl -> profileImageUrl
     }
 
     @Builder
@@ -34,6 +38,6 @@ public class MemberResponseDTO {
     @AllArgsConstructor
     public static class MemberProfileImageResponseDto {
         private Long memberId;
-        private String imageUrl;
+        private String profileImageUrl; // profileImageUrl
     }
 }

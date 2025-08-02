@@ -8,6 +8,17 @@ import java.util.List;
 
 public class IssueReqDTO {
 
+    public record CreateIssue (
+            String title,
+            String content,
+            State state,
+            Priority priority,
+            List<Long> managersId,
+            Boolean isIncludeMe,
+            Deadline deadline,
+            Long goalId
+    ){}
+
     public record UpdateIssue(
             String title,
             String content,

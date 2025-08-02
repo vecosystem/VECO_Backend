@@ -74,7 +74,7 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
                         .build())
                 .toList();
 
-        // 5. 멤버-팀 관계 저장
+        // 5. 멤버~팀 관계 저장
         memberTeamRepository.saveAll(memberTeams);
 
         // 6. 응답 DTO 생성 후 반환
@@ -99,11 +99,7 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
     }
 
     @Override
-    public WorkspaceResponseDTO.CreateWorkspaceResponseDto createWorkspace(Long memberId, WorkspaceRequestDTO.CreateWorkspaceRequestDto request) {
-        // 1. 멤버 조회
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND));
-
+    public WorkspaceResponseDTO.CreateWorkspaceResponseDto createWorkspace(Member member, WorkspaceRequestDTO.CreateWorkspaceRequestDto request) {
         // 2. 이미 워크스페이스가 있으면 예외
         if (member.getWorkSpace() != null) {
             throw new WorkspaceHandler(WorkspaceErrorStatus._WORKSPACE_DUPLICATED);
@@ -149,9 +145,13 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
         defaultTeam.getMemberTeams().add(memberTeam);
 
         // 7. 저장
-        workspaceRepository.save(workSpace);
-        teamRepository.save(defaultTeam);
-        memberRepository.save(member);
+        try {
+            workspaceRepository.save(workSpace);
+            teamRepository.save(defaultTeam);
+            memberRepository.save(member);
+        } catch (Exception e) {
+            throw new WorkspaceHandler(WorkspaceErrorStatus._WORKSPACE_SAVE_FAILED);
+        }
 
         // 8. 응답
         return WorkspaceResponseDTO.CreateWorkspaceResponseDto.builder()
@@ -163,7 +163,6 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
                 .workspaceUrl(workSpace.getWorkspaceUrl())
                 .build();
     }
-
 
     // 워크스페이스 참여
     @Override
@@ -202,5 +201,4 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
 
         return WorkspaceConverter.toJoinWorkspace(workSpace.getId(), now);
     }
-
 }

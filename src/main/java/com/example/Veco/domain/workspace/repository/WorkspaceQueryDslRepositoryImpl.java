@@ -66,7 +66,7 @@ public class WorkspaceQueryDslRepositoryImpl implements WorkspaceQueryDslReposit
                         return WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto.TeamInfoDto.builder()
                                 .teamId(team.getId())
                                 .teamName(team.getName())
-                                .teamProfileUrl(team.getProfileUrl())
+                                .teamImageUrl(team.getProfileUrl())
                                 .build();
                     }).toList();
 
@@ -79,7 +79,7 @@ public class WorkspaceQueryDslRepositoryImpl implements WorkspaceQueryDslReposit
                     .memberId(member.getId())
                     .email(member.getEmail())
                     .name(member.getName())
-                    .profileUrl(member.getProfile().getProfileImageUrl()) // 필요시 profile.getUrl()로 수정
+                    .profileImageUrl(member.getProfile().getProfileImageUrl()) // 필요시 profile.getUrl()로 수정
                     .teams(teamDtos)
                     .joinedAt(joinedAt)
                     .build();
