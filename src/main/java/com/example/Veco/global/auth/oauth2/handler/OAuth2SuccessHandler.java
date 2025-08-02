@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -49,8 +50,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String redirectURL;
 
         String refreshToken = jwtUtil.createRefreshToken(customUserDetails);
-        Cookie refreshTokenCookie = jwtUtil.createRefreshTokenCookie(refreshToken);
-        response.addCookie(refreshTokenCookie);
+        ResponseCookie refreshTokenCookie = jwtUtil.createRefreshTokenCookie(refreshToken);
+        response.addHeader("Set-Cookie", refreshTokenCookie.toString());
 
         UsernamePasswordAuthenticationToken authToken =
                 new UsernamePasswordAuthenticationToken(customUserDetails, null, userDetails.getAuthorities());
@@ -62,13 +63,13 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         if (userDetails.getMember().getWorkSpace() == null) {
             // 워크스페이스 생성
             if (flow.equals("create")) {
-                redirectURL = UriComponentsBuilder.fromUriString("https://veco-eight.vercel.app/onboarding/workspace")
+                redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/onboarding/workspace")
                         .build()
                         .encode(StandardCharsets.UTF_8)
                         .toUriString();
                 // 워크스페이스 참여
             } else if (flow.equals("join")) {
-                redirectURL = UriComponentsBuilder.fromUriString("https://veco-eight.vercel.app/onboarding/input-pw")
+                redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/onboarding/input-pw")
                         .build()
                         .encode(StandardCharsets.UTF_8)
                         .toUriString();
@@ -77,7 +78,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             }
             // 기존 회원
         } else {
-            redirectURL = UriComponentsBuilder.fromUriString("https://veco-eight.vercel.app/workspace")
+            redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/workspace")
                     .build()
                     .encode(StandardCharsets.UTF_8)
                     .toUriString();

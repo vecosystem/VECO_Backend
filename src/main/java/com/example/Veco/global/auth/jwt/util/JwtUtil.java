@@ -13,6 +13,7 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
@@ -213,28 +214,32 @@ public class JwtUtil {
         }
     }
 
-    public Cookie createRefreshTokenCookie(String refreshToken) {
+    public ResponseCookie createRefreshTokenCookie(String refreshToken) {
         // refresh 토큰 유효기간 설정
         Date TokenExpiration = getTokenExpiration(refreshToken);
         long exp = TokenExpiration.getTime() - Instant.now().toEpochMilli();
         int maxAge = exp > 0 ? Math.toIntExact(exp / 1000) : 0;
 
-        // refresh 토큰 쿠키 생성
-        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(maxAge);
-        // HTTPS 사용하면 허용
-//            refreshTokenCookie.setSecure(true);
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .path("/")
+                .maxAge(maxAge)
+                .build();
+
         return refreshTokenCookie;
     }
 
-    public Cookie expireRefreshTokenCookie() {
+    public ResponseCookie expireRefreshTokenCookie() {
         // 만료된 refresh 토큰 쿠키 생성
-        Cookie refreshTokenCookie = new Cookie("refreshToken", "");
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(0);
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .path("/")
+                .maxAge(0)
+                .build();
 
         return refreshTokenCookie;
     }

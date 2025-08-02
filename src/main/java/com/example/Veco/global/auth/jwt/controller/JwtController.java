@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,8 +50,8 @@ public class JwtController {
             String newAccessToken = tokenPair.accessToken();
             String newRefreshToken = tokenPair.refreshToken();
             if (newRefreshToken != null) {
-                Cookie refreshTokenCookie = jwtUtil.createRefreshTokenCookie(newRefreshToken);
-                response.addCookie(refreshTokenCookie);
+                ResponseCookie refreshTokenCookie = jwtUtil.createRefreshTokenCookie(newRefreshToken);
+                response.addHeader("Set-Cookie", refreshTokenCookie.toString());
             }
             return ApiResponse.onSuccess(TokenConverter.toTokenDTO(newAccessToken));
         } catch (CustomJwtException e) {
@@ -71,8 +72,8 @@ public class JwtController {
         jwtUtil.setBlackList(token);
 
         // 리프레쉬 토큰 쿠키 삭제
-        Cookie refreshTokenCookie = jwtUtil.expireRefreshTokenCookie();
-        response.addCookie(refreshTokenCookie);
+        ResponseCookie refreshTokenCookie = jwtUtil.expireRefreshTokenCookie();
+        response.addHeader("Set-Cookie", refreshTokenCookie.toString());
 
         return ApiResponse.onSuccess(JwtSuccessCode.OK, null);
     }
