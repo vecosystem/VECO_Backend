@@ -33,8 +33,9 @@ public class Team extends BaseEntity {
     @Column(name = "goal_number")
     private Long goalNumber;
 
+    @Builder.Default
     @Column(name = "issue_number")
-    private Long issueNumber;
+    private Long issueNumber = 1L;
 
     @Column(name = "team_order")
     private Integer order;
