@@ -1,5 +1,6 @@
 package com.example.Veco.domain.workspace.controller;
 
+import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.member.service.MemberQueryService;
 import com.example.Veco.domain.workspace.converter.WorkspaceConverter;
 import com.example.Veco.domain.workspace.dto.WorkspaceRequestDTO;
