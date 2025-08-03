@@ -54,8 +54,9 @@ public class Member extends BaseEntity {
     @JoinColumn(name = "profile_id", nullable = true)
     private Profile profile;
 
+    // update
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
-
+    public void updateWorkspace(WorkSpace workSpace) { this.workSpace = workSpace; }
 }
