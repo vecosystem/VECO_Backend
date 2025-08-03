@@ -3,7 +3,7 @@ name: CI/CD PipeLine (Develop)
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "main" ] # 테스트를 위해 잠시 변경
 
 jobs:
   build:
