@@ -2,6 +2,7 @@
 *.yml
 *.properties
 
+### 민감한 개인 정보 제거 ###
 *.pem
 
 HELP.md
@@ -10,6 +11,7 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+*.DS_Store
 
 ### STS ###
 .apt_generated
