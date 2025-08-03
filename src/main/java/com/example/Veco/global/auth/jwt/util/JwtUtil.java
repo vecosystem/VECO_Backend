@@ -220,7 +220,7 @@ public class JwtUtil {
         int maxAge = exp > 0 ? Math.toIntExact(exp / 1000) : 0;
 
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
-                .domain("vecoservice.shop")
+                .domain(".vecoservice.shop")
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("None")
@@ -234,7 +234,7 @@ public class JwtUtil {
     public ResponseCookie expireRefreshTokenCookie() {
         // 만료된 refresh 토큰 쿠키 생성
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", "")
-                .domain("vecoservice.shop")
+                .domain(".vecoservice.shop")
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("None")
