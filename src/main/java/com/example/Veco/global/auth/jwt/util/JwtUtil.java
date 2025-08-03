@@ -2,15 +2,14 @@ package com.example.Veco.global.auth.jwt.util;
 
 import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.member.repository.MemberRepository;
+import com.example.Veco.global.auth.jwt.exception.CustomJwtException;
 import com.example.Veco.global.auth.jwt.exception.code.JwtErrorCode;
 import com.example.Veco.global.auth.user.userdetails.CustomUserDetails;
 import com.example.Veco.global.redis.util.RedisUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
-import com.example.Veco.global.auth.jwt.exception.CustomJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.Cookie;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
@@ -221,6 +220,7 @@ public class JwtUtil {
         int maxAge = exp > 0 ? Math.toIntExact(exp / 1000) : 0;
 
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
+                .domain("vecoservice.shop")
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("None")
@@ -234,6 +234,7 @@ public class JwtUtil {
     public ResponseCookie expireRefreshTokenCookie() {
         // 만료된 refresh 토큰 쿠키 생성
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", "")
+                .domain("vecoservice.shop")
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("None")
