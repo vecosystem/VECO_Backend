@@ -1,12 +1,11 @@
 package com.example.Veco.global.auth.oauth2.handler;
 
+import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.member.service.MemberCommandService;
+import com.example.Veco.global.auth.jwt.util.JwtUtil;
 import com.example.Veco.global.auth.oauth2.CustomOAuth2User;
-import com.example.Veco.global.auth.oauth2.exception.OAuth2Exeception;
-import com.example.Veco.global.auth.oauth2.exception.code.OAuth2ErrorCode;
 import com.example.Veco.global.auth.user.userdetails.CustomUserDetails;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -18,16 +17,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
-import com.example.Veco.global.auth.jwt.util.JwtUtil;
+import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-
-
-import com.example.Veco.domain.member.entity.Member;
-import org.springframework.stereotype.Component;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -97,7 +92,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 //                    .toUriString();
 //        }
 
-        redirectURL = UriComponentsBuilder.fromUriString("https://localhost:5173/onboarding/workspace")
+        redirectURL = UriComponentsBuilder.fromUriString("https://we.vecoservice.shop/onboarding/workspace")
                         .build()
                         .encode(StandardCharsets.UTF_8)
                         .toUriString();
