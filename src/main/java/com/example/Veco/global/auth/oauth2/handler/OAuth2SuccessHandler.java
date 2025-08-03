@@ -92,7 +92,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 //                    .toUriString();
 //        }
 
-        redirectURL = UriComponentsBuilder.fromUriString("https://we.vecoservice.shop/onboarding/workspace")
+        redirectURL = UriComponentsBuilder.fromUriString("https://web.vecoservice.shop/onboarding/workspace")
                         .build()
                         .encode(StandardCharsets.UTF_8)
                         .toUriString();
