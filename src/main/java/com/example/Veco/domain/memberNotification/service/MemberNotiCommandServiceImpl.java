@@ -39,9 +39,20 @@ public class MemberNotiCommandServiceImpl implements MemberNotiCommandService {
         Member member = memberRepository.findBySocialUid(user.getSocialUid()).orElseThrow(() ->
                 new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND));
         List<MemberNotification> notifications = memberNotiRepository.findAllById(memberNotiIds);
-        notifications.stream()
-                .filter(noti -> noti.getMember().equals(member))
-                .forEach(MemberNotification::markAsDeleted);
+
+        if (notifications.isEmpty()) {
+            throw new MemberNotiException(MemberNotiErrorCode.NOT_FOUND);
+        }
+
+        if (notifications.size() != memberNotiIds.size()) {
+            throw new MemberNotiException(MemberNotiErrorCode.ID_LIST_INVALID);
+        }
+
+        if (notifications.stream().anyMatch(noti -> !noti.getMember().equals(member))) {
+            throw new MemberHandler(MemberErrorStatus._FORBIDDEN);
+        }
+
+        notifications.forEach(MemberNotification::markAsDeleted);
     }
 
 }

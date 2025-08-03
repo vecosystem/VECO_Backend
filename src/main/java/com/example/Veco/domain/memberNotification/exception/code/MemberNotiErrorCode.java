@@ -13,6 +13,9 @@ public enum MemberNotiErrorCode implements BaseErrorStatus {
     NOT_FOUND(HttpStatus.NOT_FOUND,
             "MEMBER_NOTIFICATION404_0",
                     "해당 알림을 찾을 수 없습니다."),
+    ID_LIST_INVALID(HttpStatus.NOT_FOUND,
+            "MEMBER_NOTIFICATION404_1",
+            "일부 알림을 찾을 수 없습니다."),
     QUERY_INVALID(HttpStatus.BAD_REQUEST,
             "MEMBER_NOTIFICATION400_0",
             "Query값이 잘못되었습니다.");
