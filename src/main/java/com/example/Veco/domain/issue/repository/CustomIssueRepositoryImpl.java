@@ -4,6 +4,7 @@ import com.example.Veco.domain.assignee.entity.Assignee;
 import com.example.Veco.domain.assignee.entity.QAssignee;
 import com.example.Veco.domain.goal.entity.QGoal;
 import com.example.Veco.domain.issue.dto.IssueResponseDTO;
+import com.example.Veco.domain.issue.entity.Issue;
 import com.example.Veco.domain.issue.entity.QIssue;
 import com.example.Veco.domain.issue.exception.IssueException;
 import com.example.Veco.domain.issue.exception.code.IssueErrorCode;
@@ -152,4 +153,15 @@ public class CustomIssueRepositoryImpl implements CustomIssueRepository {
         return result;
 
     }
+
+    @Override
+    public List<Issue> findAllByTeamId(Long teamId) {
+        QIssue issue = QIssue.issue;
+
+        return queryFactory
+                .selectFrom(issue)
+                .where(issue.team.id.eq(teamId))
+                .fetch();
+    }
+
 }

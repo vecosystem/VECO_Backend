@@ -100,6 +100,15 @@ public class IssueConverter {
                 .build();
     }
 
+    public static IssueResponseDTO.IssueInfo toIssueInfo(
+        Issue issue
+    ){
+        return IssueResponseDTO.IssueInfo.builder()
+                .id(issue.getId())
+                .title(issue.getTitle())
+                .build();
+    }
+
     public static List<IssueResponseDTO.SimpleManagerInfo> toSimpleManagerInfos(
             List<Assignee> assignees
     ) {

@@ -256,4 +256,17 @@ public class IssueQueryService {
         Long issueNumber = team.getIssueNumber() != null ? team.getIssueNumber() : 1L;
         return team.getWorkSpace().getName()+"-i"+issueNumber;
     }
+
+    public IssueResponseDTO.Data<IssueResponseDTO.IssueInfo> getSimpleIssue(
+            Long teamId
+    ) {
+        teamRepository.findById(teamId).orElseThrow(()->
+                new TeamException(TeamErrorCode._NOT_FOUND));
+
+        List<Issue> issues = issueRepository.findAllByTeamId(teamId);
+        if (issues.isEmpty()){
+            throw new IssueException(IssueErrorCode.NOT_FOUND_IN_TEAM);
+        }
+        return IssueConverter.toData(issues.stream().map(IssueConverter::toIssueInfo).toList());
+    }
 }
