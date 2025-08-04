@@ -132,5 +132,11 @@ public class IssueResponseDTO {
             LocalDateTime createdAt
     ){}
 
+    @Builder
+    public record IssueInfo(
+            Long id,
+            String title
+    ) {
+    }
 
 }

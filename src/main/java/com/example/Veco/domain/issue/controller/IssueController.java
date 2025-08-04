@@ -120,4 +120,17 @@ public class IssueController {
     ) {
         return ApiResponse.onSuccess(IssueSuccessCode.OK, issueQueryService.getIssueDetailById(issueId));
     }
+
+    @Operation(
+            summary = "팀 내 이슈 간단 조회 API",
+            description = "팀의 모든 이슈를 간단히 조회합니다. " +
+                    "연결용으로 만들어진 API입니다. "
+    )
+    @GetMapping("/teams/{teamId}/issues-simple")
+    public ApiResponse<IssueResponseDTO.Data<IssueResponseDTO.IssueInfo>> getSimpleIssue(
+            @PathVariable
+            Long teamId
+    ){
+        return ApiResponse.onSuccess(IssueSuccessCode.OK, issueQueryService.getSimpleIssue(teamId));
+    }
 }
