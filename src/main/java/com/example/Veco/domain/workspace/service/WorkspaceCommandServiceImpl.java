@@ -160,6 +160,7 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
         // 8. 응답
         return WorkspaceResponseDTO.CreateWorkspaceResponseDto.builder()
                 .workspaceId(workSpace.getId())
+                .name(member.getName())
                 .workspaceName(workSpace.getName())
                 .inviteUrl(workSpace.getInviteUrl())
                 .invitePassword(workSpace.getInvitePassword())

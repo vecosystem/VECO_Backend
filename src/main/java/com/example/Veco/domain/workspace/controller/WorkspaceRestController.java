@@ -44,7 +44,7 @@ public class WorkspaceRestController {
         String socialUid = userDetails.getSocialUid();
         Member member = memberQueryService.getMemberBySocialUid(socialUid);
 
-         return ApiResponse.onSuccess(workspaceCommandService.createWorkspace(member, request));
+        return ApiResponse.onSuccess(workspaceCommandService.createWorkspace(member, request));
     }
 
     // 워크스페이스 참여
