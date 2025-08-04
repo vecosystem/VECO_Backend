@@ -2,6 +2,7 @@ package com.example.Veco.domain.issue.service.command;
 
 import com.example.Veco.domain.assignee.converter.AssigneeConverter;
 import com.example.Veco.domain.assignee.repository.AssigneeRepository;
+import com.example.Veco.domain.goal.converter.GoalConverter;
 import com.example.Veco.domain.goal.entity.Goal;
 import com.example.Veco.domain.goal.exception.GoalException;
 import com.example.Veco.domain.goal.exception.code.GoalErrorCode;
@@ -19,15 +20,23 @@ import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.member.error.MemberErrorStatus;
 import com.example.Veco.domain.member.error.MemberHandler;
 import com.example.Veco.domain.member.repository.MemberRepository;
+import com.example.Veco.domain.team.exception.TeamException;
+import com.example.Veco.domain.team.exception.code.TeamErrorCode;
+import com.example.Veco.domain.team.repository.TeamRepository;
 import com.example.Veco.global.auth.user.AuthUser;
 import com.example.Veco.global.enums.Category;
+import com.example.Veco.global.redis.exception.RedisException;
+import com.example.Veco.global.redis.exception.code.RedisErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -38,9 +47,11 @@ public class IssueCommandServiceImpl implements IssueCommandService {
     private final IssueRepository issueRepository;
     private final AssigneeRepository assigneeRepository;
     private final GoalRepository goalRepository;
+    private final TeamRepository teamRepository;
+    private final RedissonClient redissonClient;
+    private final IssueTransactionalService issueTransactionalService;
 
     @Override
-    @Transactional
     public IssueResponseDTO.UpdateIssue updateIssue(AuthUser user, IssueReqDTO.UpdateIssue dto, Long teamId, Long issueId
     ){
         Member member = memberRepository.findBySocialUid(user.getSocialUid())
@@ -53,60 +64,14 @@ public class IssueCommandServiceImpl implements IssueCommandService {
             throw new IssueException(IssueErrorCode.FORBIDDEN);
         }
 
-        boolean isRestore = false;
-
-        if (dto.title() != null) {
-            issue.updateTitle(dto.title());
-            isRestore = true;
-        }
-
-        if (dto.content() != null) {
-            issue.updateContent(dto.content());
-            isRestore = true;
-        }
-
-        if (dto.state() != null) {
-            issue.updateState(dto.state());
-            isRestore = true;
-        }
-
-        if (dto.priority() != null) {
-            issue.updatePriority(dto.priority());
-            isRestore = true;
-        }
-
-        if (dto.managersId() != null) {
-
-            assigneeRepository.deleteAllByTypeAndTargetId(Category.ISSUE, issueId);
-
-            List<MemberTeam> memberTeamList = memberTeamRepository
-                    .findAllByMemberIdInAndTeamId(dto.managersId(), teamId);
-            memberTeamList.forEach(
-                    value -> assigneeRepository.save(
-                            AssigneeConverter.toIssueAssignee(value, Category.ISSUE, issue)
-                    )
-            );
-            isRestore = true;
-        }
-
-        if (dto.deadline() != null) {
-            issue.updateDeadlineStart(dto.deadline().start());
-            issue.updateDeadlineEnd(dto.deadline().end());
-            isRestore = true;
-        }
-
-        if (dto.goalId() != null) {
-            Goal goal = goalRepository.findById(dto.goalId())
-                    .orElseThrow(() -> new GoalException(GoalErrorCode.NOT_FOUND));
-                    issue.updateGoal(goal);
-            isRestore = true;
-        }
+        boolean isRestore = issueTransactionalService.updateIssue(dto, issueId, teamId);
         if (!isRestore) {
             return null;
         } else {
             LocalDateTime now = LocalDateTime.now();
             return IssueConverter.toUpdateIssue(issueId, now);
         }
+
     }
 
     @Override
@@ -131,5 +96,50 @@ public class IssueCommandServiceImpl implements IssueCommandService {
         assigneeRepository.deleteAllByTypeAndTargetIds(Category.ISSUE, result);
 
         return result;
+    }
+
+    @Override
+    public IssueResponseDTO.CreateIssue createIssue(AuthUser user, Long teamId, IssueReqDTO.CreateIssue dto){
+
+        List<Long> memberIds = new ArrayList<>(dto.managersId());
+        if (dto.isIncludeMe()) {
+            Member member = memberRepository.findBySocialUid(user.getSocialUid()).orElseThrow(() ->
+                    new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND));
+            memberIds.add(member.getId());
+        }
+
+        List<Member> memberList = memberRepository.findAllById(memberIds);
+        if (memberList.size() != memberIds.size()) {
+            throw new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND);
+        }
+
+        if (!teamRepository.existsById(teamId)) {
+            throw new TeamException(TeamErrorCode._NOT_FOUND);
+        }
+
+        List<MemberTeam> memberTeamList = memberTeamRepository.findAllByMemberIdInAndTeamId(memberIds, teamId);
+        if (memberTeamList.size() != memberIds.size()) {
+            throw new MemberHandler(MemberErrorStatus._FORBIDDEN);
+        }
+
+        Goal goal = goalRepository.findById(dto.goalId()).orElseThrow(()->
+                new GoalException(GoalErrorCode.NOT_FOUND));
+
+        RLock lock = redissonClient.getLock("lock:issue:" + teamId);
+        Long issueId;
+        try {
+            boolean available = lock.tryLock(60, 15, TimeUnit.SECONDS);
+            if (!available) {
+                throw new RedisException(RedisErrorCode.LOCK_TIMEOUT);
+            }
+
+            issueId = issueTransactionalService.createIssue(teamId, dto, memberTeamList, goal);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            lock.unlock();
+        }
+        LocalDateTime now = LocalDateTime.now();
+        return IssueConverter.toCreateIssue(issueId, now);
     }
 }

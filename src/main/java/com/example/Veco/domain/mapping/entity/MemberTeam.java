@@ -1,6 +1,7 @@
 package com.example.Veco.domain.mapping.entity;
 
 
+
 import com.example.Veco.domain.common.BaseEntity;
 import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.team.entity.Team;

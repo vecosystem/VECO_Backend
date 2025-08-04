@@ -1,6 +1,8 @@
 package com.example.Veco.domain.issue.converter;
 
 import com.example.Veco.domain.goal.dto.response.GoalResDTO;
+import com.example.Veco.domain.issue.dto.IssueReqDTO;
+import com.example.Veco.domain.team.entity.Team;
 import org.springframework.stereotype.Component;
 import com.example.Veco.domain.assignee.entity.Assignee;
 import com.example.Veco.domain.comment.entity.Comment;
@@ -98,6 +100,15 @@ public class IssueConverter {
                 .build();
     }
 
+    public static IssueResponseDTO.IssueInfo toIssueInfo(
+        Issue issue
+    ){
+        return IssueResponseDTO.IssueInfo.builder()
+                .id(issue.getId())
+                .title(issue.getTitle())
+                .build();
+    }
+
     public static List<IssueResponseDTO.SimpleManagerInfo> toSimpleManagerInfos(
             List<Assignee> assignees
     ) {
@@ -153,6 +164,35 @@ public class IssueConverter {
         return IssueResponseDTO.UpdateIssue.builder()
                 .issueId(issueId)
                 .updatedAt(now)
+                .build();
+    }
+
+    public static IssueResponseDTO.CreateIssue toCreateIssue(
+            Long issueId,
+            LocalDateTime now
+    ){
+        return IssueResponseDTO.CreateIssue.builder()
+                .issueId(issueId)
+                .createdAt(now)
+                .build();
+    }
+
+    public static Issue toIssue(
+            IssueReqDTO.CreateIssue dto,
+            Team team,
+            String name,
+            Goal goal
+    ){
+        return Issue.builder()
+                .state(dto.state())
+                .content(dto.content())
+                .title(dto.title())
+                .deadlineStart(dto.deadline().start())
+                .deadlineEnd(dto.deadline().end())
+                .priority(dto.priority())
+                .team(team)
+                .name(name)
+                .goal(goal)
                 .build();
     }
 }

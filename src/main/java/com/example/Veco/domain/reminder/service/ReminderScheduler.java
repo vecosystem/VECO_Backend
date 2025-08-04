@@ -18,7 +18,7 @@ public class ReminderScheduler {
 
 
     // ⏳ 자정마다 캐시 초기화
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 */1 * * * *")
     public void runReminderJobInOrder() {
         clearOldCache();
         cacheTodayReminders();

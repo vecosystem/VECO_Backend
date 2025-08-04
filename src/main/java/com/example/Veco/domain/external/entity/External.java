@@ -1,7 +1,5 @@
 package com.example.Veco.domain.external.entity;
 
-
-import com.example.Veco.domain.comment.entity.CommentRoom;
 import com.example.Veco.domain.common.BaseEntity;
 import com.example.Veco.domain.external.dto.request.ExternalRequestDTO;
 import com.example.Veco.domain.external.dto.GitHubWebhookPayload;

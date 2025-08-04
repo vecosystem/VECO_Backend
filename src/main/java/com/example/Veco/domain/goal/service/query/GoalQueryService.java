@@ -79,7 +79,6 @@ public class GoalQueryService {
                 builder.and(goal.id.loe(idCursor));
 
                 // firstCursor 검증: 속성과 일치하지 않으면 NONE 설정
-                // 담당자는 어떻게 처리하면 좋을지 논의
                 switch (query.toLowerCase()) {
                     case "state": {
                         String finalFirstCursor = firstCursor;
@@ -117,13 +116,14 @@ public class GoalQueryService {
             }
         }
 
+        // 요청 데이터 수 +1 많게 조회: 메타데이터 설정용
+        size += 1;
+
         // 필터별 분류
         // 상태: 없음 → 진행중 → 해야할 일 → 완료 → 검토 → 삭제
         // 우선순위: 없음 → 긴급 → 높음 → 보통 → 낮음
         // 담당자: 사전순
         List<FilteringGoal<SimpleGoal>> filterResult = new ArrayList<>();
-        // 요청 데이터 수 +1 많게 조회: 메타데이터 설정용
-        int cnt = 0;
         boolean isContinue = false;
         BooleanBuilder dataQuery =  new BooleanBuilder();
         dataQuery.and(goal.team.id.eq(teamId));
@@ -143,14 +143,15 @@ public class GoalQueryService {
                     Long dataCnt = goalRepository.findGoalsCountByFilter(dataQuery);
 
                     // firstCursor가 일치할때, 그떄 조회 시작
-                    if ((cnt <= size) && (filter.name().equals(firstCursor) || isContinue)){
+                    if ((size > 0) && (filter.name().equals(firstCursor) || isContinue)){
                         builder.and(goal.state.eq(filter));
 
-                        result = goalRepository.findGoalsByTeamId(builder, size-cnt+1);
+                        result = goalRepository.findGoalsByTeamId(builder, size);
 
                         // 조회 시작했을때, 설정한 사이즈를 넘을때까지 조회
                         isContinue = true;
-                        cnt += result.size();
+                        size -= result.size();
+                        pageSize += result.size();
 
                         // ID 조건 초기화
                         builder = new BooleanBuilder();
@@ -158,18 +159,22 @@ public class GoalQueryService {
                     }
 
                     // 사이즈를 넘어 조회한 경우: 다음 데이터 존재 -> 메타데이터로 설정
-                    if (cnt > size && isContinue){
+                    if (size <= 0 && isContinue){
+
                         // 그만 조회
                         isContinue = false;
 
                         hasNext = true;
-                        pageSize = cnt-1;
+                        pageSize -= 1;
                         nextCursor = filter + ":" + result.getLast().id();
 
                         // 사이즈 조절
-                        result = result.subList(0, result.size()-1);
+                        if (result.size() > 1){
+                            result = result.subList(0, result.size()-1);
+                        } else {
+                            result = new ArrayList<>();
+                        }
                     } else if (isContinue && !result.isEmpty()) {
-                        pageSize = cnt;
                         nextCursor = filter + ":" + result.getLast().id();
                     }
 
@@ -192,14 +197,15 @@ public class GoalQueryService {
                     Long dataCnt = goalRepository.findGoalsCountByFilter(dataQuery);
 
                     // firstCursor가 일치할때, 그떄 조회 시작
-                    if ((cnt <= size) && (filter.name().equals(firstCursor) || isContinue)){
+                    if ((size > 0) && (filter.name().equals(firstCursor) || isContinue)){
                         builder.and(goal.priority.eq(filter));
 
-                        result = goalRepository.findGoalsByTeamId(builder, size-cnt+1);
+                        result = goalRepository.findGoalsByTeamId(builder, size);
 
                         // 조회 시작했을때, 설정한 사이즈를 넘을때까지 조회
                         isContinue = true;
-                        cnt += result.size();
+                        size -= result.size();
+                        pageSize += result.size();
 
                         // ID 조건 초기화
                         builder = new BooleanBuilder();
@@ -207,18 +213,22 @@ public class GoalQueryService {
                     }
 
                     // 사이즈를 넘어 조회한 경우: 다음 데이터 존재 -> 메타데이터로 설정
-                    if (cnt > size && isContinue){
+                    if (size <= 0 && isContinue){
+
                         // 그만 조회
                         isContinue = false;
 
                         hasNext = true;
-                        pageSize = cnt-1;
+                        pageSize -= 1;
                         nextCursor = filter + ":" + result.getLast().id();
 
                         // 사이즈 조절
-                        result = result.subList(0, result.size()-1);
-                    } else if (isContinue) {
-                        pageSize = cnt;
+                        if (result.size() > 1){
+                            result = result.subList(0, result.size()-1);
+                        } else {
+                            result = new ArrayList<>();
+                        }
+                    } else if (isContinue && !result.isEmpty()) {
                         nextCursor = filter + ":" + result.getLast().id();
                     }
 
@@ -254,14 +264,15 @@ public class GoalQueryService {
                     List<SimpleGoal> result = new ArrayList<>();
 
                     // firstCursor가 일치할때, 그떄 조회 시작
-                    if ((cnt <= size) && (filter.equals(firstCursor) || isContinue)){
+                    if ((size > 0) && (filter.equals(firstCursor) || isContinue)){
                         builder.and(assignee.memberTeam.member.name.eq(filter));
 
-                        result = goalRepository.findGoalsByTeamId(builder, size-cnt+1);
+                        result = goalRepository.findGoalsByTeamId(builder, size);
 
                         // 조회 시작했을때, 설정한 사이즈를 넘을때까지 조회
                         isContinue = true;
-                        cnt += result.size();
+                        size -= result.size();
+                        pageSize += result.size();
 
                         // ID 조건 초기화
                         builder = new BooleanBuilder();
@@ -269,18 +280,22 @@ public class GoalQueryService {
                     }
 
                     // 사이즈를 넘어 조회한 경우: 다음 데이터 존재 -> 메타데이터로 설정
-                    if (cnt > size && isContinue){
+                    if (size <= 0 && isContinue){
+
                         // 그만 조회
                         isContinue = false;
 
                         hasNext = true;
-                        pageSize = cnt-1;
+                        pageSize -= 1;
                         nextCursor = filter + ":" + result.getLast().id();
 
                         // 사이즈 조절
-                        result = result.subList(0, result.size()-1);
-                    } else if (isContinue) {
-                        pageSize = cnt;
+                        if (result.size() > 1){
+                            result = result.subList(0, result.size()-1);
+                        } else {
+                            result = new ArrayList<>();
+                        }
+                    } else if (isContinue && !result.isEmpty()) {
                         nextCursor = filter + ":" + result.getLast().id();
                     }
 

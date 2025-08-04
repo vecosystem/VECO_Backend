@@ -46,6 +46,7 @@ public class GoalQueryDslImpl implements GoalQueryDsl {
                 .leftJoin(member).on(member.id.eq(memberTeam.member.id))
                 .leftJoin(profile).on(profile.id.eq(member.profile.id))
                 .orderBy(goal.id.desc())
+                .limit(size)
                 .groupBy(
                         goal.id,
                         goal.name,

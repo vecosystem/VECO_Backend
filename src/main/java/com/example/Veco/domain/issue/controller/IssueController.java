@@ -1,5 +1,8 @@
 package com.example.Veco.domain.issue.controller;
 
+import com.example.Veco.domain.goal.dto.request.GoalReqDTO;
+import com.example.Veco.domain.goal.dto.response.GoalResDTO;
+import com.example.Veco.domain.goal.exception.code.GoalSuccessCode;
 import com.example.Veco.domain.issue.dto.IssueReqDTO;
 import com.example.Veco.domain.issue.dto.IssueResponseDTO;
 
@@ -26,6 +29,32 @@ public class IssueController {
     private final IssueQueryService issueQueryService;
 
     private final IssueCommandService issueCommandService;
+
+    // POST : 이슈 작성
+    @Operation(
+            summary = "이슈 생성 API",
+            description = "이슈를 작성합니다."
+    )
+    @PostMapping("/teams/{teamId}/issues")
+    public ApiResponse<IssueResponseDTO.CreateIssue> createIssue(
+            @PathVariable Long teamId,
+            @RequestBody IssueReqDTO.CreateIssue dto,
+            @AuthenticationPrincipal AuthUser user
+    ){
+        return ApiResponse.onSuccess(IssueSuccessCode.CREATE, issueCommandService.createIssue(user, teamId, dto));
+    }
+    // 생성될 이슈 이름 조회
+    @Operation(
+            summary = "생성될 이슈 이름 조회",
+            description = "이슈 생성 시 먼저 보이는 이름(Veco-i3) 을 조회합니다."
+    )
+    @GetMapping("/teams/{teamId}/issue-name")
+    public ApiResponse<String> getIssueName(
+            @PathVariable
+            Long teamId
+    ){
+        return ApiResponse.onSuccess(IssueSuccessCode.OK, issueQueryService.getIssueName(teamId));
+    }
 
     // PATCH : 이슈 수정
     @Operation(
@@ -90,5 +119,18 @@ public class IssueController {
             @PathVariable Long issueId
     ) {
         return ApiResponse.onSuccess(IssueSuccessCode.OK, issueQueryService.getIssueDetailById(issueId));
+    }
+
+    @Operation(
+            summary = "팀 내 이슈 간단 조회 API",
+            description = "팀의 모든 이슈를 간단히 조회합니다. " +
+                    "연결용으로 만들어진 API입니다. "
+    )
+    @GetMapping("/teams/{teamId}/issues-simple")
+    public ApiResponse<IssueResponseDTO.Data<IssueResponseDTO.IssueInfo>> getSimpleIssue(
+            @PathVariable
+            Long teamId
+    ){
+        return ApiResponse.onSuccess(IssueSuccessCode.OK, issueQueryService.getSimpleIssue(teamId));
     }
 }
