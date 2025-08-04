@@ -17,6 +17,7 @@ import com.example.Veco.global.apiPayload.ApiResponse;
 import com.example.Veco.global.auth.user.userdetails.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -137,7 +138,7 @@ public class SettingRestController {
     @Operation(summary = "워크스페이스 안에 팀을 생성합니다.")
     public ApiResponse<WorkspaceResponseDTO.CreateTeamResponseDto> createTeam(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody WorkspaceRequestDTO.CreateTeamRequestDto request // 팀 이름 + 멤버 ID 리스트
+            @RequestBody @Valid WorkspaceRequestDTO.CreateTeamRequestDto request // 팀 이름 + 멤버 ID 리스트
     ) {
 
         String socialUid = userDetails.getSocialUid();
@@ -176,7 +177,7 @@ public class SettingRestController {
     @Operation(summary = "사이드 바의 팀 목록 순서를 수정합니다.")
     public ApiResponse<Void> updateTeamOrder(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody WorkspaceRequestDTO.TeamOrderRequestDto request
+            @RequestBody @Valid WorkspaceRequestDTO.TeamOrderRequestDto request
     ) {
         String socialUid = userDetails.getSocialUid();
         Member member = memberQueryService.getMemberBySocialUid(socialUid);
@@ -185,5 +186,20 @@ public class SettingRestController {
         workspaceCommandService.updateTeamOrder(workspace, request.getTeamIdList());
 
         return ApiResponse.onSuccess(null);
+    }
+
+    @GetMapping("/setting/invite")
+    @Operation(
+            summary = "워크스페이스에 팀원을 초대합니다.",
+            description = "초대링크와 암호를 보여줍니다."
+    )
+    public ApiResponse<WorkspaceResponseDTO.InviteInfoResponseDto> inviteWorkspace(
+            @AuthenticationPrincipal CustomUserDetails user
+    ){
+        String socialUid = user.getSocialUid();
+        Member member = memberQueryService.getMemberBySocialUid(socialUid);
+        WorkSpace workspace = workspaceQueryService.getWorkSpaceByMember(member);
+
+        return ApiResponse.onSuccess(WorkspaceConverter.toInviteInfoResponseDto(workspace));
     }
 }

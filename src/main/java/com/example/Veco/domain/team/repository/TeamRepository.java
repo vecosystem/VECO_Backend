@@ -14,4 +14,6 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
     Page<Team> findAllByWorkSpace(WorkSpace workspace, Pageable pageable);
 
     Team findFirstByWorkSpaceOrderById(WorkSpace workSpace);
+
+    int countByWorkSpace(WorkSpace workSpace);
 }

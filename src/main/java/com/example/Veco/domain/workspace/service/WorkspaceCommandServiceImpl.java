@@ -84,6 +84,12 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
     @Transactional
     @Override
     public void updateTeamOrder(WorkSpace workspace, List<Long> teamIdList) {
+        // 요청한 팀 개수와 워크스페이스 안에 있는 실제 팀의 개수가 같아야함.
+        int currentTeamCount = teamRepository.countByWorkSpace(workspace);
+        if (teamIdList.size() != currentTeamCount) {
+            throw new TeamException(TeamErrorCode._TEAM_COUNT_MISMATCH);
+        }
+
         for (int i = 0; i < teamIdList.size(); i++) {
             Long teamId = teamIdList.get(i);
             Team team = teamRepository.findById(teamId)
@@ -136,18 +142,16 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
                 .goalNumber(1L)
                 .build();
 
-        MemberTeam memberTeam = MemberTeam.builder()
-                .member(member)
-                .team(defaultTeam)
-                .build();
-
         workSpace.getTeams().add(defaultTeam);
+
+        MemberTeam memberTeam = MemberTeamConverter.toMemberTeam(member, defaultTeam);
         defaultTeam.getMemberTeams().add(memberTeam);
 
         // 7. 저장
         try {
             workspaceRepository.save(workSpace);
             teamRepository.save(defaultTeam);
+            memberTeamRepository.save(memberTeam);
             memberRepository.save(member);
         } catch (Exception e) {
             throw new WorkspaceHandler(WorkspaceErrorStatus._WORKSPACE_SAVE_FAILED);

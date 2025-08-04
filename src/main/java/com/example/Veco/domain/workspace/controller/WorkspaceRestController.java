@@ -6,6 +6,7 @@ import com.example.Veco.domain.workspace.converter.WorkspaceConverter;
 import com.example.Veco.domain.workspace.dto.WorkspaceRequestDTO;
 import com.example.Veco.domain.workspace.dto.WorkspaceResponseDTO;
 import com.example.Veco.domain.workspace.dto.WorkspaceResponseDTO.JoinWorkspace;
+import com.example.Veco.domain.workspace.entity.WorkSpace;
 import com.example.Veco.domain.workspace.error.WorkspaceSuccessCode;
 import com.example.Veco.domain.workspace.service.WorkspaceCommandService;
 import com.example.Veco.domain.workspace.service.WorkspaceQueryService;
@@ -17,10 +18,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Validated
 @RestController
