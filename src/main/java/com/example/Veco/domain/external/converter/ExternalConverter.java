@@ -234,6 +234,7 @@ public class ExternalConverter {
                 .priority(external.getPriority().name())
                 .deadline(deadline)
                 .managers(managers)
+                .extType(external.getType())
                 .build();
     }
 

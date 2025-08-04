@@ -1,5 +1,6 @@
 package com.example.Veco.domain.external.dto.response;
 
+import com.example.Veco.global.enums.ExtServiceType;
 import com.example.Veco.global.enums.State;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -72,6 +73,9 @@ public class ExternalGroupedResponseDTO {
         
         @Schema(description = "담당자 정보")
         private ManagersDTO managers;
+
+        @Schema(description = "외부 연동 툴 정보")
+        private ExtServiceType extType;
     }
 
     @Getter
