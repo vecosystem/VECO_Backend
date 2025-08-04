@@ -14,6 +14,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,13 +65,13 @@ public class External extends BaseEntity {
     @Builder.Default
     private LocalDate endDate = null;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     @Column(name = "service_type", nullable = false)
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private ExtServiceType type = ExtServiceType.NONE;
-
-    @Column(name = "external_code", nullable = false)
-    private String externalCode;
 
     // 연관 관계
     @ManyToOne(fetch = FetchType.LAZY)
@@ -95,6 +96,10 @@ public class External extends BaseEntity {
         goal.getExternals().add(this);
     }
 
+    public void addAssignment(Assignment assignment) {
+        this.assignments.add(assignment);
+    }
+
     public void updateExternal(ExternalRequestDTO.ExternalUpdateRequestDTO requestDTO) {
         if(requestDTO.getTitle() != null) {
             this.title = requestDTO.getTitle();
@@ -114,6 +119,9 @@ public class External extends BaseEntity {
         if(requestDTO.getPriority() != null) {
             this.priority = requestDTO.getPriority();
         }
+        if(requestDTO.getExtServiceType() != null) {
+            this.type = requestDTO.getExtServiceType();
+        }
     }
 
     public void closeIssue(){
@@ -130,4 +138,7 @@ public class External extends BaseEntity {
         }
     }
 
+    public void softDelete(){
+        deletedAt = LocalDateTime.now();
+    }
 }
