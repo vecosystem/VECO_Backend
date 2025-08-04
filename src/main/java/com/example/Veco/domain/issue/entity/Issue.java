@@ -7,7 +7,11 @@ import com.example.Veco.global.enums.Priority;
 import com.example.Veco.global.enums.State;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "issue")
@@ -15,6 +19,8 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@SQLDelete(sql = "UPDATE issue SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class Issue extends BaseEntity {
 
     @Id
@@ -48,6 +54,9 @@ public class Issue extends BaseEntity {
     @Column(name = "deadline_end")
     @Builder.Default
     private LocalDate deadlineEnd = null;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     // 이슈가 속한 팀
     @ManyToOne(fetch = FetchType.LAZY)
