@@ -2,6 +2,7 @@ package com.example.Veco.global.auth.oauth2.util;
 
 import com.example.Veco.domain.member.enums.Provider;
 import com.example.Veco.global.auth.oauth2.userinfo.GoogleOAuth2UserInfo;
+import com.example.Veco.global.auth.oauth2.userinfo.KakaoOAuth2UserInfo;
 import com.example.Veco.global.auth.oauth2.userinfo.OAuth2UserInfo;
 
 import java.util.Map;
@@ -15,8 +16,8 @@ public class OAuth2Util {
 
         if ("GOOGLE".equals(registrationId)) {
             return Provider.GOOGLE;
-//        } else if ("KAKAO".equals(registrationId)) {
-//            return Provider.KAKAO;
+        } else if ("KAKAO".equals(registrationId)) {
+            return Provider.KAKAO;
         }
         return null;
     }
@@ -25,8 +26,8 @@ public class OAuth2Util {
         switch (provider) {
             case GOOGLE:
                 return new GoogleOAuth2UserInfo(attributes);
-//            case KAKAO:
-//                return new KakaoOAuth2UserInfo(attributes);
+            case KAKAO:
+                return new KakaoOAuth2UserInfo(attributes);
         }
         return null;
     }

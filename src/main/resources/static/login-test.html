@@ -7,22 +7,42 @@
 <body>
 <h1>🔐 Google 로그인 테스트</h1>
 
-<button id="loginBtn-create">Google로 로그인 - 워크스페이스 생성</button>
-<button id="loginBtn-join">Google로 로그인 - 기존 워크스페이스 참여</button>
-<button id="reissue">액세스 토큰 발급</button>
-<!--테스트용 액세스 토큰 입력창-->
-<input type="text" id="accessToken" placeholder="액세스 토큰을 입력하세요">
-<button id="logoutBtn">로그아웃</button>
+<div>
+    <button id="loginBtn-create-google">Google로 로그인 - 워크스페이스 생성</button>
+    <button id="loginBtn-join-google">Google로 로그인 - 기존 워크스페이스 참여</button>
+</div>
+
+<div>
+    <button id="loginBtn-create-kakao">kakao로 로그인 - 워크스페이스 생성</button>
+    <button id="loginBtn-join-kakao">kakao로 로그인 - 기존 워크스페이스 참여</button>
+</div>
+
+<div>
+    <button id="reissue">액세스 토큰 발급</button>
+    <!--테스트용 액세스 토큰 입력창-->
+    <input type="text" id="accessToken" placeholder="액세스 토큰을 입력하세요">
+    <button id="logoutBtn">로그아웃</button>
+</div>
 
 <script>
-    document.getElementById("loginBtn-create").addEventListener("click", () => {
+    document.getElementById("loginBtn-create-google").addEventListener("click", () => {
         // 구글 OAuth2 로그인 시작
         window.location.href = "/oauth2/authorization/google?flow=create";
     })
 
-    document.getElementById("loginBtn-join").addEventListener("click", () => {
+    document.getElementById("loginBtn-join-google").addEventListener("click", () => {
         // 구글 OAuth2 로그인 시작
         window.location.href = "/oauth2/authorization/google?flow=join";
+    })
+
+    document.getElementById("loginBtn-create-kakao").addEventListener("click", () => {
+        // 카카오 OAuth2 로그인 시작
+        window.location.href = "/oauth2/authorization/kakao?flow=create";
+    })
+
+    document.getElementById("loginBtn-join-kakao").addEventListener("click", () => {
+        // 카카오 OAuth2 로그인 시작
+        window.location.href = "/oauth2/authorization/kakao?flow=join";
     })
 
     document.getElementById("reissue").addEventListener("click", () => {
