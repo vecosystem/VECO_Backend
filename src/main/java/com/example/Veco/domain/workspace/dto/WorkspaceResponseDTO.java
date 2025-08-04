@@ -120,6 +120,7 @@ public class WorkspaceResponseDTO {
     @AllArgsConstructor
     public static class CreateWorkspaceResponseDto {
         private Long workspaceId;
+        private String name;
         private String workspaceName;
         private String workspaceUrl;
         private String inviteUrl;
@@ -132,6 +133,7 @@ public class WorkspaceResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class InviteInfoResponseDto {
+        private String name;
         private String inviteUrl;
         private String invitePassword;
     }

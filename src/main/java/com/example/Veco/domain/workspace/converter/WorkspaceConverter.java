@@ -96,8 +96,9 @@ public class WorkspaceConverter {
                 .build();
     }
 
-    public static WorkspaceResponseDTO.InviteInfoResponseDto toInviteInfoResponseDto(WorkSpace workspace) {
+    public static WorkspaceResponseDTO.InviteInfoResponseDto toInviteInfoResponseDto(WorkSpace workspace, Member member) {
         return WorkspaceResponseDTO.InviteInfoResponseDto.builder()
+                .name(member.getName())
                 .inviteUrl(workspace.getInviteUrl())
                 .invitePassword(workspace.getInvitePassword())
                 .build();

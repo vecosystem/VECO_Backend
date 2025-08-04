@@ -200,6 +200,6 @@ public class SettingRestController {
         Member member = memberQueryService.getMemberBySocialUid(socialUid);
         WorkSpace workspace = workspaceQueryService.getWorkSpaceByMember(member);
 
-        return ApiResponse.onSuccess(WorkspaceConverter.toInviteInfoResponseDto(workspace));
+        return ApiResponse.onSuccess(WorkspaceConverter.toInviteInfoResponseDto(workspace, member));
     }
 }
