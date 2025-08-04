@@ -1,14 +1,19 @@
 package com.example.Veco.domain.goal.entity;
 
-
 import com.example.Veco.domain.common.BaseEntity;
+import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.global.enums.Priority;
 import com.example.Veco.global.enums.State;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "goal")
@@ -16,6 +21,8 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@SQLDelete(sql = "UPDATE goal SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class Goal extends BaseEntity {
 
     @Id
@@ -27,31 +34,47 @@ public class Goal extends BaseEntity {
     private String name;
 
     @Column(name = "title", nullable = false)
-    private  String title;
+    private String title;
 
     @Column(name = "content")
     @Builder.Default
-    private  String content = "";
+    private String content = "";
 
     @Column(name = "state", nullable = false)
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private State state = State.NONE;
 
-    @Column(name = "priority",  nullable = false)
+    @Column(name = "priority", nullable = false)
     @Enumerated(EnumType.STRING)
     @Builder.Default
-    private Priority priority =  Priority.NONE;
+    private Priority priority = Priority.NONE;
 
-    @Column(name = "deadline")
+    @Column(name = "deadline_start")
     @Builder.Default
-    private LocalDateTime deadline = null;
+    private LocalDate deadlineStart = null;
 
-    @Column(name = "goal_number", nullable = false)
-    private Integer goal_number;
+    @Column(name = "deadline_end")
+    @Builder.Default
+    private LocalDate deadlineEnd = null;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+    @OneToMany(mappedBy = "goal")
+    @Builder.Default
+    private List<External> externals = new ArrayList<>();
     // 연관 관계
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
     private Team team;
+
+    // update
+    public void updateTitle(String title) { this.title = title; }
+    public void updateContent(String content) { this.content = content; }
+    public void updateState(State state) { this.state = state; }
+    public void updatePriority(Priority priority) { this.priority = priority; }
+    public void updateDeadlineStart(LocalDate deadlineStart) { this.deadlineStart = deadlineStart; }
+    public void updateDeadlineEnd(LocalDate deadlineEnd) { this.deadlineEnd = deadlineEnd; }
+    public void restore(){ this.deletedAt = null; }
 }

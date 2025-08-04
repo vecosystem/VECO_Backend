@@ -1,16 +1,17 @@
 package com.example.Veco.domain.comment.entity;
 
 import com.example.Veco.domain.common.BaseEntity;
-import com.example.Veco.domain.external.entity.External;
-import com.example.Veco.domain.goal.entity.Goal;
-import com.example.Veco.domain.issue.entity.Issue;
 
 import com.example.Veco.global.enums.Category;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
-@Table(name = "comment_room")
+@Table(name = "comment_room", 
+       uniqueConstraints = @UniqueConstraint(columnNames = {"room_type", "target_id"}))
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -21,20 +22,15 @@ public class CommentRoom extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "room_type")
+    @Column(name = "room_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private Category roomType;
 
-    // 연관 관계
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "issue_id")
-    private Issue issue;
+    @Column(name = "target_id", nullable = false)
+    private Long targetId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "goal_id")
-    private Goal goal;
+    @OneToMany(mappedBy = "commentRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Comment> comments = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "external_id")
-    private External external;
 }

@@ -1,5 +1,5 @@
 package com.example.Veco.global.enums;
 
 public enum State {
-    NONE, TODO, DOING, FINISH, REVIEW, DELETE
+    NONE, IN_PROGRESS, TODO, FINISH, REVIEW, DELETE
 }

@@ -13,6 +13,7 @@ import java.util.List;
 @Entity
 @Getter
 @Builder
+@Table(name = "work_space")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class WorkSpace extends BaseEntity {
@@ -30,12 +31,23 @@ public class WorkSpace extends BaseEntity {
     @Column(name = "workspace_url")
     private String workspaceUrl;
 
-    @Column(name = "cert_pwd")
-    private String certPwd;
+    @Column(name = "invite_password")
+    private String invitePassword;
+
+    @Column(name = "invite_url")
+    private String inviteUrl;
+
+    @Column(name = "invite_token")
+    private String inviteToken;
+
+    @Column(name = "slug")
+    private String slug;
 
     @OneToMany(mappedBy = "workSpace")
+    @Builder.Default
     private List<Member> members = new ArrayList<>();
 
     @OneToMany(mappedBy = "workSpace", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<Team> teams = new ArrayList<>();
 }

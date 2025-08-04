@@ -26,4 +26,13 @@ public class Comment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment_room_id")
     private CommentRoom commentRoom;
+
+    public void setMember(Member member) {
+        this.member = member;
+    }
+
+    public void setCommentRoom(CommentRoom commentRoom) {
+        this.commentRoom = commentRoom;
+        commentRoom.getComments().add(this);
+    }
 }

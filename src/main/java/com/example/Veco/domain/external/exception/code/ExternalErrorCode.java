@@ -1,0 +1,26 @@
+package com.example.Veco.domain.external.exception.code;
+
+import com.example.Veco.global.apiPayload.ErrorReasonDTO;
+import com.example.Veco.global.apiPayload.code.BaseErrorStatus;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
+
+@Getter
+@AllArgsConstructor
+public enum ExternalErrorCode implements BaseErrorStatus {
+    NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 외부이슈가 존재하지 않습니다.", "EXTERNAL404");
+
+    private HttpStatus httpStatus;
+    private String message;
+    private String code;
+
+    @Override
+    public ErrorReasonDTO getReasonHttpStatus() {
+        return ErrorReasonDTO.builder()
+                .httpStatus(httpStatus)
+                .message(message)
+                .code(code)
+                .build();
+    }
+}
