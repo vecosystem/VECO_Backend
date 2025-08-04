@@ -23,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.view.RedirectView;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -50,20 +49,16 @@ public class SlackCommandService {
     private String scope;
 
     // 리다이렉트 링크 생성
-    public RedirectView redirectSlackOAuth(
+    public String redirectSlackOAuth(
             String token
     ){
         // 토큰 Bearer 제거
         token = token.replace("Bearer ", "");
 
-        String url = "https://slack.com/oauth/v2/authorize?" +
+        return "https://slack.com/oauth/v2/authorize?" +
                 "client_id="+clientId+
                 "&scope="+scope+
                 "&state="+token;
-
-        RedirectView redirectView = new RedirectView();
-        redirectView.setUrl(url);
-        return redirectView;
     }
 
     // Slack 연동 비즈니스 로직
