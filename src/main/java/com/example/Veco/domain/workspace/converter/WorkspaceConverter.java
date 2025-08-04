@@ -95,4 +95,11 @@ public class WorkspaceConverter {
                 .workspaceUrl(previewUrl)
                 .build();
     }
+
+    public static WorkspaceResponseDTO.InviteInfoResponseDto toInviteInfoResponseDto(WorkSpace workspace) {
+        return WorkspaceResponseDTO.InviteInfoResponseDto.builder()
+                .inviteUrl(workspace.getInviteUrl())
+                .invitePassword(workspace.getInvitePassword())
+                .build();
+    }
 }

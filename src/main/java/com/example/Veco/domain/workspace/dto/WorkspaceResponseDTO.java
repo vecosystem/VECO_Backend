@@ -126,4 +126,13 @@ public class WorkspaceResponseDTO {
         private String invitePassword;
         private Long defaultTeamId;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class InviteInfoResponseDto {
+        private String inviteUrl;
+        private String invitePassword;
+    }
 }
