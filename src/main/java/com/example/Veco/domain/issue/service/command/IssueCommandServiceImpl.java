@@ -98,6 +98,7 @@ public class IssueCommandServiceImpl implements IssueCommandService {
         issues.forEach(issue -> result.add(issue.getId()));
 
         issueRepository.deleteAll(issues);
+        team.updateIssueNumber(team.getIssueNumber()-issues.size());
 
         return result;
     }
