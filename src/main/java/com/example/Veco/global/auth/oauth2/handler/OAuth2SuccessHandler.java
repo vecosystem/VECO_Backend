@@ -73,13 +73,13 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         if (userDetails.getMember().getWorkSpace() == null) {
             // 워크스페이스 생성
             if (flow.equals("create")) {
-                redirectURL = UriComponentsBuilder.fromUriString("https://web.vecoservice.shop/onboarding/workspace")
+                redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/onboarding/workspace")
                         .build()
                         .encode(StandardCharsets.UTF_8)
                         .toUriString();
                 // 워크스페이스 참여
             } else if (flow.equals("join")) {
-                redirectURL = UriComponentsBuilder.fromUriString("https://web.vecoservice.shop/onboarding/input-pw")
+                redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/onboarding/input-pw")
                         .build()
                         .encode(StandardCharsets.UTF_8)
                         .toUriString();
@@ -88,13 +88,13 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             }
             // 기존 회원
         } else {
-            redirectURL = UriComponentsBuilder.fromUriString("https://web.vecoservice.shop/workspace")
+            redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/workspace")
                     .build()
                     .encode(StandardCharsets.UTF_8)
                     .toUriString();
         }
 
-//        redirectURL = UriComponentsBuilder.fromUriString("https://web.vecoservice.shop/onboarding/workspace")
+//        redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/onboarding/workspace")
 //                        .build()
 //                        .encode(StandardCharsets.UTF_8)
 //                        .toUriString();
