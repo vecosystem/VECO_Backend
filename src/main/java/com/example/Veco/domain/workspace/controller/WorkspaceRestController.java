@@ -63,7 +63,7 @@ public class WorkspaceRestController {
         );
     }
 
-    @GetMapping
+    @GetMapping("/setting/invite")
     @Operation(
             summary = "워크스페이스에 팀원을 초대합니다.",
             description = "초대링크와 암호를 보여줍니다."
