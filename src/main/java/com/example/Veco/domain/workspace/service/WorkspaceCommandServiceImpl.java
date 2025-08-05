@@ -1,5 +1,6 @@
 package com.example.Veco.domain.workspace.service;
 
+import com.example.Veco.domain.assignee.repository.AssigneeRepository;
 import com.example.Veco.domain.mapping.converter.MemberTeamConverter;
 import com.example.Veco.domain.mapping.entity.MemberTeam;
 import com.example.Veco.domain.mapping.repository.MemberTeamRepository;
@@ -21,6 +22,7 @@ import com.example.Veco.domain.workspace.repository.WorkspaceRepository;
 import com.example.Veco.domain.workspace.util.InvitePasswordGenerator;
 import com.example.Veco.domain.workspace.util.InviteTokenGenerator;
 import com.example.Veco.domain.workspace.util.SlugGenerator;
+import com.example.Veco.global.auth.user.AuthUser;
 import com.example.Veco.global.auth.user.userdetails.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,6 +40,7 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
     private final MemberRepository memberRepository;
     private final MemberTeamRepository memberTeamRepository;
     private final WorkspaceRepository workspaceRepository;
+    private final AssigneeRepository assigneeRepository;
     private final SlugGenerator slugGenerator;
     private final InviteTokenGenerator inviteTokenGenerator;
     private final InvitePasswordGenerator invitePasswordGenerator;
@@ -167,6 +170,34 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
                 .defaultTeamId(defaultTeam.getId())
                 .workspaceUrl(workSpace.getWorkspaceUrl())
                 .build();
+    }
+
+    // 워크스페이스 연동 해제
+    @Override
+    @Transactional
+    public String unlinkWorkspace(
+            AuthUser user
+    ) {
+        // 유저 정보 조회
+        Member member = memberRepository.findBySocialUid(user.getSocialUid())
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND));
+
+        // 유저 - 팀 조회
+        List<MemberTeam> result = memberTeamRepository.findAllByMemberIdAndTeamIn(
+                member.getId(),
+                member.getWorkSpace().getTeams()
+        );
+
+        // 담당자 정보 null 처리
+        result.forEach(memberTeam -> assigneeRepository.findByMemberTeamId(memberTeam.getId()).updateMemberTeam(null));
+
+        // 유저 - 팀 삭제
+        memberTeamRepository.deleteAll(result);
+
+        // 유저 - 워크스페이스 null 처리
+        member.updateWorkspace(null);
+
+        return member.getName();
     }
 
     // 워크스페이스 참여

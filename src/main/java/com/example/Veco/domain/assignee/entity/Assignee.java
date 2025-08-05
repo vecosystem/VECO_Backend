@@ -45,4 +45,9 @@ public class Assignee extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_team_id")
     private MemberTeam memberTeam;
+
+    // update
+    public void updateMemberTeam(MemberTeam memberTeam) {
+        this.memberTeam = memberTeam;
+    }
 }

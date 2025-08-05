@@ -1,12 +1,14 @@
 package com.example.Veco.domain.mapping.repository;
 
 import com.example.Veco.domain.mapping.entity.MemberTeam;
+import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.domain.workspace.dto.TeamMemberCountDto;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,4 +30,6 @@ public interface MemberTeamRepository extends JpaRepository<MemberTeam, Long> {
     List<TeamMemberCountDto> countMembersByTeamIds(@Param("teamIds") List<Long> teamIds);
 
     boolean existsByMemberIdAndTeamId(Long memberId, Long teamId);
+
+    List<MemberTeam> findAllByMemberIdAndTeamIn(Long memberId, Collection<Team> teams);
 }
