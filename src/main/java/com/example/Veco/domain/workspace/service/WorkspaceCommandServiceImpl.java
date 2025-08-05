@@ -64,10 +64,24 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
 
         // 3. 요청으로 전달된 멤버 ID 리스트로 멤버 조회
         List<Member> members = memberRepository.findAllById(request.getMemberId());
+        List<Long> memberIds = request.getMemberId();
 
-        // 4. 에러 처리 : 멤버가 아예 없을 경우 예외 발생
+        // 4-1. 에러 처리 : 멤버가 아예 없을 경우 예외 발생
         if (members.isEmpty()) {
             throw new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND);
+        }
+
+        // 4-2 에러 처리 : 존재하지 않는 멤버 아이디가 포함되어 있을 경우
+        if (members.size() != memberIds.size()) {
+            throw new MemberHandler(MemberErrorStatus._INVALID_MEMBER_INCLUDE);
+        }
+
+        // 4-3. 에러 처리 : 워크스페이스에 속하지 않은 멤버가 있는지 체크
+        boolean hasInvalidMember = members.stream()
+                .anyMatch(member -> !workspace.equals(member.getWorkSpace()));
+
+        if (hasInvalidMember) {
+            throw new MemberHandler(MemberErrorStatus._MEMBER_NOT_IN_WORKSPACE);
         }
 
         // 5. 멤버와 팀을 매핑하여 MemberTeam 리스트 생성
