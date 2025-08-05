@@ -1,8 +1,5 @@
 package com.example.Veco.domain.issue.service.command;
 
-import com.example.Veco.domain.assignee.converter.AssigneeConverter;
-import com.example.Veco.domain.assignee.repository.AssigneeRepository;
-import com.example.Veco.domain.goal.converter.GoalConverter;
 import com.example.Veco.domain.goal.entity.Goal;
 import com.example.Veco.domain.goal.exception.GoalException;
 import com.example.Veco.domain.goal.exception.code.GoalErrorCode;
@@ -24,7 +21,6 @@ import com.example.Veco.domain.team.exception.TeamException;
 import com.example.Veco.domain.team.exception.code.TeamErrorCode;
 import com.example.Veco.domain.team.repository.TeamRepository;
 import com.example.Veco.global.auth.user.AuthUser;
-import com.example.Veco.global.enums.Category;
 import com.example.Veco.global.redis.exception.RedisException;
 import com.example.Veco.global.redis.exception.code.RedisErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +41,6 @@ public class IssueCommandServiceImpl implements IssueCommandService {
     private final MemberRepository memberRepository;
     private final MemberTeamRepository memberTeamRepository;
     private final IssueRepository issueRepository;
-    private final AssigneeRepository assigneeRepository;
     private final GoalRepository goalRepository;
     private final TeamRepository teamRepository;
     private final RedissonClient redissonClient;
@@ -78,9 +73,15 @@ public class IssueCommandServiceImpl implements IssueCommandService {
     @Transactional
     public List<Long> deleteIssue(AuthUser user, Long teamId, IssueReqDTO.DeleteIssue dto){
         List<Issue> issues = issueRepository.findAllById(dto.issueIds());
+        if (issues.isEmpty() || issues.size() != dto.issueIds().size()){
+            throw new IssueException(IssueErrorCode.NOT_FOUND);
+        }
 
         Member member = memberRepository.findBySocialUid(user.getSocialUid())
                 .orElseThrow(() -> new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND));
+
+        teamRepository.findById(teamId)
+                        .orElseThrow(() -> new TeamException(TeamErrorCode._NOT_FOUND));
 
         memberTeamRepository.findByMemberIdAndTeamId(member.getId(), teamId)
                 .orElseThrow(() -> new MemberHandler(MemberErrorStatus._FORBIDDEN));
@@ -93,7 +94,6 @@ public class IssueCommandServiceImpl implements IssueCommandService {
         issues.forEach(issue -> result.add(issue.getId()));
 
         issueRepository.deleteAll(issues);
-        assigneeRepository.deleteAllByTypeAndTargetIds(Category.ISSUE, result);
 
         return result;
     }
