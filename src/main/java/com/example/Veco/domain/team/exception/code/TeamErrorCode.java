@@ -11,7 +11,7 @@ public enum TeamErrorCode implements BaseErrorStatus {
     _NOT_FOUND(HttpStatus.NOT_FOUND, "TEAM404_0", "해당 팀을 찾을 수 없습니다."),
     _TEAM_NOT_IN_WORKSPACE(HttpStatus.BAD_REQUEST, "TEAM404_1", "팀이 해당 워크스페이스에 없습니다."),
     _TEAM_COUNT_MISMATCH(HttpStatus.BAD_REQUEST, "TEAM404_2", "요청한 팀 개수와 워크스페이스의 팀 개수가 일치하지 않습니다."),
-    _DUPLICATE_TEAM_NAME(HttpStatus.BAD_REQUEST, "TEAM404_3", "팀 이름이 중복됩니다.")
+    _DUPLICATE_TEAM_NAME(HttpStatus.BAD_REQUEST, "TEAM404_3", "중복된 팀 이름입니다.")
     ;
 
     private final HttpStatus httpStatus;
