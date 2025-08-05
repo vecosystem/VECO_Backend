@@ -38,7 +38,6 @@ public class WorkspaceRequestDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class TeamOrderRequestDto {
-        //@NotEmpty("")
         private List<Long> teamIdList;
     }
 

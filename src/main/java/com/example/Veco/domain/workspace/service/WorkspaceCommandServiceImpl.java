@@ -51,6 +51,10 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
      */
     @Override
     public WorkspaceResponseDTO.CreateTeamResponseDto createTeam(WorkSpace workspace, WorkspaceRequestDTO.CreateTeamRequestDto request) {
+        // 팀 이름 중복 검사
+        if (teamRepository.existsByName(request.getTeamName())) {
+            throw new TeamException(TeamErrorCode._DUPLICATE_TEAM_NAME);
+        }
         // 1. 팀 저장
         Team team = teamRepository.save(Team.builder()
                 .name(request.getTeamName())
