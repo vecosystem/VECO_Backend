@@ -21,4 +21,6 @@ public interface WorkspaceQueryService {
     List<WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto> getWorkspaceMembers(Member loginMember);
 
     String createPreviewUrl(String workspaceName);
+
+    WorkSpace getWorkspaceBySocialUid(String socialUid);
 }

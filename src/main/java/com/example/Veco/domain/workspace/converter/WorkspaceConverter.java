@@ -103,4 +103,27 @@ public class WorkspaceConverter {
                 .invitePassword(workspace.getInvitePassword())
                 .build();
     }
+
+    public static WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto toWorkspaceMemberWithTeamsDto(
+            Member member,
+            List<Team> teams,
+            LocalDateTime joinedAt
+    ) {
+        List<WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto.TeamInfoDto> teamDtos = teams.stream()
+                .map(team -> WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto.TeamInfoDto.builder()
+                        .teamId(team.getId())
+                        .teamName(team.getName())
+                        .teamImageUrl(team.getProfileUrl())
+                        .build())
+                .toList();
+
+        return WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto.builder()
+                .memberId(member.getId())
+                .email(member.getEmail())
+                .name(member.getName())
+                .profileImageUrl(member.getProfile().getProfileImageUrl())
+                .teams(teamDtos)
+                .joinedAt(joinedAt)
+                .build();
+    }
 }
