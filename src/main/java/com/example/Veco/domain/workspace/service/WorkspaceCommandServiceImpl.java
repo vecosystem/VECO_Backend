@@ -105,7 +105,7 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
     }
 
     @Override
-    public WorkspaceResponseDTO.CreateWorkspaceResponseDto createWorkspace(Member member, WorkspaceRequestDTO.CreateWorkspaceRequestDto request) {
+    public WorkspaceResponseDTO.CreateWorkspaceResponseDto createWorkspace(Member member, WorkspaceRequestDTO.WorkspaceRequestDto request) {
         // 2. 이미 워크스페이스가 있으면 예외
         if (member.getWorkSpace() != null) {
             throw new WorkspaceHandler(WorkspaceErrorStatus._WORKSPACE_DUPLICATED);

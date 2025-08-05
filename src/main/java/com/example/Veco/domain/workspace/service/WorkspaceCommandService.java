@@ -18,5 +18,5 @@ public interface WorkspaceCommandService {
 
     WorkspaceResponseDTO.JoinWorkspace joinWorkspace(WorkspaceRequestDTO.JoinWorkspace dto, CustomUserDetails user);
 
-    WorkspaceResponseDTO.CreateWorkspaceResponseDto createWorkspace(Member member, WorkspaceRequestDTO.CreateWorkspaceRequestDto request);
+    WorkspaceResponseDTO.CreateWorkspaceResponseDto createWorkspace(Member member, WorkspaceRequestDTO.WorkspaceRequestDto request);
 }

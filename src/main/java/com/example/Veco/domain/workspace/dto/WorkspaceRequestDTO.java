@@ -2,7 +2,6 @@ package com.example.Veco.domain.workspace.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,7 +30,8 @@ public class WorkspaceRequestDTO {
     }
 
     /**
-     *
+     * 팀 순서 변경 요청 DTO
+     * - 프론트에서 변경된 팀 순서를 리스트로 전달
      */
     @Builder
     @Getter
@@ -42,27 +42,22 @@ public class WorkspaceRequestDTO {
         private List<Long> teamIdList;
     }
 
-    // 워크스페이스 참여
+    /**
+     * 워크스페이스 참여 요청 DTO
+     */
     public record JoinWorkspace(
             String token,
             String password
     ){}
 
+    /**
+     * 워크스페이스 URL 미리보기 & 워크스페이스 생성 요청 DTO
+     */
     @Builder
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class PreviewUrlRequestDto {
-        @NotBlank(message = "워크스페이스 이름을 입력해주세요.")
-        @Size(min = 4, max = 10, message = "워크스페이스 이름은 최소 4자, 최대 10자입니다.")
-        private String workspaceName;
-    }
-
-    @Builder
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class CreateWorkspaceRequestDto {
+    public static class WorkspaceRequestDto {
         @NotBlank(message = "워크스페이스 이름을 입력해주세요.")
         @Size(min = 4, max = 10, message = "워크스페이스 이름은 최소 4자, 최대 10자입니다.")
         private String workspaceName;

@@ -6,7 +6,6 @@ import com.example.Veco.domain.workspace.converter.WorkspaceConverter;
 import com.example.Veco.domain.workspace.dto.WorkspaceRequestDTO;
 import com.example.Veco.domain.workspace.dto.WorkspaceResponseDTO;
 import com.example.Veco.domain.workspace.dto.WorkspaceResponseDTO.JoinWorkspace;
-import com.example.Veco.domain.workspace.entity.WorkSpace;
 import com.example.Veco.domain.workspace.error.WorkspaceSuccessCode;
 import com.example.Veco.domain.workspace.service.WorkspaceCommandService;
 import com.example.Veco.domain.workspace.service.WorkspaceQueryService;
@@ -33,14 +32,14 @@ public class WorkspaceRestController {
 
     @PostMapping("/create-url")
     @Operation(summary = "워크스페이스 이름에 맞는 url를 미리보기합니다.")
-    public ApiResponse<WorkspaceResponseDTO.PreviewUrlResponseDto> createWorkspaceUrl(@Valid @RequestBody WorkspaceRequestDTO.PreviewUrlRequestDto request) {
+    public ApiResponse<WorkspaceResponseDTO.PreviewUrlResponseDto> createWorkspaceUrl(@Valid @RequestBody WorkspaceRequestDTO.WorkspaceRequestDto request) {
         String previewUrl = workspaceQueryService.createPreviewUrl(request.getWorkspaceName());
         return ApiResponse.onSuccess(WorkspaceConverter.toPreviewUrlResponseDto(previewUrl));
     }
 
     @PostMapping("")
     @Operation(summary = "워크스페이스를 생성합니다.")
-    public ApiResponse<WorkspaceResponseDTO.CreateWorkspaceResponseDto> createWorkspace(@AuthenticationPrincipal CustomUserDetails userDetails, @Valid @RequestBody WorkspaceRequestDTO.CreateWorkspaceRequestDto request) {
+    public ApiResponse<WorkspaceResponseDTO.CreateWorkspaceResponseDto> createWorkspace(@AuthenticationPrincipal CustomUserDetails userDetails, @Valid @RequestBody WorkspaceRequestDTO.WorkspaceRequestDto request) {
         String socialUid = userDetails.getSocialUid();
         Member member = memberQueryService.getMemberBySocialUid(socialUid);
 
