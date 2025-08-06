@@ -90,12 +90,18 @@ public class WorkspaceConverter {
                 .build();
     }
 
+    /**
+     * 워크스페이스 URL 미리보기 응답 DTO 변환
+     */
     public static WorkspaceResponseDTO.PreviewUrlResponseDto toPreviewUrlResponseDto(String previewUrl) {
         return WorkspaceResponseDTO.PreviewUrlResponseDto.builder()
                 .workspaceUrl(previewUrl)
                 .build();
     }
 
+    /**
+     * 워크스페이스 초대 정보 응답 DTO 변환
+     */
     public static WorkspaceResponseDTO.InviteInfoResponseDto toInviteInfoResponseDto(WorkSpace workspace, Member member) {
         return WorkspaceResponseDTO.InviteInfoResponseDto.builder()
                 .name(member.getName())
@@ -104,6 +110,9 @@ public class WorkspaceConverter {
                 .build();
     }
 
+    /**
+     * 워크스페이스 내 멤버 + 소속 팀 리스트 응답 DTO 변환
+     */
     public static WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto toWorkspaceMemberWithTeamsDto(
             Member member,
             List<Team> teams,
