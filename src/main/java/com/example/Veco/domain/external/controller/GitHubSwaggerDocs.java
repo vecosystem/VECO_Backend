@@ -3,11 +3,14 @@ package com.example.Veco.domain.external.controller;
 import com.example.Veco.domain.external.dto.response.GitHubApiResponseDTO;
 import com.example.Veco.global.apiPayload.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+@Tag(name = "GitHub 연동 API", description = "GitHub 외부 툴 연동을 위한 인증 및 콜백 API")
 public interface GitHubSwaggerDocs {
 
     @Operation(
@@ -16,4 +19,9 @@ public interface GitHubSwaggerDocs {
     )
     Mono<ApiResponse<List<GitHubApiResponseDTO.GitHubRepositoryDTO>>> getRepositories(@PathVariable("teamId") Long teamId);
 
+    @Operation(
+            summary = "GitHub 연동을 위한 인증 페이지 URL조회",
+            description = "GitHub App 설치를 위한 사용자 인증 페이지 URL을 전달합니다."
+    )
+    ApiResponse<?> connectGitHub(@RequestParam("teamId") Long teamId);
 }

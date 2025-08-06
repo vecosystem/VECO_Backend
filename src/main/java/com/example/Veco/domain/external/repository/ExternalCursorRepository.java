@@ -271,14 +271,18 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
                 }
             }
             
-            List<ExternalResponseDTO.ExternalDTO> externalDTOs = groupExternals.stream()
-                    .map(e -> ExternalConverter.toExternalDTO(e, e.getAssignments()))
-                    .toList();
-            
+//            List<ExternalResponseDTO.ExternalDTO> externalDTOs = groupExternals.stream()
+//                    .map(e -> ExternalConverter.toExternalDTO(e, e.getAssignments()))
+//                    .toList();
+
+            List<ExternalGroupedResponseDTO.ExternalItemDTO> externalDTOs = groupExternals.stream().map(
+                    ExternalConverter::toExternalItemDTO
+            ).toList();
+
             ExternalGroupedResponseDTO.FilteredExternalGroup group = ExternalGroupedResponseDTO.FilteredExternalGroup.builder()
                     .filterName(getDisplayName(enumValue))
                     .dataCnt(externalDTOs.size())
-                    .externals(convertToExternalItemDTOs(externalDTOs))
+                    .externals(externalDTOs)
                     .build();
                     
             groups.add(group);
@@ -357,7 +361,7 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
                                         .build())
                                     .toList())
                                 .build() : null)
-                        .extType(dto.getExtServiceType())
+                        .extServiceType(dto.getExtServiceType())
                         .build())
                 .toList();
     }

@@ -223,7 +223,7 @@ public class ExternalConverter {
                 .build();
     }
 
-    private static ExternalGroupedResponseDTO.ExternalItemDTO toExternalItemDTO(External external) {
+    public static ExternalGroupedResponseDTO.ExternalItemDTO toExternalItemDTO(External external) {
         ExternalGroupedResponseDTO.DeadlineDTO deadline = ExternalGroupedResponseDTO.DeadlineDTO.builder()
                 .start(external.getStartDate() != null ? external.getStartDate().toString() : null)
                 .end(external.getEndDate() != null ? external.getEndDate().toString() : null)
@@ -249,7 +249,7 @@ public class ExternalConverter {
                 .priority(external.getPriority().name())
                 .deadline(deadline)
                 .managers(managers)
-                .extType(external.getType())
+                .extServiceType(external.getType())
                 .build();
     }
 
