@@ -82,7 +82,7 @@ public class External extends BaseEntity {
     @JoinColumn(name = "goal_id")
     private Goal goal;
 
-    @OneToMany(mappedBy = "external")
+    @OneToMany(mappedBy = "external", cascade = CascadeType.PERSIST)
     @Builder.Default
     private List<Assignment> assignments = new ArrayList<>();
 
@@ -118,9 +118,6 @@ public class External extends BaseEntity {
         }
         if(requestDTO.getPriority() != null) {
             this.priority = requestDTO.getPriority();
-        }
-        if(requestDTO.getExtServiceType() != null) {
-            this.type = requestDTO.getExtServiceType();
         }
     }
 

@@ -1,5 +1,6 @@
 package com.example.Veco.domain.external.service;
 
+import com.example.Veco.domain.assignee.repository.AssigneeRepository;
 import com.example.Veco.domain.comment.entity.CommentRoom;
 import com.example.Veco.domain.external.converter.ExternalConverter;
 import com.example.Veco.domain.external.dto.request.ExternalRequestDTO;
@@ -12,23 +13,16 @@ import com.example.Veco.domain.external.repository.ExternalRepository;
 import com.example.Veco.domain.goal.entity.Goal;
 import com.example.Veco.domain.goal.repository.GoalRepository;
 import com.example.Veco.domain.mapping.Assignment;
-import com.example.Veco.domain.mapping.GithubInstallation;
-import com.example.Veco.domain.mapping.entity.Link;
-import com.example.Veco.domain.mapping.repository.AssigmentRepository;
-import com.example.Veco.domain.mapping.repository.CommentRoomRepository;
-import com.example.Veco.domain.mapping.repository.GitHubInstallationRepository;
-import com.example.Veco.domain.mapping.repository.LinkRepository;
+import com.example.Veco.domain.mapping.converter.AssignmentConverter;
+import com.example.Veco.domain.mapping.entity.MemberTeam;
+import com.example.Veco.domain.mapping.repository.*;
 import com.example.Veco.domain.member.entity.Member;
+import com.example.Veco.domain.member.error.MemberErrorStatus;
+import com.example.Veco.domain.member.error.MemberHandler;
 import com.example.Veco.domain.member.repository.MemberRepository;
-import com.example.Veco.domain.slack.dto.SlackResDTO;
-import com.example.Veco.domain.slack.exception.SlackException;
-import com.example.Veco.domain.slack.exception.code.SlackErrorCode;
 import com.example.Veco.domain.slack.util.SlackUtil;
-import com.example.Veco.domain.team.converter.AssigneeConverter;
-import com.example.Veco.domain.team.dto.AssigneeResponseDTO;
 import com.example.Veco.domain.team.dto.NumberSequenceResponseDTO;
 import com.example.Veco.domain.team.entity.Team;
-import com.example.Veco.domain.team.enums.Category;
 import com.example.Veco.domain.team.exception.TeamException;
 import com.example.Veco.domain.team.exception.code.TeamErrorCode;
 import com.example.Veco.domain.team.repository.TeamRepository;
@@ -36,6 +30,7 @@ import com.example.Veco.domain.team.service.NumberSequenceService;
 import com.example.Veco.global.apiPayload.code.ErrorStatus;
 import com.example.Veco.global.apiPayload.exception.VecoException;
 import com.example.Veco.global.apiPayload.page.CursorPage;
+import com.example.Veco.global.enums.Category;
 import com.example.Veco.global.enums.ExtServiceType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,10 +51,12 @@ public class ExternalService {
     private final NumberSequenceService numberSequenceService;
     private final AssigmentRepository assigmentRepository;
     private final ExternalCustomRepository externalCustomRepository;
+    private final MemberTeamRepository memberTeamRepository;
     private final TeamRepository teamRepository;
     private final GoalRepository goalRepository;
     private final MemberRepository memberRepository;
     private final LinkRepository linkRepository;
+    private final AssigneeRepository assigneeRepository;
 
     // 유틸
     private final SlackUtil slackUtil;
@@ -76,6 +73,18 @@ public class ExternalService {
         NumberSequenceResponseDTO sequenceDTO = numberSequenceService
                 .allocateNextNumber(team.getWorkSpace().getName(), teamId, Category.EXTERNAL);
 
+
+        List<Member> members = memberRepository.findAllByIdIn(request.getManagersId());
+
+        if(request.getManagersId().size() != members.size()){
+            throw new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND);
+        }
+
+        List<MemberTeam> memberTeamList = memberTeamRepository.findAllByMemberIdInAndTeamId(request.getManagersId(), teamId);
+        if (memberTeamList.size() != request.getManagersId().size()) {
+            throw new MemberHandler(MemberErrorStatus._FORBIDDEN);
+        }
+
         Goal goal = null;
 
         if(request.getGoalId() != null){
@@ -83,6 +92,11 @@ public class ExternalService {
         }
 
         External external = ExternalConverter.toExternal(team, goal, request, sequenceDTO.getNextCode());
+
+        members.forEach(member -> {
+            Assignment assignment = AssignmentConverter.toAssignment(member, external, Category.EXTERNAL);
+            external.addAssignment(assignment);
+        });
 
         externalRepository.save(external);
 
@@ -111,6 +125,10 @@ public class ExternalService {
     public ExternalGroupedResponseDTO.ExternalGroupedPageResponse getExternalsWithGroupedPagination(ExternalSearchCriteria criteria, String cursor, int size){
         return ((com.example.Veco.domain.external.repository.ExternalCursorRepository) externalCustomRepository)
                 .findExternalWithGroupedResponse(criteria, cursor, size);
+    }
+
+    public ExternalResponseDTO.SimpleListDTO getSimpleExternals(Long teamId) {
+        return ExternalConverter.toSimpleListDTO(externalRepository.findByTeamId(teamId));
     }
 
     @Transactional

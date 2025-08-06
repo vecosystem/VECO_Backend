@@ -120,8 +120,6 @@ class CommentServiceTest {
         testExternal = External.builder()
                 .title("Test External")
                 .description("Test External Content")
-                .externalCode("test-external-code")
-                .externalCode("TEST-EXT-001")
                 .name("Test External Name")
                 .build();
         externalRepository.save(testExternal);

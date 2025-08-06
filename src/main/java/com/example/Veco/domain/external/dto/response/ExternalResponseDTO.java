@@ -14,6 +14,23 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class ExternalResponseDTO {
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class SimpleListDTO {
+        private int cnt;
+        private List<SimpleExternalDTO> info;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class SimpleExternalDTO {
+        private Long id;
+        private String title;
+    }
 
     @Getter
     @AllArgsConstructor
