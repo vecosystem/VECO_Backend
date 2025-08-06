@@ -4,6 +4,8 @@ import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.member.service.MemberCommandService;
 import com.example.Veco.global.auth.jwt.util.JwtUtil;
 import com.example.Veco.global.auth.oauth2.CustomOAuth2User;
+import com.example.Veco.global.auth.oauth2.exception.OAuth2Exeception;
+import com.example.Veco.global.auth.oauth2.exception.code.OAuth2ErrorCode;
 import com.example.Veco.global.auth.user.userdetails.CustomUserDetails;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -68,34 +70,34 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         memberCommandService.saveMember(member);
         // 최초 로그인
         // TODO: 테스트용 주석 처리, 이후 해제 필요
-//        if (userDetails.getMember().getWorkSpace() == null) {
-//            // 워크스페이스 생성
-//            if (flow.equals("create")) {
-//                redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/onboarding/workspace")
-//                        .build()
-//                        .encode(StandardCharsets.UTF_8)
-//                        .toUriString();
-//                // 워크스페이스 참여
-//            } else if (flow.equals("join")) {
-//                redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/onboarding/input-pw")
-//                        .build()
-//                        .encode(StandardCharsets.UTF_8)
-//                        .toUriString();
-//            } else {
-//                throw new OAuth2Exeception(OAuth2ErrorCode.OAUTH2_INVALID_STATE);
-//            }
-//            // 기존 회원
-//        } else {
-//            redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/workspace")
-//                    .build()
-//                    .encode(StandardCharsets.UTF_8)
-//                    .toUriString();
-//        }
-
-        redirectURL = UriComponentsBuilder.fromUriString("https://web.vecoservice.shop/onboarding/workspace")
+        if (userDetails.getMember().getWorkSpace() == null) {
+            // 워크스페이스 생성
+            if (flow.equals("create")) {
+                redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/onboarding/workspace")
                         .build()
                         .encode(StandardCharsets.UTF_8)
                         .toUriString();
+                // 워크스페이스 참여
+            } else if (flow.equals("join")) {
+                redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/onboarding/input-pw")
+                        .build()
+                        .encode(StandardCharsets.UTF_8)
+                        .toUriString();
+            } else {
+                throw new OAuth2Exeception(OAuth2ErrorCode.OAUTH2_INVALID_STATE);
+            }
+            // 기존 회원
+        } else {
+            redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/workspace")
+                    .build()
+                    .encode(StandardCharsets.UTF_8)
+                    .toUriString();
+        }
+
+//        redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/onboarding/workspace")
+//                        .build()
+//                        .encode(StandardCharsets.UTF_8)
+//                        .toUriString();
 
         getRedirectStrategy().sendRedirect(request, response, redirectURL);
     }

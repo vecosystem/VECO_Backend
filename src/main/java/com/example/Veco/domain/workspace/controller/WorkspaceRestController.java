@@ -10,6 +10,7 @@ import com.example.Veco.domain.workspace.error.WorkspaceSuccessCode;
 import com.example.Veco.domain.workspace.service.WorkspaceCommandService;
 import com.example.Veco.domain.workspace.service.WorkspaceQueryService;
 import com.example.Veco.global.apiPayload.ApiResponse;
+import com.example.Veco.global.auth.user.AuthUser;
 import com.example.Veco.global.auth.user.userdetails.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -60,5 +61,17 @@ public class WorkspaceRestController {
                 WorkspaceSuccessCode.OK,
                 workspaceCommandService.joinWorkspace(dto, user)
         );
+    }
+
+    // 워크스페이스 연동 해제
+    @Operation(
+            summary = "워크스페이스 연동 해제 (테스트용) API By 김주헌",
+            description = "계정과 연동되어 있는 워크스페이스를 해제합니다. (워크스페이스ID null 처리)"
+    )
+    @PostMapping("/unlinked")
+    public ApiResponse<String> unlinkWorkspace(
+            @AuthenticationPrincipal AuthUser user
+    ){
+        return ApiResponse.onSuccess(workspaceCommandService.unlinkWorkspace(user));
     }
 }

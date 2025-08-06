@@ -50,7 +50,7 @@ public class Member extends BaseEntity {
     @JoinColumn(name = "workspace_id")
     private WorkSpace workSpace;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "profile_id", nullable = true)
     private Profile profile;
 

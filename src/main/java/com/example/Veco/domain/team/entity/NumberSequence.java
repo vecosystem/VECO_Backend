@@ -1,6 +1,6 @@
 package com.example.Veco.domain.team.entity;
 
-import com.example.Veco.domain.team.enums.Category;
+import com.example.Veco.global.enums.Category;
 import jakarta.persistence.*;
 import lombok.*;
 

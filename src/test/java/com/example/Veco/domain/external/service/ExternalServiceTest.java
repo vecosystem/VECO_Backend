@@ -4,6 +4,8 @@ import com.example.Veco.domain.external.dto.request.ExternalRequestDTO;
 import com.example.Veco.domain.external.dto.response.ExternalResponseDTO;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.external.repository.ExternalRepository;
+import com.example.Veco.domain.goal.entity.Goal;
+import com.example.Veco.domain.goal.repository.GoalRepository;
 import com.example.Veco.domain.mapping.Assignment;
 import com.example.Veco.domain.mapping.GithubInstallation;
 import com.example.Veco.domain.mapping.entity.Link;
@@ -17,17 +19,21 @@ import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.domain.team.repository.TeamRepository;
 import com.example.Veco.domain.workspace.entity.WorkSpace;
 import com.example.Veco.domain.workspace.repository.WorkspaceRepository;
+import com.example.Veco.global.enums.Priority;
+import com.example.Veco.global.enums.State;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @SpringBootTest
+
 class ExternalServiceTest {
 
     @Autowired
@@ -54,13 +60,15 @@ class ExternalServiceTest {
     @Autowired
     private WorkspaceRepository workspaceRepository;
 
+    @Autowired
+    private GoalRepository goalRepository;
+
 
     @BeforeEach
     void setUp() {
         External external = External.builder()
                 .title("test")
                 .name("test")
-                .externalCode("test")
                 .build();
         externalRepository.save(external);
 
@@ -77,11 +85,13 @@ class ExternalServiceTest {
         Member member = Member.builder()
                         .name("박승범")
                         .profile(profile1)
+                        .email("email")
                         .build();
 
         Member member1 = Member.builder()
                 .name("사용자")
                 .profile(profile2)
+                .email("email")
                 .build();
 
         memberRepository.saveAll(List.of(member, member1));
@@ -162,7 +172,7 @@ class ExternalServiceTest {
 
     @DisplayName("연동되지 않은 서비스들은 false를 반환한다")
     @Test
-    @Transactional
+    @Rollback(false)
     void getExternalServices_should_return_false_for_unlinked_services() {
         // given
         WorkSpace workSpace = WorkSpace.builder()
@@ -176,11 +186,39 @@ class ExternalServiceTest {
                 .build();
         teamRepository.save(team);
 
+        Goal goal = Goal.builder()
+                .priority(Priority.HIGH)
+                .state(State.NONE)
+                .name("name")
+                .title("title")
+                .build();
+        goalRepository.save(goal);
+
         // when
         ExternalResponseDTO.LinkInfoResponseDTO result = externalService.getExternalServices(team.getId());
 
         // then
         Assertions.assertThat(result.getLinkedWithSlack()).isFalse();
         Assertions.assertThat(result.getLinkedWithGithub()).isFalse();
+    }
+
+
+    @DisplayName("")
+    @Test
+    @Rollback(false)
+    void test1(){
+
+        //given
+        Goal goal = Goal.builder()
+                .priority(Priority.HIGH)
+                .state(State.NONE)
+                .name("name")
+                .title("title")
+                .build();
+        goalRepository.save(goal);
+
+        //when
+
+        //then
     }
 }

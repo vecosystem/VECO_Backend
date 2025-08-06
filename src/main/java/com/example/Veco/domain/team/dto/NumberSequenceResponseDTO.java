@@ -1,6 +1,6 @@
 package com.example.Veco.domain.team.dto;
 
-import com.example.Veco.domain.team.enums.Category;
+import com.example.Veco.global.enums.Category;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

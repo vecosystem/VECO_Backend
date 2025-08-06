@@ -51,6 +51,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         String socialId = oAuth2UserInfo.getSocialId();
         String email = oAuth2UserInfo.getEmail();
         String name = oAuth2UserInfo.getName();
+        String profileImage = oAuth2UserInfo.getPicture();
 
         Optional<Member> optionalMember = memberRepository.findBySocialUid(socialId);
 
@@ -60,6 +61,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         } else {
             Profile profile = Profile.builder()
                     .name(name)
+                    .profileImageUrl(profileImage)
                     .build();
 
             profileRepository.save(profile);

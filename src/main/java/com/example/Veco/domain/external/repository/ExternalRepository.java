@@ -10,4 +10,6 @@ public interface ExternalRepository extends JpaRepository<External, Long> {
     Optional<External> findByGithubDataId(Long githubDataId);
 
     List<External> findByIdIn(List<Long> externalIds);
+
+    List<External> findByTeamId(Long teamId);
 }

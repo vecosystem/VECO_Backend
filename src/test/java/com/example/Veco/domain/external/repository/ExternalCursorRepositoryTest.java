@@ -1,7 +1,9 @@
 package com.example.Veco.domain.external.repository;
 
 import com.example.Veco.domain.external.dto.response.ExternalResponseDTO;
+import com.example.Veco.domain.external.dto.response.ExternalGroupedResponseDTO;
 import com.example.Veco.domain.external.dto.paging.ExternalSearchCriteria;
+import com.example.Veco.domain.external.dto.request.ExternalRequestDTO;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.member.repository.MemberRepository;
@@ -17,6 +19,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -54,6 +57,8 @@ class ExternalCursorRepositoryTest {
 
         testMember = Member.builder()
                 .name("TestMember")
+                .email("test@example.com")
+                .nickname("testNick")
                 .build();
         memberRepository.save(testMember);
     }
@@ -216,6 +221,187 @@ class ExternalCursorRepositoryTest {
         assertThat(result.getNextCursor()).isNull();
     }
 
+    @DisplayName("상태별 그룹핑 테스트: 각 상태별로 그룹화되어 반환")
+    @Test
+    void testStateGrouping() {
+        // given
+        createExternalWithState("NONE_External_1", State.NONE);
+        createExternalWithState("NONE_External_2", State.NONE);
+        createExternalWithState("TODO_External_1", State.TODO);
+        createExternalWithState("IN_PROGRESS_External_1", State.IN_PROGRESS);
+        createExternalWithState("FINISH_External_1", State.FINISH);
+
+        ExternalSearchCriteria criteria = ExternalSearchCriteria.builder()
+                .teamId(testTeam.getId())
+                .filterType(ExternalRequestDTO.ExternalGroupedSearchRequestDTO.FilterType.STATE)
+                .build();
+
+        // when
+        ExternalGroupedResponseDTO.ExternalGroupedPageResponse result =
+            externalCursorRepository.findExternalWithGroupedResponse(criteria, null, 50);
+
+        // then
+        assertThat(result.getData()).hasSize(5); // 모든 상태 그룹이 포함됨: NONE, IN_PROGRESS, TODO, FINISH, REVIEW
+        
+        // 그룹 순서 확인: NONE -> IN_PROGRESS -> TODO -> FINISH
+        ExternalGroupedResponseDTO.FilteredExternalGroup noneGroup = result.getData().get(0);
+        assertThat(noneGroup.getFilterName()).isEqualTo("NONE");
+        assertThat(noneGroup.getDataCnt()).isEqualTo(2);
+        
+        ExternalGroupedResponseDTO.FilteredExternalGroup inProgressGroup = result.getData().get(1);
+        assertThat(inProgressGroup.getFilterName()).isEqualTo("IN_PROGRESS");
+        assertThat(inProgressGroup.getDataCnt()).isEqualTo(1);
+        
+        ExternalGroupedResponseDTO.FilteredExternalGroup todoGroup = result.getData().get(2);
+        assertThat(todoGroup.getFilterName()).isEqualTo("TODO");
+        assertThat(todoGroup.getDataCnt()).isEqualTo(1);
+        
+        ExternalGroupedResponseDTO.FilteredExternalGroup finishGroup = result.getData().get(3);
+        assertThat(finishGroup.getFilterName()).isEqualTo("FINISH");
+        assertThat(finishGroup.getDataCnt()).isEqualTo(1);
+    }
+
+    @DisplayName("우선순위별 그룹핑 테스트: 각 우선순위별로 그룹화되어 반환")
+    @Test
+    void testPriorityGrouping() {
+        // given
+        createExternalWithPriority("NONE_External_1", Priority.NONE);
+        createExternalWithPriority("NONE_External_2", Priority.NONE);
+        createExternalWithPriority("URGENT_External_1", Priority.URGENT);
+        createExternalWithPriority("HIGH_External_1", Priority.HIGH);
+        createExternalWithPriority("NORMAL_External_1", Priority.NORMAL);
+
+        ExternalSearchCriteria criteria = ExternalSearchCriteria.builder()
+                .teamId(testTeam.getId())
+                .filterType(ExternalRequestDTO.ExternalGroupedSearchRequestDTO.FilterType.PRIORITY)
+                .build();
+
+        // when
+        ExternalGroupedResponseDTO.ExternalGroupedPageResponse result =
+            externalCursorRepository.findExternalWithGroupedResponse(criteria, null, 50);
+
+        // then
+        assertThat(result.getData()).hasSize(5); // 모든 우선순위 그룹이 포함됨: NONE, URGENT, HIGH, NORMAL, LOW
+        
+        // 그룹 순서 확인: NONE -> URGENT -> HIGH -> NORMAL
+        ExternalGroupedResponseDTO.FilteredExternalGroup noneGroup = result.getData().get(0);
+        assertThat(noneGroup.getFilterName()).isEqualTo("NONE");
+        assertThat(noneGroup.getDataCnt()).isEqualTo(2);
+        
+        ExternalGroupedResponseDTO.FilteredExternalGroup urgentGroup = result.getData().get(1);
+        assertThat(urgentGroup.getFilterName()).isEqualTo("URGENT");
+        assertThat(urgentGroup.getDataCnt()).isEqualTo(1);
+        
+        ExternalGroupedResponseDTO.FilteredExternalGroup highGroup = result.getData().get(2);
+        assertThat(highGroup.getFilterName()).isEqualTo("HIGH");
+        assertThat(highGroup.getDataCnt()).isEqualTo(1);
+        
+        ExternalGroupedResponseDTO.FilteredExternalGroup normalGroup = result.getData().get(3);
+        assertThat(normalGroup.getFilterName()).isEqualTo("NORMAL");
+        assertThat(normalGroup.getDataCnt()).isEqualTo(1);
+    }
+
+    @DisplayName("그룹핑 50개 제한 테스트: 그룹 전체에서 50개만 반환")
+    @Test
+    @Rollback(false)
+    void testGroupingFiftyItemsLimit() {
+        // given - NONE 상태 45개, TODO 상태 30개 생성 (총 75개)
+        for (int i = 0; i < 45; i++) {
+            createExternalWithState("NONE_External_" + i, State.NONE);
+        }
+        for (int i = 0; i < 30; i++) {
+            createExternalWithState("TODO_External_" + i, State.TODO);
+        }
+
+        ExternalSearchCriteria criteria = ExternalSearchCriteria.builder()
+                .teamId(testTeam.getId())
+                .filterType(ExternalRequestDTO.ExternalGroupedSearchRequestDTO.FilterType.STATE)
+                .build();
+
+        // when
+        ExternalGroupedResponseDTO.ExternalGroupedPageResponse result =
+            externalCursorRepository.findExternalWithGroupedResponse(criteria, null, 50);
+
+        // then
+        assertThat(result.isHasNext()).isTrue();
+        assertThat(result.getNextCursor()).isNotNull();
+        
+        // NONE 그룹에서 45개, TODO 그룹에서 5개만 조회되어야 함
+        int totalItems = result.getData().stream()
+                .mapToInt(ExternalGroupedResponseDTO.FilteredExternalGroup::getDataCnt)
+                .sum();
+        assertThat(totalItems).isEqualTo(50);
+        
+        // NONE 그룹이 먼저 나와야 함
+        ExternalGroupedResponseDTO.FilteredExternalGroup firstGroup = result.getData().get(0);
+        assertThat(firstGroup.getFilterName()).isEqualTo("NONE");
+        assertThat(firstGroup.getDataCnt()).isEqualTo(45);
+        
+        // IN_PROGRESS 그룹은 빈 그룹이어야 함
+        if (result.getData().size() > 1) {
+            ExternalGroupedResponseDTO.FilteredExternalGroup secondGroup = result.getData().get(1);
+            assertThat(secondGroup.getFilterName()).isEqualTo("IN_PROGRESS");
+            assertThat(secondGroup.getDataCnt()).isEqualTo(0);
+        }
+        
+        // TODO 그룹에서 5개만 조회되어야 함
+        if (result.getData().size() > 2) {
+            ExternalGroupedResponseDTO.FilteredExternalGroup thirdGroup = result.getData().get(2);
+            assertThat(thirdGroup.getFilterName()).isEqualTo("TODO");
+            assertThat(thirdGroup.getDataCnt()).isEqualTo(5);
+        }
+    }
+
+    @DisplayName("빈 그룹도 응답에 포함되는지 테스트")
+    @Test
+    void testEmptyGroupsIncluded() {
+        // given - NONE 상태만 2개 생성 (다른 상태는 없음)
+        createExternalWithState("NONE_External_1", State.NONE);
+        createExternalWithState("NONE_External_2", State.NONE);
+
+        ExternalSearchCriteria criteria = ExternalSearchCriteria.builder()
+                .teamId(testTeam.getId())
+                .filterType(ExternalRequestDTO.ExternalGroupedSearchRequestDTO.FilterType.STATE)
+                .build();
+
+        // when
+        ExternalGroupedResponseDTO.ExternalGroupedPageResponse result =
+            externalCursorRepository.findExternalWithGroupedResponse(criteria, null, 50);
+
+        // then
+        assertThat(result.getData()).hasSize(5); // 모든 상태 그룹이 포함되어야 함: NONE, IN_PROGRESS, TODO, FINISH, REVIEW
+        
+        // NONE 그룹은 데이터가 있어야 함
+        ExternalGroupedResponseDTO.FilteredExternalGroup noneGroup = result.getData().get(0);
+        assertThat(noneGroup.getFilterName()).isEqualTo("NONE");
+        assertThat(noneGroup.getDataCnt()).isEqualTo(2);
+        assertThat(noneGroup.getExternals()).hasSize(2);
+        
+        // IN_PROGRESS 그룹은 빈 그룹이어야 함
+        ExternalGroupedResponseDTO.FilteredExternalGroup inProgressGroup = result.getData().get(1);
+        assertThat(inProgressGroup.getFilterName()).isEqualTo("IN_PROGRESS");
+        assertThat(inProgressGroup.getDataCnt()).isEqualTo(0);
+        assertThat(inProgressGroup.getExternals()).isEmpty();
+        
+        // TODO 그룹은 빈 그룹이어야 함
+        ExternalGroupedResponseDTO.FilteredExternalGroup todoGroup = result.getData().get(2);
+        assertThat(todoGroup.getFilterName()).isEqualTo("TODO");
+        assertThat(todoGroup.getDataCnt()).isEqualTo(0);
+        assertThat(todoGroup.getExternals()).isEmpty();
+        
+        // FINISH 그룹은 빈 그룹이어야 함
+        ExternalGroupedResponseDTO.FilteredExternalGroup finishGroup = result.getData().get(3);
+        assertThat(finishGroup.getFilterName()).isEqualTo("FINISH");
+        assertThat(finishGroup.getDataCnt()).isEqualTo(0);
+        assertThat(finishGroup.getExternals()).isEmpty();
+        
+        // REVIEW 그룹은 빈 그룹이어야 함
+        ExternalGroupedResponseDTO.FilteredExternalGroup reviewGroup = result.getData().get(4);
+        assertThat(reviewGroup.getFilterName()).isEqualTo("REVIEW");
+        assertThat(reviewGroup.getDataCnt()).isEqualTo(0);
+        assertThat(reviewGroup.getExternals()).isEmpty();
+    }
+
     private void createExternalWithState(String name, State state) {
         External external = External.builder()
                 .name(name)
@@ -225,7 +411,6 @@ class ExternalCursorRepositoryTest {
                 .member(testMember)
                 .priority(Priority.NORMAL)
                 .type(ExtServiceType.GITHUB)
-                .externalCode(name + "_CODE")
                 .team(testTeam)
                 .build();
         
@@ -242,7 +427,6 @@ class ExternalCursorRepositoryTest {
                 .member(testMember)
                 .priority(priority)
                 .type(ExtServiceType.GITHUB)
-                .externalCode(name + "_CODE")
                 .team(testTeam)
                 .build();
         

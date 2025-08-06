@@ -5,6 +5,7 @@ import com.example.Veco.domain.external.dto.paging.ExternalCursor;
 import com.example.Veco.domain.external.dto.response.ExternalResponseDTO;
 import com.example.Veco.domain.external.dto.response.ExternalGroupedResponseDTO;
 import com.example.Veco.domain.external.dto.paging.ExternalSearchCriteria;
+import com.example.Veco.domain.external.dto.paging.ExternalSearchCriteria.FilterType;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.external.entity.QExternal;
 import com.example.Veco.global.apiPayload.page.CursorPage;
@@ -49,11 +50,11 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
         BooleanExpression teamCondition = external.team.id.eq(criteria.getTeamId());
         
         BooleanExpression filterCondition = switch (criteria.getActiveFilterType()){
-            case STATE -> external.state.eq(criteria.getState());
-            case PRIORITY -> external.priority.eq(criteria.getPriority());
-            case ASSIGNEE -> external.assignments.any().assignee.id.eq(criteria.getAssigneeId());
-            case EXT_TYPE -> external.type.eq(criteria.getExtServiceType());
-            case GOAL -> external.goal.id.eq(criteria.getGoalId());
+            case STATE -> criteria.getState() != null ? external.state.eq(criteria.getState()) : null;
+            case PRIORITY -> criteria.getPriority() != null ? external.priority.eq(criteria.getPriority()) : null;
+            case ASSIGNEE -> criteria.getAssigneeId() != null ? external.assignments.any().assignee.id.eq(criteria.getAssigneeId()) : null;
+            case EXT_TYPE -> criteria.getExtServiceType() != null ? external.type.eq(criteria.getExtServiceType()) : null;
+            case GOAL -> criteria.getGoalId() != null ? external.goal.id.eq(criteria.getGoalId()) : null;
             case NONE -> null;
         };
         
@@ -163,30 +164,220 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
     }
 
     public ExternalGroupedResponseDTO.ExternalGroupedPageResponse findExternalWithGroupedResponse(ExternalSearchCriteria criteria, String cursor, int size) {
-        JPAQuery<External> query = queryFactory.selectFrom(external)
-                .leftJoin(external.assignments).fetchJoin()
-                .where(
-                        buildFilterConditions(criteria),
-                        buildCursorCondition(criteria, cursor)
-                )
-                .orderBy(buildOrderClause(criteria))
-                .limit(size + 1);
-
-        List<External> externals = query.fetch();
+        FilterType filterType = criteria.getActiveFilterType();
         
-        boolean hasNext = externals.size() > size;
-        if(hasNext) {
-            externals = externals.subList(0, size);
-        }
+        return switch (filterType) {
+            case STATE -> findExternalsGroupedByState(criteria, cursor, size);
+            case PRIORITY -> findExternalsGroupedByPriority(criteria, cursor, size);
+            case ASSIGNEE -> findExternalsGroupedByAssignee(criteria, cursor, size);
+            case EXT_TYPE -> findExternalsGroupedByExtType(criteria, cursor, size);
+            case GOAL -> findExternalsGroupedByGoal(criteria, cursor, size);
+            case NONE -> findExternalsGroupedByState(criteria, cursor, size); // 기본값은 상태별 그룹핑
+        };
+    }
 
+    private ExternalGroupedResponseDTO.ExternalGroupedPageResponse findExternalsGroupedByState(ExternalSearchCriteria criteria, String cursor, int size) {
+        State[] stateOrder = {State.NONE, State.IN_PROGRESS, State.TODO, State.FINISH, State.REVIEW};
+        return findExternalsGroupedByField(criteria, cursor, size, stateOrder, "state");
+    }
+
+    private ExternalGroupedResponseDTO.ExternalGroupedPageResponse findExternalsGroupedByPriority(ExternalSearchCriteria criteria, String cursor, int size) {
+        com.example.Veco.global.enums.Priority[] priorityOrder = {
+            com.example.Veco.global.enums.Priority.NONE, 
+            com.example.Veco.global.enums.Priority.URGENT, 
+            com.example.Veco.global.enums.Priority.HIGH, 
+            com.example.Veco.global.enums.Priority.NORMAL, 
+            com.example.Veco.global.enums.Priority.LOW
+        };
+        return findExternalsGroupedByField(criteria, cursor, size, priorityOrder, "priority");
+    }
+
+    private ExternalGroupedResponseDTO.ExternalGroupedPageResponse findExternalsGroupedByAssignee(ExternalSearchCriteria criteria, String cursor, int size) {
+        JPAQuery<External> baseQuery = queryFactory.selectFrom(external)
+                .leftJoin(external.assignments).fetchJoin()
+                .where(external.team.id.eq(criteria.getTeamId()));
+
+        return buildGroupedResponseForAssignee(baseQuery, cursor, size, criteria);
+    }
+
+    private ExternalGroupedResponseDTO.ExternalGroupedPageResponse findExternalsGroupedByExtType(ExternalSearchCriteria criteria, String cursor, int size) {
+        com.example.Veco.global.enums.ExtServiceType[] extTypeOrder = com.example.Veco.global.enums.ExtServiceType.values();
+        return findExternalsGroupedByField(criteria, cursor, size, extTypeOrder, "extType");
+    }
+
+    private ExternalGroupedResponseDTO.ExternalGroupedPageResponse findExternalsGroupedByGoal(ExternalSearchCriteria criteria, String cursor, int size) {
+        JPAQuery<External> baseQuery = queryFactory.selectFrom(external)
+                .leftJoin(external.goal).fetchJoin()
+                .where(external.team.id.eq(criteria.getTeamId()));
+
+        return buildGroupedResponseForGoal(baseQuery, cursor, size, criteria);
+    }
+
+    private <T extends Enum<T>> ExternalGroupedResponseDTO.ExternalGroupedPageResponse findExternalsGroupedByField(
+            ExternalSearchCriteria criteria, String cursor, int size, T[] enumOrder, String fieldType) {
+        
+        List<ExternalGroupedResponseDTO.FilteredExternalGroup> groups = new java.util.ArrayList<>();
+        int totalFetched = 0;
+        boolean hasNext = false;
         String nextCursor = null;
-        if(hasNext && !externals.isEmpty()) {
-            External last = externals.getLast();
-            ExternalCursor externalCursor = createCursorFromExternal(last, criteria);
-            nextCursor = externalCursor.encode();
+        
+        ExternalCursor decodedCursor = cursor != null ? ExternalCursor.decode(cursor) : null;
+        
+        for (T enumValue : enumOrder) {
+            if (totalFetched >= size) {
+                hasNext = true;
+                break;
+            }
+            
+            BooleanExpression condition = external.team.id.eq(criteria.getTeamId());
+            condition = condition.and(buildEnumCondition(enumValue, fieldType));
+            
+            JPAQuery<External> query = queryFactory.selectFrom(external)
+                    .leftJoin(external.assignments).fetchJoin()
+                    .where(condition);
+            
+            if (decodedCursor != null && shouldSkipGroup(enumValue, decodedCursor, fieldType)) {
+                // 건너뛰는 그룹도 빈 그룹으로 추가
+                ExternalGroupedResponseDTO.FilteredExternalGroup emptyGroup = ExternalGroupedResponseDTO.FilteredExternalGroup.builder()
+                        .filterName(getDisplayName(enumValue))
+                        .dataCnt(0)
+                        .externals(new java.util.ArrayList<>())
+                        .build();
+                groups.add(emptyGroup);
+                continue;
+            }
+            
+            if (decodedCursor != null && isSameGroup(enumValue, decodedCursor, fieldType)) {
+                query = query.where(buildCursorConditionForGroup(decodedCursor));
+            }
+            
+            query = query.orderBy(external.createdAt.desc(), external.id.asc());
+            
+            int remainingSize = size - totalFetched;
+            List<External> groupExternals = query.limit(remainingSize + 1).fetch();
+            
+            // 데이터가 있든 없든 항상 그룹을 추가
+            boolean groupHasNext = groupExternals.size() > remainingSize;
+            if (groupHasNext) {
+                groupExternals = groupExternals.subList(0, remainingSize);
+                hasNext = true;
+                if (!groupExternals.isEmpty()) {
+                    External lastExternal = groupExternals.getLast();
+                    ExternalCursor groupCursor = new ExternalCursor();
+                    groupCursor.setId(lastExternal.getId());
+                    groupCursor.setCreatedAt(lastExternal.getCreatedAt());
+                    groupCursor.setGroupValue(enumValue.name());
+                    nextCursor = groupCursor.encode();
+                }
+            }
+            
+            List<ExternalResponseDTO.ExternalDTO> externalDTOs = groupExternals.stream()
+                    .map(e -> ExternalConverter.toExternalDTO(e, e.getAssignments()))
+                    .toList();
+            
+            ExternalGroupedResponseDTO.FilteredExternalGroup group = ExternalGroupedResponseDTO.FilteredExternalGroup.builder()
+                    .filterName(getDisplayName(enumValue))
+                    .dataCnt(externalDTOs.size())
+                    .externals(convertToExternalItemDTOs(externalDTOs))
+                    .build();
+                    
+            groups.add(group);
+            totalFetched += groupExternals.size();
         }
+        
+        return ExternalGroupedResponseDTO.ExternalGroupedPageResponse.builder()
+                .data(groups)
+                .hasNext(hasNext)
+                .nextCursor(nextCursor)
+                .pageSize(size)
+                .build();
+    }
 
-        return ExternalConverter.toGroupedPageResponse(externals, hasNext, nextCursor, size);
+    private BooleanExpression buildEnumCondition(Enum<?> enumValue, String fieldType) {
+        return switch (fieldType) {
+            case "state" -> external.state.eq((State) enumValue);
+            case "priority" -> external.priority.eq((com.example.Veco.global.enums.Priority) enumValue);
+            case "extType" -> external.type.eq((com.example.Veco.global.enums.ExtServiceType) enumValue);
+            default -> null;
+        };
+    }
+
+    private boolean shouldSkipGroup(Enum<?> enumValue, ExternalCursor cursor, String fieldType) {
+        if (cursor.getGroupValue() == null) return false;
+        
+        String[] fieldOrder = getFieldOrder(fieldType);
+        int currentIndex = java.util.Arrays.asList(fieldOrder).indexOf(enumValue.name());
+        int cursorIndex = java.util.Arrays.asList(fieldOrder).indexOf(cursor.getGroupValue());
+        
+        return currentIndex < cursorIndex;
+    }
+
+    private boolean isSameGroup(Enum<?> enumValue, ExternalCursor cursor, String fieldType) {
+        return cursor.getGroupValue() != null && cursor.getGroupValue().equals(enumValue.name());
+    }
+
+    private String[] getFieldOrder(String fieldType) {
+        return switch (fieldType) {
+            case "state" -> new String[]{"NONE", "IN_PROGRESS", "TODO", "FINISH", "REVIEW"};
+            case "priority" -> new String[]{"NONE", "URGENT", "HIGH", "NORMAL", "LOW"};
+            case "extType" -> java.util.Arrays.stream(com.example.Veco.global.enums.ExtServiceType.values()).map(Enum::name).toArray(String[]::new);
+            default -> new String[]{};
+        };
+    }
+
+    private BooleanExpression buildCursorConditionForGroup(ExternalCursor cursor) {
+        return external.createdAt.lt(cursor.getCreatedAt())
+                .or(external.createdAt.eq(cursor.getCreatedAt()).and(external.id.gt(cursor.getId())));
+    }
+
+    private String getDisplayName(Enum<?> enumValue) {
+        return enumValue.name();
+    }
+
+    private List<ExternalGroupedResponseDTO.ExternalItemDTO> convertToExternalItemDTOs(List<ExternalResponseDTO.ExternalDTO> externalDTOs) {
+        return externalDTOs.stream()
+                .map(dto -> ExternalGroupedResponseDTO.ExternalItemDTO.builder()
+                        .id(dto.getId())
+                        .name(dto.getName())
+                        .title(dto.getTitle())
+                        .state(dto.getState())
+                        .priority(dto.getPriority() != null ? dto.getPriority().name() : "없음")
+                        .deadline(dto.getDeadlines() != null ? 
+                            ExternalGroupedResponseDTO.DeadlineDTO.builder()
+                                .start(dto.getDeadlines().getStart() != null ? dto.getDeadlines().getStart().toString() : null)
+                                .end(dto.getDeadlines().getEnd() != null ? dto.getDeadlines().getEnd().toString() : null)
+                                .build() : null)
+                        .managers(dto.getManagers() != null ?
+                            ExternalGroupedResponseDTO.ManagersDTO.builder()
+                                .cnt(dto.getManagers().getCnt())
+                                .info(dto.getManagers().getInfo().stream()
+                                    .map(info -> ExternalGroupedResponseDTO.ManagerInfoDTO.builder()
+                                        .profileUrl(info.getProfileUrl())
+                                        .managerName(info.getNickname())
+                                        .build())
+                                    .toList())
+                                .build() : null)
+                        .extType(dto.getExtServiceType())
+                        .build())
+                .toList();
+    }
+
+    private ExternalGroupedResponseDTO.ExternalGroupedPageResponse buildGroupedResponseForAssignee(JPAQuery<External> baseQuery, String cursor, int size, ExternalSearchCriteria criteria) {
+        return ExternalGroupedResponseDTO.ExternalGroupedPageResponse.builder()
+                .data(new java.util.ArrayList<>())
+                .hasNext(false)
+                .nextCursor(null)
+                .pageSize(size)
+                .build();
+    }
+
+    private ExternalGroupedResponseDTO.ExternalGroupedPageResponse buildGroupedResponseForGoal(JPAQuery<External> baseQuery, String cursor, int size, ExternalSearchCriteria criteria) {
+        return ExternalGroupedResponseDTO.ExternalGroupedPageResponse.builder()
+                .data(new java.util.ArrayList<>())
+                .hasNext(false)
+                .nextCursor(null)
+                .pageSize(size)
+                .build();
     }
 
 }
