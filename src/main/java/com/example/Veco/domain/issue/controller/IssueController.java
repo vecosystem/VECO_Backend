@@ -1,15 +1,13 @@
 package com.example.Veco.domain.issue.controller;
 
-import com.example.Veco.domain.goal.dto.request.GoalReqDTO;
-import com.example.Veco.domain.goal.dto.response.GoalResDTO;
-import com.example.Veco.domain.goal.exception.code.GoalSuccessCode;
 import com.example.Veco.domain.issue.dto.IssueReqDTO;
 import com.example.Veco.domain.issue.dto.IssueResponseDTO;
-
+import com.example.Veco.domain.issue.exception.code.IssueErrorCode;
 import com.example.Veco.domain.issue.exception.code.IssueSuccessCode;
 import com.example.Veco.domain.issue.service.IssueQueryService;
 import com.example.Veco.domain.issue.service.command.IssueCommandService;
 import com.example.Veco.global.apiPayload.ApiResponse;
+import com.example.Veco.global.apiPayload.code.BaseErrorStatus;
 import com.example.Veco.global.auth.user.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -107,7 +105,17 @@ public class IssueController {
             @RequestParam(required = false, defaultValue = "state")
             String query
     ) {
-        return ApiResponse.onSuccess(IssueSuccessCode.OK, issueQueryService.getIssuesByTeamId(teamId, cursor, size, query));
+        IssueResponseDTO.Pageable<IssueResponseDTO.FilteringIssue<IssueResponseDTO.IssueWithManagers>> result = issueQueryService.getIssuesByTeamId(teamId, cursor, size, query);
+        if (result != null) {
+            return ApiResponse.onSuccess(IssueSuccessCode.OK, result);
+        } else {
+            BaseErrorStatus status = IssueErrorCode.NOT_FOUND_IN_TEAM;
+            return ApiResponse.onFailure(
+                    status.getReasonHttpStatus().getCode(),
+                    status.getReasonHttpStatus().getMessage(),
+                    null
+            );
+        }
     }
 
     @Operation(

@@ -66,15 +66,10 @@ public class CustomIssueRepositoryImpl implements CustomIssueRepository {
                         )
                 );
 
-        // 이슈가 없는 경우 throw
-        if (result.isEmpty()){
-            throw new IssueException(IssueErrorCode.NOT_FOUND_IN_TEAM);
-        }
-
         return result;
     }
 
-    // 필터에 맞는 모든 목표 개수 조회
+    // 필터에 맞는 모든 이슈 개수 조회
     @Override
     public Long findIssuesCountByFilter(
             Predicate query
@@ -89,7 +84,7 @@ public class CustomIssueRepositoryImpl implements CustomIssueRepository {
                 .fetchFirst();
     }
 
-    // 모든 목표 담당자 리스트 조회
+    // 모든 이슈 담당자 리스트 조회
     @Override
     public List<String> findIssuesAssigneeInTeam(
             Long teamId

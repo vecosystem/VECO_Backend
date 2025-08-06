@@ -70,6 +70,10 @@ public class IssueQueryService {
         // 데이터 조회
         List<SimpleIssue> result = issueRepository.findIssuesByTeamId(builder, size);
 
+        if (result.isEmpty()) {
+            return null;
+        }
+
         // 페이지네이션 메타데이터 설정
         boolean hasNext = result.size() > size;
         int pageSize = Math.min(result.size(), size);
@@ -98,7 +102,7 @@ public class IssueQueryService {
             case "state": {
                 // 필터 설정
                 for (State filter : State.values()) {
-                    // 필터링에 맞는 모든 목표 개수 조회
+                    // 필터링에 맞는 모든 이슈 개수 조회
                     builder = new BooleanBuilder();
                     builder.and(qIssue.state.eq(filter))
                             .and(qIssue.team.id.eq(teamId));
@@ -120,7 +124,7 @@ public class IssueQueryService {
             case "priority": {
                 // 필터 설정
                 for (Priority filter : Priority.values()) {
-                    // 필터링에 맞는 모든 목표 개수 조회
+                    // 필터링에 맞는 모든 이슈 개수 조회
                     builder = new BooleanBuilder();
                     builder.and(qIssue.priority.eq(filter))
                             .and(qIssue.team.id.eq(teamId));
@@ -175,7 +179,6 @@ public class IssueQueryService {
                 break;
             }
             case "goal": {
-                // 목표 리스트 뽑아와서 Map 처리: 목표 : 개수
                 List<IssueResponseDTO.GoalInfo> goals = issueRepository.findGoalInfoByTeamId(teamId);
                 Map<IssueResponseDTO.GoalInfo, Integer> map = new HashMap<>();
                 for (IssueResponseDTO.GoalInfo goal : goals) {
