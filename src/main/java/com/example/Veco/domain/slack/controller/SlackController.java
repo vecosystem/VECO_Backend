@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.view.RedirectView;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,11 +28,11 @@ public class SlackController {
                     "요청이 오면 Slack OAuth 화면으로 리다이렉트되는 방식입니다."
     )
     @GetMapping("/connect")
-    public RedirectView slackConnect(
+    public ApiResponse<String> slackConnect(
             @RequestHeader("Authorization") @Parameter(hidden = true)
             String token
     ){
-        return slackCommandService.redirectSlackOAuth(token);
+        return ApiResponse.onSuccess(slackCommandService.redirectSlackOAuth(token));
     }
 
     // Slack Callback: 비즈니스 로직 시작 지점
