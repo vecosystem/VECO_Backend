@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 @Slf4j
 public class GitHubTokenService {
+
     private final GitHubJwtProvider jwtProvider;
 
     WebClient webClient = WebClient.builder()

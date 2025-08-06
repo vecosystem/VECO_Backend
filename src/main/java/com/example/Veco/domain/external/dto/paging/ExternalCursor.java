@@ -18,14 +18,16 @@ public class ExternalCursor {
     private LocalDateTime createdAt;
     private Long id;
     private Boolean isStatusFiltered;
+    private String groupValue;
 
     public String encode(){
         try{
-            String data = String.format("%s|%d|%s|%d",
+            String data = String.format("%s|%d|%s|%d|%s",
                     Boolean.TRUE.equals(isStatusFiltered) ? "SIMPLE" : "COMPLEX",
                     statusPriority != null ? statusPriority : 0,
                     createdAt.toString(),
-                    id);
+                    id,
+                    groupValue != null ? groupValue : "");
             return Base64.getEncoder().encodeToString(data.getBytes(StandardCharsets.UTF_8));
         }catch (Exception e){
             throw new IllegalArgumentException("커서 인코딩 실패");
@@ -44,6 +46,10 @@ public class ExternalCursor {
             cursor.setStatusPriority(statusPriorityValue > 0 ? statusPriorityValue : null);
             cursor.setCreatedAt(LocalDateTime.parse(parts[2]));
             cursor.setId(Long.parseLong(parts[3]));
+            
+            if (parts.length > 4 && !parts[4].isEmpty()) {
+                cursor.setGroupValue(parts[4]);
+            }
 
             return cursor;
         } catch (Exception e) {

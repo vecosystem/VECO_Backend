@@ -19,6 +19,21 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ExternalConverter {
+
+    public static ExternalResponseDTO.SimpleListDTO toSimpleListDTO(List<External> externals) {
+        List<ExternalResponseDTO.SimpleExternalDTO> simpleDTOs = externals.stream().map(
+                external -> ExternalResponseDTO.SimpleExternalDTO.builder()
+                        .id(external.getId())
+                        .title(external.getTitle())
+                        .build()
+        ).toList();
+
+        return ExternalResponseDTO.SimpleListDTO.builder()
+                .cnt(externals.size())
+                .info(simpleDTOs)
+                .build();
+    }
+
     public static External toExternal(Team team, Goal goal, ExternalRequestDTO.ExternalCreateRequestDTO dto, String externalCode){
         External external = External.builder()
                 .description(dto.getContent())
@@ -234,6 +249,7 @@ public class ExternalConverter {
                 .priority(external.getPriority().name())
                 .deadline(deadline)
                 .managers(managers)
+                .extType(external.getType())
                 .build();
     }
 

@@ -3,7 +3,7 @@ package com.example.Veco.domain.team.converter;
 import com.example.Veco.domain.team.dto.NumberSequenceResponseDTO;
 import com.example.Veco.domain.team.entity.NumberSequence;
 import com.example.Veco.domain.team.entity.Team;
-import com.example.Veco.domain.team.enums.Category;
+import com.example.Veco.global.enums.Category;
 
 public class NumberSequenceConverter {
 

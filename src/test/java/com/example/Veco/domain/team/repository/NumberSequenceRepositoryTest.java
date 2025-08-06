@@ -2,7 +2,7 @@ package com.example.Veco.domain.team.repository;
 
 import com.example.Veco.domain.team.entity.NumberSequence;
 import com.example.Veco.domain.team.entity.Team;
-import com.example.Veco.domain.team.enums.Category;
+import com.example.Veco.global.enums.Category;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

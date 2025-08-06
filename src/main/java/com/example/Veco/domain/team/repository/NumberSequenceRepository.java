@@ -1,7 +1,7 @@
 package com.example.Veco.domain.team.repository;
 
 import com.example.Veco.domain.team.entity.NumberSequence;
-import com.example.Veco.domain.team.enums.Category;
+import com.example.Veco.global.enums.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

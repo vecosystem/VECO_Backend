@@ -1,6 +1,7 @@
 package com.example.Veco.domain.assignee.converter;
 
 import com.example.Veco.domain.assignee.entity.Assignee;
+import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.goal.entity.Goal;
 import com.example.Veco.domain.issue.entity.Issue;
 import com.example.Veco.domain.mapping.entity.MemberTeam;
@@ -32,6 +33,19 @@ public class AssigneeConverter {
                 .type(type)
                 .memberTeam(memberTeam)
                 .issue(issue)
+                .build();
+    }
+
+    public static Assignee toExternalAssignee(
+            MemberTeam memberTeam,
+            Category type,
+            External external
+    ) {
+        return Assignee.builder()
+                .targetId(external.getId())
+                .type(type)
+                .memberTeam(memberTeam)
+                .external(external)
                 .build();
     }
 }

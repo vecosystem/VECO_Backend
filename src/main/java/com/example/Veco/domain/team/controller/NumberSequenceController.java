@@ -1,9 +1,9 @@
 package com.example.Veco.domain.team.controller;
 
 import com.example.Veco.domain.team.dto.NumberSequenceResponseDTO;
-import com.example.Veco.domain.team.enums.Category;
 import com.example.Veco.domain.team.service.NumberSequenceService;
 import com.example.Veco.global.apiPayload.ApiResponse;
+import com.example.Veco.global.enums.Category;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
