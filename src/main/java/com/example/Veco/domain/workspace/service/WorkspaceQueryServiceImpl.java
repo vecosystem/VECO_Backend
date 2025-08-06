@@ -4,6 +4,7 @@ import com.example.Veco.domain.mapping.entity.MemberTeam;
 import com.example.Veco.domain.mapping.repository.MemberTeamRepository;
 import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.member.repository.MemberRepository;
+import com.example.Veco.domain.member.service.MemberQueryService;
 import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.domain.team.repository.TeamRepository;
 import com.example.Veco.domain.workspace.converter.WorkspaceConverter;
@@ -38,6 +39,7 @@ public class WorkspaceQueryServiceImpl implements WorkspaceQueryService {
     private final MemberRepository memberRepository;
     private final WorkspaceQueryDslRepository workspaceQueryDslRepository;
     private final SlugGenerator slugGenerator;
+    private final MemberQueryService memberQueryService;
 
     /**
      * 로그인한 멤버가 속한 워크스페이스 조회
@@ -47,6 +49,12 @@ public class WorkspaceQueryServiceImpl implements WorkspaceQueryService {
     public WorkSpace getWorkSpaceByMember(Member member) {
         return Optional.ofNullable(member.getWorkSpace())
                 .orElseThrow(() -> new WorkspaceHandler(WorkspaceErrorStatus._WORKSPACE_NOT_FOUND));
+    }
+
+    @Override
+    public WorkSpace getWorkspaceBySocialUid(String socialUid) {
+        Member member = memberQueryService.getMemberBySocialUid(socialUid);
+        return getWorkSpaceByMember(member);
     }
 
     /**
@@ -84,8 +92,7 @@ public class WorkspaceQueryServiceImpl implements WorkspaceQueryService {
 
     @Override
     public List<WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto> getWorkspaceMembers(Member loginMember) {
-        WorkSpace workspace = Optional.ofNullable(loginMember.getWorkSpace())
-                .orElseThrow(() -> new WorkspaceHandler(WorkspaceErrorStatus._WORKSPACE_NOT_FOUND));
+        WorkSpace workspace = getWorkSpaceByMember(loginMember);
 
         return workspaceQueryDslRepository.findWorkspaceMembersWithTeams(workspace);
     }

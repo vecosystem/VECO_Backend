@@ -54,22 +54,40 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
      */
     @Override
     public WorkspaceResponseDTO.CreateTeamResponseDto createTeam(WorkSpace workspace, WorkspaceRequestDTO.CreateTeamRequestDto request) {
-        // 1. 팀 저장
+        // 1. 팀 이름 중복 검사
+        if (teamRepository.existsByName(request.getTeamName())) {
+            throw new TeamException(TeamErrorCode._DUPLICATE_TEAM_NAME);
+        }
+        // 2. 팀 저장
         Team team = teamRepository.save(Team.builder()
                 .name(request.getTeamName())
                 .workSpace(workspace)
                 .goalNumber(1L)
                 .build());
 
-        // 2. 요청으로 전달된 멤버 ID 리스트로 멤버 조회
+        // 3. 요청으로 전달된 멤버 ID 리스트로 멤버 조회
         List<Member> members = memberRepository.findAllById(request.getMemberId());
+        List<Long> memberIds = request.getMemberId();
 
-        // 3. 에러 처리 : 멤버가 아예 없을 경우 예외 발생
+        // 4-1. 에러 처리 : 멤버가 아예 없을 경우 예외 발생
         if (members.isEmpty()) {
             throw new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND);
         }
 
-        // 4. 멤버와 팀을 매핑하여 MemberTeam 리스트 생성
+        // 4-2 에러 처리 : 존재하지 않는 멤버 아이디가 포함되어 있을 경우
+        if (members.size() != memberIds.size()) {
+            throw new MemberHandler(MemberErrorStatus._INVALID_MEMBER_INCLUDE);
+        }
+
+        // 4-3. 에러 처리 : 워크스페이스에 속하지 않은 멤버가 있는지 체크
+        boolean hasInvalidMember = members.stream()
+                .anyMatch(member -> !workspace.equals(member.getWorkSpace()));
+
+        if (hasInvalidMember) {
+            throw new MemberHandler(MemberErrorStatus._MEMBER_NOT_IN_WORKSPACE);
+        }
+
+        // 5. 멤버와 팀을 매핑하여 MemberTeam 리스트 생성
         List<MemberTeam> memberTeams = members.stream()
                 .map(member -> MemberTeam.builder()
                         .member(member)
@@ -77,10 +95,10 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
                         .build())
                 .toList();
 
-        // 5. 멤버~팀 관계 저장
+        // 6. 멤버~팀 관계 저장
         memberTeamRepository.saveAll(memberTeams);
 
-        // 6. 응답 DTO 생성 후 반환
+        // 7. 응답 DTO 생성 후 반환
         return WorkspaceConverter.toCreateTeamResponseDto(team, members);
     }
 
@@ -108,7 +126,11 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
     }
 
     @Override
-    public WorkspaceResponseDTO.CreateWorkspaceResponseDto createWorkspace(Member member, WorkspaceRequestDTO.CreateWorkspaceRequestDto request) {
+    public WorkspaceResponseDTO.CreateWorkspaceResponseDto createWorkspace(Member member, WorkspaceRequestDTO.WorkspaceRequestDto request) {
+        // 1. 워크스페이스 이름 중복 검사
+        if (workspaceRepository.existsByName(request.getWorkspaceName())) {
+            throw new WorkspaceHandler(WorkspaceErrorStatus._DUPLICATE_WORKSPACE_NAME);
+        }
         // 2. 이미 워크스페이스가 있으면 예외
         if (member.getWorkSpace() != null) {
             throw new WorkspaceHandler(WorkspaceErrorStatus._WORKSPACE_DUPLICATED);

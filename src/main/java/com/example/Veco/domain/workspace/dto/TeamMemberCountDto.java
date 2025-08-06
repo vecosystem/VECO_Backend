@@ -4,6 +4,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * WorkspaceMemberWithTeamsDto 내 TeamInfoDto에 추가됨
+ */
 @Getter
 @Builder
 @NoArgsConstructor

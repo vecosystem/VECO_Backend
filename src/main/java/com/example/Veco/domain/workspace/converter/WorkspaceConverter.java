@@ -90,17 +90,49 @@ public class WorkspaceConverter {
                 .build();
     }
 
+    /**
+     * 워크스페이스 URL 미리보기 응답 DTO 변환
+     */
     public static WorkspaceResponseDTO.PreviewUrlResponseDto toPreviewUrlResponseDto(String previewUrl) {
         return WorkspaceResponseDTO.PreviewUrlResponseDto.builder()
                 .workspaceUrl(previewUrl)
                 .build();
     }
 
+    /**
+     * 워크스페이스 초대 정보 응답 DTO 변환
+     */
     public static WorkspaceResponseDTO.InviteInfoResponseDto toInviteInfoResponseDto(WorkSpace workspace, Member member) {
         return WorkspaceResponseDTO.InviteInfoResponseDto.builder()
                 .name(member.getName())
                 .inviteUrl(workspace.getInviteUrl())
                 .invitePassword(workspace.getInvitePassword())
+                .build();
+    }
+
+    /**
+     * 워크스페이스 내 멤버 + 소속 팀 리스트 응답 DTO 변환
+     */
+    public static WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto toWorkspaceMemberWithTeamsDto(
+            Member member,
+            List<Team> teams,
+            LocalDateTime joinedAt
+    ) {
+        List<WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto.TeamInfoDto> teamDtos = teams.stream()
+                .map(team -> WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto.TeamInfoDto.builder()
+                        .teamId(team.getId())
+                        .teamName(team.getName())
+                        .teamImageUrl(team.getProfileUrl())
+                        .build())
+                .toList();
+
+        return WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto.builder()
+                .memberId(member.getId())
+                .email(member.getEmail())
+                .name(member.getName())
+                .profileImageUrl(member.getProfile().getProfileImageUrl())
+                .teams(teamDtos)
+                .joinedAt(joinedAt)
                 .build();
     }
 }

@@ -7,6 +7,7 @@ import com.example.Veco.domain.member.error.MemberErrorStatus;
 import com.example.Veco.domain.member.error.MemberHandler;
 import com.example.Veco.domain.team.entity.QTeam;
 import com.example.Veco.domain.team.entity.Team;
+import com.example.Veco.domain.workspace.converter.WorkspaceConverter;
 import com.example.Veco.domain.workspace.dto.WorkspaceResponseDTO;
 import com.example.Veco.domain.workspace.entity.WorkSpace;
 import com.example.Veco.domain.workspace.error.WorkspaceErrorStatus;
@@ -47,42 +48,31 @@ public class WorkspaceQueryDslRepositoryImpl implements WorkspaceQueryDslReposit
                 .where(m.workSpace.eq(workspace))
                 .fetch();
 
+        // 2. 멤버 ID 기준으로 그룹핑
+        Map<Member, List<Tuple>> grouped = tuples.stream()
+                .collect(Collectors.groupingBy(tuple -> tuple.get(m)));
+
         // 워크스페이스 내에 멤버가 없을 경우 예외 처리
-        if (tuples.isEmpty()) {
+        if (grouped.isEmpty()) {
             throw new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND);
         }
 
-        // 2. 멤버 ID 기준으로 그룹핑
-        Map<Long, List<Tuple>> grouped = tuples.stream()
-                .collect(Collectors.groupingBy(tuple -> tuple.get(m).getId()));
-
         // 3. 최종 DTO 변환
-        return grouped.values().stream().map(tupleList -> {
-            Member member = tupleList.get(0).get(m);
+        return grouped.entrySet().stream().map(entry -> {
+            Member member = entry.getKey();
 
-            List<WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto.TeamInfoDto> teamDtos = tupleList.stream()
-                    .map(tu -> {
-                        Team team = tu.get(t);
-                        return WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto.TeamInfoDto.builder()
-                                .teamId(team.getId())
-                                .teamName(team.getName())
-                                .teamImageUrl(team.getProfileUrl())
-                                .build();
-                    }).toList();
+            List<Tuple> tupleList = entry.getValue();
+
+            List<Team> teams = tupleList.stream()
+                    .map(tu -> tu.get(t))
+                    .toList();
 
             LocalDateTime joinedAt = tupleList.stream()
                     .map(tu -> tu.get(mt.createdAt))
                     .min(LocalDateTime::compareTo)
                     .orElse(null);
 
-            return WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto.builder()
-                    .memberId(member.getId())
-                    .email(member.getEmail())
-                    .name(member.getName())
-                    .profileImageUrl(member.getProfile().getProfileImageUrl()) // 필요시 profile.getUrl()로 수정
-                    .teams(teamDtos)
-                    .joinedAt(joinedAt)
-                    .build();
+            return WorkspaceConverter.toWorkspaceMemberWithTeamsDto(member, teams, joinedAt);
         }).toList();
     }
 }
