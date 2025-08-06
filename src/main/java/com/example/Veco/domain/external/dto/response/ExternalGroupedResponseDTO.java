@@ -75,7 +75,7 @@ public class ExternalGroupedResponseDTO {
         private ManagersDTO managers;
 
         @Schema(description = "외부 연동 툴 정보")
-        private ExtServiceType extType;
+        private ExtServiceType extServiceType;
     }
 
     @Getter

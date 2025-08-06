@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequiredArgsConstructor
 @RequestMapping("/github")
 @Slf4j
-@Tag(name = "GitHub 연동 API", description = "GitHub 외부 툴 연동을 위한 인증 및 콜백 API")
+
 public class GitHubController {
 
     private final GitHubService gitHubService;
