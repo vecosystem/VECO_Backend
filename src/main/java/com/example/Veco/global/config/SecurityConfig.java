@@ -49,7 +49,7 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class)
-                .logout(logout -> logout.logoutSuccessUrl("/"))
+                .logout(logout -> logout.logoutSuccessUrl("http://localhost:5173/onboarding"))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2Login(oauth2 -> oauth2
@@ -57,12 +57,13 @@ public class SecurityConfig {
                                 .authorizationRequestRepository(new HttpSessionOAuth2AuthorizationRequestRepository())
                                 .authorizationRequestResolver(customAuthorizationRequestResolver)
                         )
+                        .loginPage("http://localhost:5173/onboarding")
                         .successHandler(oAuth2SuccessHandler)
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                         .failureHandler((request, response, exception) -> {
                             // 로그인 실패 시 처리 로직
                             log.error("OAuth2 로그인 실패: {}", exception.getMessage());
-                            response.sendRedirect("/login?error");
+                            response.sendRedirect("http://localhost:5173/onboarding");
                         })
                 );
         return http.build();
