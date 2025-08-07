@@ -2,6 +2,7 @@ package com.example.Veco.domain.external.controller;
 
 import com.example.Veco.domain.external.dto.GitHubWebhookPayload;
 import com.example.Veco.domain.external.service.GitHubIssueService;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class GitHubWebhookController {
     private final GitHubIssueService gitHubIssueService;
 
+    @Hidden
     @PostMapping("/webhook")
     public ResponseEntity<String> handleWebhook(
             @RequestBody GitHubWebhookPayload payload,

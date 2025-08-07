@@ -7,11 +7,15 @@ import com.example.Veco.domain.external.exception.code.GitHubSuccessCode;
 import com.example.Veco.domain.external.service.GitHubRepositoryService;
 import com.example.Veco.domain.external.service.GitHubService;
 import com.example.Veco.global.apiPayload.ApiResponse;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -20,8 +24,8 @@ public class GitHubRestController implements GitHubSwaggerDocs{
 
     private final GitHubService gitHubService;
     private final GitHubRepositoryService gitHubRepositoryService;
-    private final GitHubConfig gitHubConfig;
 
+    @Hidden
     @GetMapping("/github/installation/callback")
     public ApiResponse<GitHubResponseDTO.GitHubAppInstallationDTO> callbackInstallation(
             @Parameter(description = "팀 ID") @RequestParam("state") Long state,
@@ -43,15 +47,12 @@ public class GitHubRestController implements GitHubSwaggerDocs{
 
     @GetMapping("/api/github/connect")
     public ApiResponse<?> connectGitHub(@RequestParam("teamId") Long teamId) {
-        String authUrl = String.format(
-                "https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s&scope=%s&state=%d",
-                gitHubConfig.getOauth().getClientId(),
-                gitHubConfig.getOauth().getRedirectUri(),
-                "read:user,repo,admin:repo_hook",
+        String appInstallUrl = String.format(
+                "https://github.com/apps/VecoApp/installations/new?state=%s",
                 teamId
         );
 
-        return ApiResponse.onSuccess(authUrl);
+        return ApiResponse.onSuccess(appInstallUrl);
     }
 }
 
