@@ -28,8 +28,9 @@ public class WorkSpace extends BaseEntity {
     @Column(name = "profile_url")
     private String profileUrl;
 
+    @Builder.Default
     @Column(name = "workspace_url")
-    private String workspaceUrl;
+    private String workspaceUrl = "https://s3.ap-northeast-2.amazonaws.com/s3.veco/default/defalut-workspace.png";
 
     @Column(name = "invite_password")
     private String invitePassword;
