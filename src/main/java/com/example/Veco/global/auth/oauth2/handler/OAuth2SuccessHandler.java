@@ -73,8 +73,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         if (userDetails.getMember().getWorkSpace() == null) {
             // 워크스페이스 생성
             if (flow.equals("create")) {
-
-                response.setHeader("flow", "create");
 //                redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/onboarding/workspace")
 //                        .build()
 //                        .encode(StandardCharsets.UTF_8)
@@ -85,13 +83,12 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 //                        .build()
 //                        .encode(StandardCharsets.UTF_8)
 //                        .toUriString();
-                response.setHeader("flow", "join");
             } else {
                 throw new OAuth2Exeception(OAuth2ErrorCode.OAUTH2_INVALID_STATE);
             }
             // 기존 회원
         } else {
-            response.setHeader("flow", "exist");
+            flow = "exist";
 //            redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/workspace")
 //                    .build()
 //                    .encode(StandardCharsets.UTF_8)
@@ -102,6 +99,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                         .build()
                         .encode(StandardCharsets.UTF_8)
                         .toUriString();
+
+        response.addHeader("Flow", flow);
 
         getRedirectStrategy().sendRedirect(request, response, redirectURL);
     }
