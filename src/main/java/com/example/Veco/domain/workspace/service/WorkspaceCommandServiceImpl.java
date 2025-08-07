@@ -25,6 +25,7 @@ import com.example.Veco.domain.workspace.util.InviteTokenGenerator;
 import com.example.Veco.domain.workspace.util.SlugGenerator;
 import com.example.Veco.global.auth.user.AuthUser;
 import com.example.Veco.global.auth.user.userdetails.CustomUserDetails;
+import com.example.Veco.global.enums.Role;
 import com.example.Veco.global.enums.TeamType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -54,6 +55,7 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
      * 3. MemberTeam 엔티티로 연결
      * 4. 연결 저장 후 DTO 반환
      */
+    @Transactional
     @Override
     public WorkspaceResponseDTO.CreateTeamResponseDto createTeam(WorkSpace workspace, WorkspaceRequestDTO.CreateTeamRequestDto request) {
         // 1. 팀 이름 중복 검사
@@ -93,6 +95,7 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
         List<MemberTeam> memberTeams = members.stream()
                 .map(member -> MemberTeam.builder()
                         .member(member)
+                        .role(Role.USER)
                         .team(team)
                         .build())
                 .toList();
