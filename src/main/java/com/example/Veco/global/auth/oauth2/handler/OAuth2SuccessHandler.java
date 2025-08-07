@@ -73,31 +73,35 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         if (userDetails.getMember().getWorkSpace() == null) {
             // 워크스페이스 생성
             if (flow.equals("create")) {
-                redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/onboarding/workspace")
-                        .build()
-                        .encode(StandardCharsets.UTF_8)
-                        .toUriString();
+
+                response.setHeader("flow", "create");
+//                redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/onboarding/workspace")
+//                        .build()
+//                        .encode(StandardCharsets.UTF_8)
+//                        .toUriString();
                 // 워크스페이스 참여
             } else if (flow.equals("join")) {
-                redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/onboarding/input-pw")
-                        .build()
-                        .encode(StandardCharsets.UTF_8)
-                        .toUriString();
+//                redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/onboarding/input-pw")
+//                        .build()
+//                        .encode(StandardCharsets.UTF_8)
+//                        .toUriString();
+                response.setHeader("flow", "join");
             } else {
                 throw new OAuth2Exeception(OAuth2ErrorCode.OAUTH2_INVALID_STATE);
             }
             // 기존 회원
         } else {
-            redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/workspace")
-                    .build()
-                    .encode(StandardCharsets.UTF_8)
-                    .toUriString();
+            response.setHeader("flow", "exist");
+//            redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/workspace")
+//                    .build()
+//                    .encode(StandardCharsets.UTF_8)
+//                    .toUriString();
         }
 
-//        redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/onboarding/workspace")
-//                        .build()
-//                        .encode(StandardCharsets.UTF_8)
-//                        .toUriString();
+        redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/onboarding/loading")
+                        .build()
+                        .encode(StandardCharsets.UTF_8)
+                        .toUriString();
 
         getRedirectStrategy().sendRedirect(request, response, redirectURL);
     }
