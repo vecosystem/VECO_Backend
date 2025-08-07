@@ -20,8 +20,8 @@ public interface GitHubSwaggerDocs {
     Mono<ApiResponse<List<GitHubApiResponseDTO.GitHubRepositoryDTO>>> getRepositories(@PathVariable("teamId") Long teamId);
 
     @Operation(
-            summary = "GitHub 연동을 위한 인증 페이지 URL조회",
-            description = "GitHub App 설치를 위한 사용자 인증 페이지 URL을 전달합니다."
+            summary = "GitHub 연동을 위한 App 설치 페이지 URL 조회",
+            description = "GitHub App 설치를 위한 App 설치 페이지 URL을 전달합니다."
     )
     ApiResponse<?> connectGitHub(@RequestParam("teamId") Long teamId);
 }
