@@ -20,8 +20,8 @@ public class KakaoOAuth2UserInfo extends OAuth2UserInfo {
 
     @Override
     public String getEmail() {
-        return "";
-    }   // 카카오는 이메일 없음
+        return (String) account.get("email");
+    }
 
     @Override
     public String getName() {
