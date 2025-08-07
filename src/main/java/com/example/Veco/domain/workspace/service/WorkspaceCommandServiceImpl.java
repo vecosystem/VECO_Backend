@@ -1,5 +1,6 @@
 package com.example.Veco.domain.workspace.service;
 
+import com.example.Veco.domain.assignee.entity.Assignee;
 import com.example.Veco.domain.assignee.repository.AssigneeRepository;
 import com.example.Veco.domain.mapping.converter.MemberTeamConverter;
 import com.example.Veco.domain.mapping.entity.MemberTeam;
@@ -211,9 +212,12 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
                 member.getId(),
                 member.getWorkSpace().getTeams()
         );
+        List<Long> memberTeamIds = new ArrayList<>();
+        result.forEach(memberTeam -> memberTeamIds.add(memberTeam.getId()));
 
         // 담당자 정보 null 처리
-        result.forEach(memberTeam -> assigneeRepository.findByMemberTeamId(memberTeam.getId()).updateMemberTeam(null));
+        List<Assignee> assignees = assigneeRepository.findAllByMemberTeamIdIn(memberTeamIds);
+        assignees.forEach(assignee -> assignee.updateMemberTeam(null));
 
         // 유저 - 팀 삭제
         memberTeamRepository.deleteAll(result);
