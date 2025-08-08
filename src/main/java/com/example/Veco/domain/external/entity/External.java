@@ -1,6 +1,7 @@
 package com.example.Veco.domain.external.entity;
 
 import com.example.Veco.domain.common.BaseEntity;
+import com.example.Veco.domain.external.dto.GitHubPullRequestPayload;
 import com.example.Veco.domain.external.dto.request.ExternalRequestDTO;
 import com.example.Veco.domain.external.dto.GitHubWebhookPayload;
 import com.example.Veco.domain.team.entity.Team;
@@ -132,6 +133,16 @@ public class External extends BaseEntity {
         }
         if(issue.getBody() != null) {
             this.description = issue.getBody();
+        }
+    }
+
+    public void updateByPullRequest(GitHubPullRequestPayload.PullRequest pullRequest){
+
+        if(pullRequest.getTitle() != null) {
+            this.title = pullRequest.getTitle();
+        }
+        if(pullRequest.getBody() != null) {
+            this.description = pullRequest.getBody();
         }
     }
 

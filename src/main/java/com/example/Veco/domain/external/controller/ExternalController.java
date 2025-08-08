@@ -7,6 +7,7 @@ import com.example.Veco.domain.external.dto.response.ExternalGroupedResponseDTO;
 import com.example.Veco.domain.external.exception.code.ExternalSuccessCode;
 import com.example.Veco.domain.external.service.ExternalService;
 import com.example.Veco.global.apiPayload.ApiResponse;
+import com.example.Veco.global.auth.user.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -16,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -58,9 +60,10 @@ public class ExternalController implements ExternalSwaggerDocs{
     @PostMapping
     public ApiResponse<ExternalResponseDTO.CreateResponseDTO> createExternal(
             @PathVariable("teamId") Long teamId,
-            @Valid @RequestBody ExternalRequestDTO.ExternalCreateRequestDTO requestDTO) {
+            @Valid @RequestBody ExternalRequestDTO.ExternalCreateRequestDTO requestDTO,
+            @AuthenticationPrincipal AuthUser user) {
 
-        return ApiResponse.onSuccess(externalService.createExternal(teamId, requestDTO));
+        return ApiResponse.onSuccess(externalService.createExternal(teamId, requestDTO, user));
     }
 
     @PatchMapping("/{externalId}")

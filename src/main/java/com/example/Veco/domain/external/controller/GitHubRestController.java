@@ -24,18 +24,28 @@ public class GitHubRestController implements GitHubSwaggerDocs{
 
     private final GitHubService gitHubService;
     private final GitHubRepositoryService gitHubRepositoryService;
+    private static final String FRONTEND_URL = "http://localhost:5173";
 
     @Hidden
     @GetMapping("/github/installation/callback")
-    public ApiResponse<GitHubResponseDTO.GitHubAppInstallationDTO> callbackInstallation(
+    public ResponseEntity<Void> callbackInstallation(
             @Parameter(description = "팀 ID") @RequestParam("state") Long state,
             @Parameter(description = "GitHub App 설치 ID") @RequestParam("installation_id") Long installationId
     ) {
-        return ApiResponse.onSuccess(GitHubSuccessCode.GITHUB_APP_INSTALL_SUCCESS,
-                gitHubService.saveInstallationInfo(state, installationId));
+
+        gitHubService.saveInstallationInfo(state, installationId);
+
+        String redirectUrl = String.format(
+                "%s/github/complete?teamId=%d",
+                FRONTEND_URL, state
+        );
+
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create(redirectUrl))
+                .build();
     }
 
-    @GetMapping("/api/github/teams/{teamId}/repositories")
+    @GetMapping("/api/teams/{teamId}/github/repositories")
     public Mono<ApiResponse<List<GitHubApiResponseDTO.GitHubRepositoryDTO>>> getRepositories(@PathVariable("teamId") Long teamId) {
 
         // owner, repo 정보 추출해서 클라이언트에 제공
@@ -53,6 +63,11 @@ public class GitHubRestController implements GitHubSwaggerDocs{
         );
 
         return ApiResponse.onSuccess(appInstallUrl);
+    }
+
+    @GetMapping("/api/teams/{teamId}/github/installation")
+    public ApiResponse<GitHubResponseDTO.GitHubAppInstallationDTO> getInstallation(@PathVariable("teamId") Long teamId) {
+        return ApiResponse.onSuccess(gitHubService.getInstallationInfo(teamId));
     }
 }
 

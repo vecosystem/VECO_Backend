@@ -1,6 +1,7 @@
 package com.example.Veco.domain.external.converter;
 
 import com.example.Veco.domain.comment.entity.Comment;
+import com.example.Veco.domain.external.dto.GitHubPullRequestPayload;
 import com.example.Veco.domain.external.dto.request.ExternalRequestDTO;
 import com.example.Veco.domain.external.dto.response.ExternalResponseDTO;
 import com.example.Veco.domain.external.dto.response.ExternalGroupedResponseDTO;
@@ -8,6 +9,7 @@ import com.example.Veco.domain.external.dto.GitHubWebhookPayload;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.goal.entity.Goal;
 import com.example.Veco.domain.mapping.Assignment;
+import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.global.enums.ExtServiceType;
 import com.example.Veco.global.enums.Priority;
@@ -34,8 +36,12 @@ public class ExternalConverter {
                 .build();
     }
 
-    public static External toExternal(Team team, Goal goal, ExternalRequestDTO.ExternalCreateRequestDTO dto, String externalCode){
+    public static External toExternal(Team team, Goal goal,
+                                      ExternalRequestDTO.ExternalCreateRequestDTO dto,
+                                      String externalCode,
+                                      Member author){
         External external = External.builder()
+                .member(author)
                 .description(dto.getContent())
                 .name(externalCode)
                 .startDate(dto.getDeadline() != null ? dto.getDeadline().getStart() : null)
@@ -166,6 +172,19 @@ public class ExternalConverter {
                 .title(payload.getIssue().getTitle())
                 .githubDataId(payload.getIssue().getId())
                 .description(payload.getIssue().getBody())
+                .name(externalCode)
+                .team(team)
+                .type(ExtServiceType.GITHUB)
+                .state(State.NONE)
+                .priority(Priority.NONE)
+                .build();
+    }
+
+    public static External byGitHubPullRequest(GitHubPullRequestPayload payload, Team team, String externalCode){
+        return External.builder()
+                .title(payload.getPullRequest().getTitle())
+                .githubDataId(payload.getPullRequest().getId())
+                .description(payload.getPullRequest().getBody())
                 .name(externalCode)
                 .team(team)
                 .type(ExtServiceType.GITHUB)
