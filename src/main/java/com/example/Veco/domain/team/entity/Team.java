@@ -6,7 +6,6 @@ import com.example.Veco.domain.mapping.entity.MemberTeam;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.mapping.GithubInstallation;
 import com.example.Veco.domain.workspace.entity.WorkSpace;
-import com.example.Veco.global.enums.TeamType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -41,10 +40,6 @@ public class Team extends BaseEntity {
 
     @Column(name = "team_order")
     private Integer order;
-
-    @Builder.Default
-    @Enumerated(EnumType.STRING)
-    private TeamType type = TeamType.NORMAL;
 
     // 연관 관계
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

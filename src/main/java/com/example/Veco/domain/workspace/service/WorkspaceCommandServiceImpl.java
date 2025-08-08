@@ -26,7 +26,6 @@ import com.example.Veco.domain.workspace.util.SlugGenerator;
 import com.example.Veco.global.auth.user.AuthUser;
 import com.example.Veco.global.auth.user.userdetails.CustomUserDetails;
 import com.example.Veco.global.enums.Role;
-import com.example.Veco.global.enums.TeamType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -169,7 +168,6 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
         Team defaultTeam = Team.builder()
                 .name(workSpace.getName()) // 워크스페이스 이름과 같은 디폴트 팀
                 .workSpace(workSpace)
-                .type(TeamType.WORKSPACE_LEVEL)
                 .goalNumber(1L)
                 .build();
 

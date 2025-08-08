@@ -18,7 +18,6 @@ import com.example.Veco.domain.workspace.repository.WorkspaceQueryDslRepository;
 import com.example.Veco.domain.workspace.repository.WorkspaceRepository;
 import com.example.Veco.domain.workspace.util.SlugGenerator;
 import com.example.Veco.global.apiPayload.exception.VecoException;
-import com.example.Veco.global.enums.TeamType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -70,7 +69,7 @@ public class WorkspaceQueryServiceImpl implements WorkspaceQueryService {
         }
 
         // 워크스페이스에 속한 팀들 조회 (페이징)
-        Page<Team> teamPage = teamRepository.findAllByWorkSpaceAndType(workspace, TeamType.NORMAL, pageable);
+        Page<Team> teamPage = teamRepository.findAllByWorkSpace(workspace, pageable);
 
         // 팀 ID 리스트 추출
         List<Long> teamIds = teamPage.getContent().stream()
