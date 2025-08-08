@@ -21,4 +21,6 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
     boolean existsByName(String name);
 
     Page<Team> findAllByWorkSpaceAndType(WorkSpace workspace, TeamType teamType, Pageable pageable);
+
+    boolean existsByNameAndWorkSpace(String name, WorkSpace workSpace);
 }
