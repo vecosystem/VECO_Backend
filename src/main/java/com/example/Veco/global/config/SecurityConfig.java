@@ -43,7 +43,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/test/login", "/api/token/reissue", "/login-test.html", "/v3/api-docs/**", "/swagger-ui/**",
                                 "/swagger-resources/**", "/css/**", "/images/**", "/healthcheck",
-                                "/js/**", "/h2-console/**", "/profile","/workspace/create-url", "/github/**","/api/github/**").permitAll()
+                                "/js/**", "/h2-console/**", "/profile","/workspace/create-url","/slack/callback", "/github/**","/api/github/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(AbstractHttpConfigurer::disable)
