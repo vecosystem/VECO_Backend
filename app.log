@@ -1,0 +1,1099 @@
+
+> Task :compileJava
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :processResources UP-TO-DATE
+> Task :classes
+> Task :resolveMainClassName UP-TO-DATE
+
+> Task :bootRun
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.3)
+
+2025-08-08T18:01:13.425+09:00  INFO 72512 --- [Veco] [           main] com.example.Veco.VecoApplication         : Starting VecoApplication using Java 21.0.8 with PID 72512 (/Users/seoungbeom/Desktop/VECO_Backend/build/classes/java/main started by seoungbeom in /Users/seoungbeom/Desktop/VECO_Backend)
+2025-08-08T18:01:13.426+09:00  INFO 72512 --- [Veco] [           main] com.example.Veco.VecoApplication         : The following 1 profile is active: "oauth"
+2025-08-08T18:01:13.806+09:00  INFO 72512 --- [Veco] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2025-08-08T18:01:13.807+09:00  INFO 72512 --- [Veco] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-08-08T18:01:13.939+09:00  INFO 72512 --- [Veco] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 128 ms. Found 20 JPA repository interfaces.
+2025-08-08T18:01:13.946+09:00  INFO 72512 --- [Veco] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2025-08-08T18:01:13.946+09:00  INFO 72512 --- [Veco] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2025-08-08T18:01:13.957+09:00  INFO 72512 --- [Veco] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.example.Veco.domain.assignee.repository.AssigneeRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-08-08T18:01:13.958+09:00  INFO 72512 --- [Veco] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.example.Veco.domain.comment.repository.CommentRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-08-08T18:01:13.958+09:00  INFO 72512 --- [Veco] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.example.Veco.domain.common.repository.ImageRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-08-08T18:01:13.958+09:00  INFO 72512 --- [Veco] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.example.Veco.domain.external.repository.ExternalRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-08-08T18:01:13.958+09:00  INFO 72512 --- [Veco] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.example.Veco.domain.external.repository.ExternalServiceRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-08-08T18:01:13.958+09:00  INFO 72512 --- [Veco] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.example.Veco.domain.external.repository.GitHubIssueRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-08-08T18:01:13.958+09:00  INFO 72512 --- [Veco] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.example.Veco.domain.goal.repository.GoalRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-08-08T18:01:13.958+09:00  INFO 72512 --- [Veco] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.example.Veco.domain.issue.repository.IssueRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-08-08T18:01:13.958+09:00  INFO 72512 --- [Veco] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.example.Veco.domain.mapping.repository.AssigmentRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-08-08T18:01:13.959+09:00  INFO 72512 --- [Veco] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.example.Veco.domain.mapping.repository.CommentRoomRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-08-08T18:01:13.959+09:00  INFO 72512 --- [Veco] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.example.Veco.domain.mapping.repository.GitHubInstallationRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-08-08T18:01:13.959+09:00  INFO 72512 --- [Veco] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.example.Veco.domain.mapping.repository.LinkRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-08-08T18:01:13.959+09:00  INFO 72512 --- [Veco] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.example.Veco.domain.mapping.repository.MemberTeamRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-08-08T18:01:13.959+09:00  INFO 72512 --- [Veco] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.example.Veco.domain.member.repository.MemberRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-08-08T18:01:13.959+09:00  INFO 72512 --- [Veco] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.example.Veco.domain.memberNotification.repository.MemberNotiRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-08-08T18:01:13.959+09:00  INFO 72512 --- [Veco] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.example.Veco.domain.notification.repository.NotiRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-08-08T18:01:13.959+09:00  INFO 72512 --- [Veco] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.example.Veco.domain.profile.repository.ProfileRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-08-08T18:01:13.959+09:00  INFO 72512 --- [Veco] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.example.Veco.domain.team.repository.NumberSequenceRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-08-08T18:01:13.959+09:00  INFO 72512 --- [Veco] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.example.Veco.domain.team.repository.TeamRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-08-08T18:01:13.959+09:00  INFO 72512 --- [Veco] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.example.Veco.domain.workspace.repository.WorkspaceRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-08-08T18:01:13.959+09:00  INFO 72512 --- [Veco] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 9 ms. Found 0 Redis repository interfaces.
+2025-08-08T18:01:14.221+09:00  INFO 72512 --- [Veco] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-08-08T18:01:14.227+09:00  INFO 72512 --- [Veco] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-08-08T18:01:14.227+09:00  INFO 72512 --- [Veco] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.42]
+2025-08-08T18:01:14.249+09:00  INFO 72512 --- [Veco] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-08-08T18:01:14.249+09:00  INFO 72512 --- [Veco] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 809 ms
+2025-08-08T18:01:14.492+09:00  INFO 72512 --- [Veco] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-08-08T18:01:14.512+09:00  INFO 72512 --- [Veco] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.18.Final
+2025-08-08T18:01:14.523+09:00  INFO 72512 --- [Veco] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-08-08T18:01:14.615+09:00  INFO 72512 --- [Veco] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-08-08T18:01:14.625+09:00  INFO 72512 --- [Veco] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-08-08T18:01:14.738+09:00  INFO 72512 --- [Veco] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@ccea4be
+2025-08-08T18:01:14.739+09:00  INFO 72512 --- [Veco] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-08-08T18:01:14.759+09:00  WARN 72512 --- [Veco] [           main] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-08-08T18:01:14.764+09:00  INFO 72512 --- [Veco] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0.42
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-08-08T18:01:15.247+09:00  INFO 72512 --- [Veco] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-08T18:01:15.400+09:00  INFO 72512 --- [Veco] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-08-08T18:01:15.611+09:00 ERROR 72512 --- [Veco] [           main] i.n.r.d.DnsServerAddressStreamProviders  : Unable to load io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'. Use DEBUG level to see the full stack: java.lang.UnsatisfiedLinkError: failed to load the required native library
+2025-08-08T18:01:15.792+09:00  INFO 72512 --- [Veco] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+GITHUB CONFIGURATIONIv23liz5xwEFLdOhW8kT
+2025-08-08T18:01:16.236+09:00  INFO 72512 --- [Veco] [           main] c.e.V.d.external.util.GitHubJwtProvider  : PKCS#1 형식의 private key 감지
+2025-08-08T18:01:16.236+09:00  INFO 72512 --- [Veco] [           main] c.e.V.d.external.util.GitHubJwtProvider  : GitHub App private key 로딩 완료
+2025-08-08T18:01:16.288+09:00  INFO 72512 --- [Veco] [           main] org.redisson.Version                     : Redisson 3.50.0
+2025-08-08T18:01:16.363+09:00  INFO 72512 --- [Veco] [isson-netty-4-5] o.redisson.connection.ConnectionsHolder  : 1 connections initialized for localhost/127.0.0.1:6379
+2025-08-08T18:01:16.406+09:00  INFO 72512 --- [Veco] [sson-netty-4-20] o.redisson.connection.ConnectionsHolder  : 24 connections initialized for localhost/127.0.0.1:6379
+2025-08-08T18:01:16.525+09:00  WARN 72512 --- [Veco] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-08-08T18:01:16.612+09:00  INFO 72512 --- [Veco] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
+GITHUB CONFIGURATIONIv23liz5xwEFLdOhW8kT
+2025-08-08T18:01:16.880+09:00  INFO 72512 --- [Veco] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-08-08T18:01:16.888+09:00  INFO 72512 --- [Veco] [           main] com.example.Veco.VecoApplication         : Started VecoApplication in 3.625 seconds (process running for 3.754)
+2025-08-08T18:01:50.423+09:00  INFO 72512 --- [Veco] [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-08-08T18:01:50.423+09:00  INFO 72512 --- [Veco] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-08-08T18:01:50.436+09:00  INFO 72512 --- [Veco] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 13 ms
+Hibernate: 
+    insert 
+    into
+        member
+        (created_at, email, name, nickname, profile_id, provider, refresh_token, role, social_uid, updated_at, workspace_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        member
+        (created_at, email, name, nickname, profile_id, provider, refresh_token, role, social_uid, updated_at, workspace_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        member
+        (created_at, email, name, nickname, profile_id, provider, refresh_token, role, social_uid, updated_at, workspace_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        member
+        (created_at, email, name, nickname, profile_id, provider, refresh_token, role, social_uid, updated_at, workspace_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        team
+        (created_at, goal_number, issue_number, name, team_order, profile_url, updated_at, workspace_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        goal
+        (content, created_at, deadline_end, deadline_start, deleted_at, name, priority, state, team_id, title, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        goal
+        (content, created_at, deadline_end, deadline_start, deleted_at, name, priority, state, team_id, title, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        goal
+        (content, created_at, deadline_end, deadline_start, deleted_at, name, priority, state, team_id, title, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        goal
+        (content, created_at, deadline_end, deadline_start, deleted_at, name, priority, state, team_id, title, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        external
+        (created_at, deleted_at, description, end_date, github_data_id, goal_id, member_id, name, priority, start_date, state, team_id, title, service_type, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        external
+        (created_at, deleted_at, description, end_date, github_data_id, goal_id, member_id, name, priority, start_date, state, team_id, title, service_type, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        external
+        (created_at, deleted_at, description, end_date, github_data_id, goal_id, member_id, name, priority, start_date, state, team_id, title, service_type, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        external
+        (created_at, deleted_at, description, end_date, github_data_id, goal_id, member_id, name, priority, start_date, state, team_id, title, service_type, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        external
+        (created_at, deleted_at, description, end_date, github_data_id, goal_id, member_id, name, priority, start_date, state, team_id, title, service_type, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        external
+        (created_at, deleted_at, description, end_date, github_data_id, goal_id, member_id, name, priority, start_date, state, team_id, title, service_type, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        external
+        (created_at, deleted_at, description, end_date, github_data_id, goal_id, member_id, name, priority, start_date, state, team_id, title, service_type, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        external
+        (created_at, deleted_at, description, end_date, github_data_id, goal_id, member_id, name, priority, start_date, state, team_id, title, service_type, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        external
+        (created_at, deleted_at, description, end_date, github_data_id, goal_id, member_id, name, priority, start_date, state, team_id, title, service_type, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        external
+        (created_at, deleted_at, description, end_date, github_data_id, goal_id, member_id, name, priority, start_date, state, team_id, title, service_type, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        external
+        (created_at, deleted_at, description, end_date, github_data_id, goal_id, member_id, name, priority, start_date, state, team_id, title, service_type, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        external
+        (created_at, deleted_at, description, end_date, github_data_id, goal_id, member_id, name, priority, start_date, state, team_id, title, service_type, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        assignment
+        (assignee_id, assignee_name, category, created_at, external_id, goal_id, issue_id, profile_url, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        assignment
+        (assignee_id, assignee_name, category, created_at, external_id, goal_id, issue_id, profile_url, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        assignment
+        (assignee_id, assignee_name, category, created_at, external_id, goal_id, issue_id, profile_url, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        assignment
+        (assignee_id, assignee_name, category, created_at, external_id, goal_id, issue_id, profile_url, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        assignment
+        (assignee_id, assignee_name, category, created_at, external_id, goal_id, issue_id, profile_url, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        assignment
+        (assignee_id, assignee_name, category, created_at, external_id, goal_id, issue_id, profile_url, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        assignment
+        (assignee_id, assignee_name, category, created_at, external_id, goal_id, issue_id, profile_url, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        assignment
+        (assignee_id, assignee_name, category, created_at, external_id, goal_id, issue_id, profile_url, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        assignment
+        (assignee_id, assignee_name, category, created_at, external_id, goal_id, issue_id, profile_url, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        assignment
+        (assignee_id, assignee_name, category, created_at, external_id, goal_id, issue_id, profile_url, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        assignment
+        (assignee_id, assignee_name, category, created_at, external_id, goal_id, issue_id, profile_url, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        assignment
+        (assignee_id, assignee_name, category, created_at, external_id, goal_id, issue_id, profile_url, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        assignment
+        (assignee_id, assignee_name, category, created_at, external_id, goal_id, issue_id, profile_url, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        assignment
+        (assignee_id, assignee_name, category, created_at, external_id, goal_id, issue_id, profile_url, updated_at) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-08-08T18:01:50.586+09:00 ERROR 72512 --- [Veco] [nio-8080-exec-1] c.e.V.g.auth.jwt.filter.JwtAuthFilter    : JWT 토큰이 없거나 Bearer가 아닙니다.
+Hibernate: 
+    select
+        a2_0.id,
+        a2_0.name 
+    from
+        external e1_0 
+    left join
+        assignment a1_0 
+            on e1_0.id=a1_0.external_id 
+    left join
+        member a2_0 
+            on a2_0.id=a1_0.assignee_id 
+    where
+        e1_0.team_id=? 
+        and e1_0.deleted_at is null 
+        and a2_0.id is not null 
+    group by
+        a2_0.id,
+        a2_0.name 
+    order by
+        a2_0.name
+2025-08-08T18:01:50.664+09:00  WARN 72512 --- [Veco] [nio-8080-exec-2] org.hibernate.orm.query                  : HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+Hibernate: 
+    select
+        e1_0.id,
+        a1_0.external_id,
+        a1_0.id,
+        a1_0.assignee_id,
+        a1_0.assignee_name,
+        a1_0.category,
+        a1_0.created_at,
+        a1_0.goal_id,
+        a1_0.issue_id,
+        a1_0.profile_url,
+        a1_0.updated_at,
+        e1_0.created_at,
+        e1_0.deleted_at,
+        e1_0.description,
+        e1_0.end_date,
+        e1_0.github_data_id,
+        e1_0.goal_id,
+        e1_0.member_id,
+        e1_0.name,
+        e1_0.priority,
+        e1_0.start_date,
+        e1_0.state,
+        e1_0.team_id,
+        e1_0.title,
+        e1_0.service_type,
+        e1_0.updated_at 
+    from
+        external e1_0 
+    left join
+        assignment a1_0 
+            on e1_0.id=a1_0.external_id 
+    where
+        e1_0.team_id=? 
+        and e1_0.deleted_at is null 
+        and not exists(select
+            1 
+        from
+            assignment a3_0 
+        where
+            e1_0.id=a3_0.external_id) 
+    order by
+        e1_0.created_at desc,
+        e1_0.id
+2025-08-08T18:01:50.687+09:00  WARN 72512 --- [Veco] [nio-8080-exec-2] org.hibernate.orm.query                  : HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+Hibernate: 
+    select
+        e1_0.id,
+        a1_0.external_id,
+        a1_0.id,
+        a1_0.assignee_id,
+        a1_0.assignee_name,
+        a1_0.category,
+        a1_0.created_at,
+        a1_0.goal_id,
+        a1_0.issue_id,
+        a1_0.profile_url,
+        a1_0.updated_at,
+        e1_0.created_at,
+        e1_0.deleted_at,
+        e1_0.description,
+        e1_0.end_date,
+        e1_0.github_data_id,
+        e1_0.goal_id,
+        e1_0.member_id,
+        e1_0.name,
+        e1_0.priority,
+        e1_0.start_date,
+        e1_0.state,
+        e1_0.team_id,
+        e1_0.title,
+        e1_0.service_type,
+        e1_0.updated_at 
+    from
+        external e1_0 
+    left join
+        assignment a1_0 
+            on e1_0.id=a1_0.external_id 
+    left join
+        assignment a2_0 
+            on e1_0.id=a2_0.external_id 
+    where
+        e1_0.team_id=? 
+        and e1_0.deleted_at is null 
+        and a2_0.assignee_id=? 
+    order by
+        e1_0.created_at desc,
+        e1_0.id
+2025-08-08T18:01:50.692+09:00  WARN 72512 --- [Veco] [nio-8080-exec-2] org.hibernate.orm.query                  : HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+Hibernate: 
+    select
+        e1_0.id,
+        a1_0.external_id,
+        a1_0.id,
+        a1_0.assignee_id,
+        a1_0.assignee_name,
+        a1_0.category,
+        a1_0.created_at,
+        a1_0.goal_id,
+        a1_0.issue_id,
+        a1_0.profile_url,
+        a1_0.updated_at,
+        e1_0.created_at,
+        e1_0.deleted_at,
+        e1_0.description,
+        e1_0.end_date,
+        e1_0.github_data_id,
+        e1_0.goal_id,
+        e1_0.member_id,
+        e1_0.name,
+        e1_0.priority,
+        e1_0.start_date,
+        e1_0.state,
+        e1_0.team_id,
+        e1_0.title,
+        e1_0.service_type,
+        e1_0.updated_at 
+    from
+        external e1_0 
+    left join
+        assignment a1_0 
+            on e1_0.id=a1_0.external_id 
+    left join
+        assignment a2_0 
+            on e1_0.id=a2_0.external_id 
+    where
+        e1_0.team_id=? 
+        and e1_0.deleted_at is null 
+        and a2_0.assignee_id=? 
+    order by
+        e1_0.created_at desc,
+        e1_0.id
+2025-08-08T18:01:50.695+09:00  WARN 72512 --- [Veco] [nio-8080-exec-2] org.hibernate.orm.query                  : HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+Hibernate: 
+    select
+        e1_0.id,
+        a1_0.external_id,
+        a1_0.id,
+        a1_0.assignee_id,
+        a1_0.assignee_name,
+        a1_0.category,
+        a1_0.created_at,
+        a1_0.goal_id,
+        a1_0.issue_id,
+        a1_0.profile_url,
+        a1_0.updated_at,
+        e1_0.created_at,
+        e1_0.deleted_at,
+        e1_0.description,
+        e1_0.end_date,
+        e1_0.github_data_id,
+        e1_0.goal_id,
+        e1_0.member_id,
+        e1_0.name,
+        e1_0.priority,
+        e1_0.start_date,
+        e1_0.state,
+        e1_0.team_id,
+        e1_0.title,
+        e1_0.service_type,
+        e1_0.updated_at 
+    from
+        external e1_0 
+    left join
+        assignment a1_0 
+            on e1_0.id=a1_0.external_id 
+    left join
+        assignment a2_0 
+            on e1_0.id=a2_0.external_id 
+    where
+        e1_0.team_id=? 
+        and e1_0.deleted_at is null 
+        and a2_0.assignee_id=? 
+    order by
+        e1_0.created_at desc,
+        e1_0.id
+2025-08-08T18:01:50.698+09:00  WARN 72512 --- [Veco] [nio-8080-exec-2] org.hibernate.orm.query                  : HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+Hibernate: 
+    select
+        e1_0.id,
+        a1_0.external_id,
+        a1_0.id,
+        a1_0.assignee_id,
+        a1_0.assignee_name,
+        a1_0.category,
+        a1_0.created_at,
+        a1_0.goal_id,
+        a1_0.issue_id,
+        a1_0.profile_url,
+        a1_0.updated_at,
+        e1_0.created_at,
+        e1_0.deleted_at,
+        e1_0.description,
+        e1_0.end_date,
+        e1_0.github_data_id,
+        e1_0.goal_id,
+        e1_0.member_id,
+        e1_0.name,
+        e1_0.priority,
+        e1_0.start_date,
+        e1_0.state,
+        e1_0.team_id,
+        e1_0.title,
+        e1_0.service_type,
+        e1_0.updated_at 
+    from
+        external e1_0 
+    left join
+        assignment a1_0 
+            on e1_0.id=a1_0.external_id 
+    left join
+        assignment a2_0 
+            on e1_0.id=a2_0.external_id 
+    where
+        e1_0.team_id=? 
+        and e1_0.deleted_at is null 
+        and a2_0.assignee_id=? 
+    order by
+        e1_0.created_at desc,
+        e1_0.id
+2025-08-08T18:01:50.739+09:00 ERROR 72512 --- [Veco] [nio-8080-exec-2] c.e.V.g.auth.jwt.filter.JwtAuthFilter    : JWT 토큰이 없거나 Bearer가 아닙니다.
+Hibernate: 
+    select
+        i1_0.id 
+    from
+        issue i1_0 
+    where
+        (
+            i1_0.deleted_at IS NULL
+        ) 
+        and i1_0.deadline_end=? 
+        and i1_0.state in (?, ?, ?)
+Hibernate: 
+    select
+        g1_0.id 
+    from
+        goal g1_0 
+    where
+        (
+            g1_0.deleted_at IS NULL
+        ) 
+        and g1_0.deadline_end=? 
+        and g1_0.state in (?, ?, ?)
+Hibernate: 
+    select
+        e1_0.id 
+    from
+        external e1_0 
+    where
+        e1_0.end_date=? 
+        and e1_0.state in (?, ?, ?)
+2025-08-08T18:02:09.129+09:00  WARN 72512 --- [Veco] [nio-8080-exec-4] org.hibernate.orm.query                  : HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+Hibernate: 
+    select
+        e1_0.id,
+        a1_0.external_id,
+        a1_0.id,
+        a1_0.assignee_id,
+        a1_0.assignee_name,
+        a1_0.category,
+        a1_0.created_at,
+        a1_0.goal_id,
+        a1_0.issue_id,
+        a1_0.profile_url,
+        a1_0.updated_at,
+        e1_0.created_at,
+        e1_0.deleted_at,
+        e1_0.description,
+        e1_0.end_date,
+        e1_0.github_data_id,
+        e1_0.goal_id,
+        e1_0.member_id,
+        e1_0.name,
+        e1_0.priority,
+        e1_0.start_date,
+        e1_0.state,
+        e1_0.team_id,
+        e1_0.title,
+        e1_0.service_type,
+        e1_0.updated_at 
+    from
+        external e1_0 
+    left join
+        assignment a1_0 
+            on e1_0.id=a1_0.external_id 
+    where
+        e1_0.team_id=? 
+        and e1_0.deleted_at is null 
+        and e1_0.service_type=? 
+    order by
+        e1_0.created_at desc,
+        e1_0.id
+2025-08-08T18:02:09.150+09:00  WARN 72512 --- [Veco] [nio-8080-exec-4] org.hibernate.orm.query                  : HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+Hibernate: 
+    select
+        e1_0.id,
+        a1_0.external_id,
+        a1_0.id,
+        a1_0.assignee_id,
+        a1_0.assignee_name,
+        a1_0.category,
+        a1_0.created_at,
+        a1_0.goal_id,
+        a1_0.issue_id,
+        a1_0.profile_url,
+        a1_0.updated_at,
+        e1_0.created_at,
+        e1_0.deleted_at,
+        e1_0.description,
+        e1_0.end_date,
+        e1_0.github_data_id,
+        e1_0.goal_id,
+        e1_0.member_id,
+        e1_0.name,
+        e1_0.priority,
+        e1_0.start_date,
+        e1_0.state,
+        e1_0.team_id,
+        e1_0.title,
+        e1_0.service_type,
+        e1_0.updated_at 
+    from
+        external e1_0 
+    left join
+        assignment a1_0 
+            on e1_0.id=a1_0.external_id 
+    where
+        e1_0.team_id=? 
+        and e1_0.deleted_at is null 
+        and e1_0.service_type=? 
+    order by
+        e1_0.created_at desc,
+        e1_0.id
+2025-08-08T18:02:09.159+09:00  WARN 72512 --- [Veco] [nio-8080-exec-4] org.hibernate.orm.query                  : HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+Hibernate: 
+    select
+        e1_0.id,
+        a1_0.external_id,
+        a1_0.id,
+        a1_0.assignee_id,
+        a1_0.assignee_name,
+        a1_0.category,
+        a1_0.created_at,
+        a1_0.goal_id,
+        a1_0.issue_id,
+        a1_0.profile_url,
+        a1_0.updated_at,
+        e1_0.created_at,
+        e1_0.deleted_at,
+        e1_0.description,
+        e1_0.end_date,
+        e1_0.github_data_id,
+        e1_0.goal_id,
+        e1_0.member_id,
+        e1_0.name,
+        e1_0.priority,
+        e1_0.start_date,
+        e1_0.state,
+        e1_0.team_id,
+        e1_0.title,
+        e1_0.service_type,
+        e1_0.updated_at 
+    from
+        external e1_0 
+    left join
+        assignment a1_0 
+            on e1_0.id=a1_0.external_id 
+    where
+        e1_0.team_id=? 
+        and e1_0.deleted_at is null 
+        and e1_0.service_type=? 
+    order by
+        e1_0.created_at desc,
+        e1_0.id
+2025-08-08T18:02:09.165+09:00  WARN 72512 --- [Veco] [nio-8080-exec-4] org.hibernate.orm.query                  : HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+Hibernate: 
+    select
+        e1_0.id,
+        a1_0.external_id,
+        a1_0.id,
+        a1_0.assignee_id,
+        a1_0.assignee_name,
+        a1_0.category,
+        a1_0.created_at,
+        a1_0.goal_id,
+        a1_0.issue_id,
+        a1_0.profile_url,
+        a1_0.updated_at,
+        e1_0.created_at,
+        e1_0.deleted_at,
+        e1_0.description,
+        e1_0.end_date,
+        e1_0.github_data_id,
+        e1_0.goal_id,
+        e1_0.member_id,
+        e1_0.name,
+        e1_0.priority,
+        e1_0.start_date,
+        e1_0.state,
+        e1_0.team_id,
+        e1_0.title,
+        e1_0.service_type,
+        e1_0.updated_at 
+    from
+        external e1_0 
+    left join
+        assignment a1_0 
+            on e1_0.id=a1_0.external_id 
+    where
+        e1_0.team_id=? 
+        and e1_0.deleted_at is null 
+        and e1_0.service_type=? 
+    order by
+        e1_0.created_at desc,
+        e1_0.id
+2025-08-08T18:02:09.173+09:00 ERROR 72512 --- [Veco] [nio-8080-exec-4] c.e.V.g.auth.jwt.filter.JwtAuthFilter    : JWT 토큰이 없거나 Bearer가 아닙니다.
+Hibernate: 
+    select
+        g1_0.id,
+        g1_0.name 
+    from
+        external e1_0 
+    left join
+        goal g1_0 
+            on g1_0.id=e1_0.goal_id 
+            and (g1_0.deleted_at IS NULL) 
+    where
+        e1_0.team_id=? 
+        and e1_0.deleted_at is null 
+    group by
+        g1_0.id,
+        g1_0.name 
+    order by
+        g1_0.name
+2025-08-08T18:02:09.197+09:00  WARN 72512 --- [Veco] [nio-8080-exec-6] org.hibernate.orm.query                  : HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+Hibernate: 
+    select
+        e1_0.id,
+        a1_0.external_id,
+        a1_0.id,
+        a1_0.assignee_id,
+        a1_0.assignee_name,
+        a1_0.category,
+        a1_0.created_at,
+        a1_0.goal_id,
+        a1_0.issue_id,
+        a1_0.profile_url,
+        a1_0.updated_at,
+        e1_0.created_at,
+        e1_0.deleted_at,
+        e1_0.description,
+        e1_0.end_date,
+        e1_0.github_data_id,
+        g1_0.id,
+        g1_0.content,
+        g1_0.created_at,
+        g1_0.deadline_end,
+        g1_0.deadline_start,
+        g1_0.deleted_at,
+        g1_0.name,
+        g1_0.priority,
+        g1_0.state,
+        g1_0.team_id,
+        g1_0.title,
+        g1_0.updated_at,
+        e1_0.member_id,
+        e1_0.name,
+        e1_0.priority,
+        e1_0.start_date,
+        e1_0.state,
+        e1_0.team_id,
+        e1_0.title,
+        e1_0.service_type,
+        e1_0.updated_at 
+    from
+        external e1_0 
+    left join
+        assignment a1_0 
+            on e1_0.id=a1_0.external_id 
+    left join
+        goal g1_0 
+            on g1_0.id=e1_0.goal_id 
+            and (g1_0.deleted_at IS NULL) 
+    where
+        e1_0.team_id=? 
+        and e1_0.deleted_at is null 
+        and g1_0.id is null 
+    order by
+        e1_0.created_at desc,
+        e1_0.id
+2025-08-08T18:02:09.204+09:00  WARN 72512 --- [Veco] [nio-8080-exec-6] org.hibernate.orm.query                  : HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+Hibernate: 
+    select
+        e1_0.id,
+        a1_0.external_id,
+        a1_0.id,
+        a1_0.assignee_id,
+        a1_0.assignee_name,
+        a1_0.category,
+        a1_0.created_at,
+        a1_0.goal_id,
+        a1_0.issue_id,
+        a1_0.profile_url,
+        a1_0.updated_at,
+        e1_0.created_at,
+        e1_0.deleted_at,
+        e1_0.description,
+        e1_0.end_date,
+        e1_0.github_data_id,
+        g1_0.id,
+        g1_0.content,
+        g1_0.created_at,
+        g1_0.deadline_end,
+        g1_0.deadline_start,
+        g1_0.deleted_at,
+        g1_0.name,
+        g1_0.priority,
+        g1_0.state,
+        g1_0.team_id,
+        g1_0.title,
+        g1_0.updated_at,
+        e1_0.member_id,
+        e1_0.name,
+        e1_0.priority,
+        e1_0.start_date,
+        e1_0.state,
+        e1_0.team_id,
+        e1_0.title,
+        e1_0.service_type,
+        e1_0.updated_at 
+    from
+        external e1_0 
+    left join
+        assignment a1_0 
+            on e1_0.id=a1_0.external_id 
+    left join
+        goal g1_0 
+            on g1_0.id=e1_0.goal_id 
+            and (g1_0.deleted_at IS NULL) 
+    where
+        e1_0.team_id=? 
+        and e1_0.deleted_at is null 
+        and g1_0.id=? 
+    order by
+        e1_0.created_at desc,
+        e1_0.id
+2025-08-08T18:02:09.210+09:00  WARN 72512 --- [Veco] [nio-8080-exec-6] org.hibernate.orm.query                  : HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+Hibernate: 
+    select
+        e1_0.id,
+        a1_0.external_id,
+        a1_0.id,
+        a1_0.assignee_id,
+        a1_0.assignee_name,
+        a1_0.category,
+        a1_0.created_at,
+        a1_0.goal_id,
+        a1_0.issue_id,
+        a1_0.profile_url,
+        a1_0.updated_at,
+        e1_0.created_at,
+        e1_0.deleted_at,
+        e1_0.description,
+        e1_0.end_date,
+        e1_0.github_data_id,
+        g1_0.id,
+        g1_0.content,
+        g1_0.created_at,
+        g1_0.deadline_end,
+        g1_0.deadline_start,
+        g1_0.deleted_at,
+        g1_0.name,
+        g1_0.priority,
+        g1_0.state,
+        g1_0.team_id,
+        g1_0.title,
+        g1_0.updated_at,
+        e1_0.member_id,
+        e1_0.name,
+        e1_0.priority,
+        e1_0.start_date,
+        e1_0.state,
+        e1_0.team_id,
+        e1_0.title,
+        e1_0.service_type,
+        e1_0.updated_at 
+    from
+        external e1_0 
+    left join
+        assignment a1_0 
+            on e1_0.id=a1_0.external_id 
+    left join
+        goal g1_0 
+            on g1_0.id=e1_0.goal_id 
+            and (g1_0.deleted_at IS NULL) 
+    where
+        e1_0.team_id=? 
+        and e1_0.deleted_at is null 
+        and g1_0.id=? 
+    order by
+        e1_0.created_at desc,
+        e1_0.id
+2025-08-08T18:02:09.212+09:00  WARN 72512 --- [Veco] [nio-8080-exec-6] org.hibernate.orm.query                  : HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+Hibernate: 
+    select
+        e1_0.id,
+        a1_0.external_id,
+        a1_0.id,
+        a1_0.assignee_id,
+        a1_0.assignee_name,
+        a1_0.category,
+        a1_0.created_at,
+        a1_0.goal_id,
+        a1_0.issue_id,
+        a1_0.profile_url,
+        a1_0.updated_at,
+        e1_0.created_at,
+        e1_0.deleted_at,
+        e1_0.description,
+        e1_0.end_date,
+        e1_0.github_data_id,
+        g1_0.id,
+        g1_0.content,
+        g1_0.created_at,
+        g1_0.deadline_end,
+        g1_0.deadline_start,
+        g1_0.deleted_at,
+        g1_0.name,
+        g1_0.priority,
+        g1_0.state,
+        g1_0.team_id,
+        g1_0.title,
+        g1_0.updated_at,
+        e1_0.member_id,
+        e1_0.name,
+        e1_0.priority,
+        e1_0.start_date,
+        e1_0.state,
+        e1_0.team_id,
+        e1_0.title,
+        e1_0.service_type,
+        e1_0.updated_at 
+    from
+        external e1_0 
+    left join
+        assignment a1_0 
+            on e1_0.id=a1_0.external_id 
+    left join
+        goal g1_0 
+            on g1_0.id=e1_0.goal_id 
+            and (g1_0.deleted_at IS NULL) 
+    where
+        e1_0.team_id=? 
+        and e1_0.deleted_at is null 
+        and g1_0.id=? 
+    order by
+        e1_0.created_at desc,
+        e1_0.id
+2025-08-08T18:02:09.218+09:00 ERROR 72512 --- [Veco] [nio-8080-exec-6] c.e.V.g.auth.jwt.filter.JwtAuthFilter    : JWT 토큰이 없거나 Bearer가 아닙니다.
+Hibernate: 
+    select
+        i1_0.id 
+    from
+        issue i1_0 
+    where
+        (
+            i1_0.deleted_at IS NULL
+        ) 
+        and i1_0.deadline_end=? 
+        and i1_0.state in (?, ?, ?)
+Hibernate: 
+    select
+        g1_0.id 
+    from
+        goal g1_0 
+    where
+        (
+            g1_0.deleted_at IS NULL
+        ) 
+        and g1_0.deadline_end=? 
+        and g1_0.state in (?, ?, ?)
+Hibernate: 
+    select
+        e1_0.id 
+    from
+        external e1_0 
+    where
+        e1_0.end_date=? 
+        and e1_0.state in (?, ?, ?)
+Hibernate: 
+    select
+        i1_0.id 
+    from
+        issue i1_0 
+    where
+        (
+            i1_0.deleted_at IS NULL
+        ) 
+        and i1_0.deadline_end=? 
+        and i1_0.state in (?, ?, ?)
+Hibernate: 
+    select
+        g1_0.id 
+    from
+        goal g1_0 
+    where
+        (
+            g1_0.deleted_at IS NULL
+        ) 
+        and g1_0.deadline_end=? 
+        and g1_0.state in (?, ?, ?)
+Hibernate: 
+    select
+        e1_0.id 
+    from
+        external e1_0 
+    where
+        e1_0.end_date=? 
+        and e1_0.state in (?, ?, ?)
+2025-08-08T18:04:24.104+09:00  INFO 72512 --- [Veco] [ionShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-08-08T18:04:24.114+09:00  INFO 72512 --- [Veco] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-08-08T18:04:24.297+09:00  INFO 72512 --- [Veco] [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-08-08T18:04:24.302+09:00  INFO 72512 --- [Veco] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-08-08T18:04:24.310+09:00  INFO 72512 --- [Veco] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+
+> Task :bootRun FAILED
+
+[Incubating] Problems report is available at: file:///Users/seoungbeom/Desktop/VECO_Backend/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':bootRun'.
+> Process 'command '/opt/homebrew/Cellar/openjdk@21/21.0.8/libexec/openjdk.jdk/Contents/Home/bin/java'' finished with non-zero exit value 143
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 3m 14s
+4 actionable tasks: 2 executed, 2 up-to-date

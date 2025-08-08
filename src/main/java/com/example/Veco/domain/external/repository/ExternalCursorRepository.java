@@ -31,138 +31,6 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
         this.queryFactory = new JPAQueryFactory(entityManager);
     }
 
-    // TODO : 메서드 테스트 필요
-    @Override
-    public CursorPage<ExternalResponseDTO.ExternalDTO> findExternalWithCursor(ExternalSearchCriteria criteria, String cursor, int size) {
-        JPAQuery<External> query = queryFactory.selectFrom(external)
-                .where(
-                        buildFilterConditions(criteria),
-                        buildCursorCondition(criteria, cursor)
-                )
-                .orderBy(buildOrderClause(criteria))
-                .limit(size + 1);
-
-        List<External> externals = query.fetch();
-        return buildCursorPage(externals, size, criteria);
-    }
-
-    private BooleanExpression buildFilterConditions(ExternalSearchCriteria criteria) {
-        BooleanExpression teamCondition = external.team.id.eq(criteria.getTeamId());
-        
-        BooleanExpression filterCondition = switch (criteria.getActiveFilterType()){
-            case STATE -> criteria.getState() != null ? external.state.eq(criteria.getState()) : null;
-            case PRIORITY -> criteria.getPriority() != null ? external.priority.eq(criteria.getPriority()) : null;
-            case ASSIGNEE -> criteria.getAssigneeId() != null ? external.assignments.any().assignee.id.eq(criteria.getAssigneeId()) : null;
-            case EXT_TYPE -> criteria.getExtServiceType() != null ? external.type.eq(criteria.getExtServiceType()) : null;
-            case GOAL -> criteria.getGoalId() != null ? external.goal.id.eq(criteria.getGoalId()) : null;
-            case NONE -> null;
-        };
-        
-        return filterCondition != null ? teamCondition.and(filterCondition) : teamCondition;
-    }
-
-    private BooleanExpression buildCursorCondition(ExternalSearchCriteria criteria, String cursor) {
-
-        if(cursor == null) return null;
-
-        ExternalCursor decodedCursor = ExternalCursor.decode(cursor);
-        boolean hasStateFilter = criteria.getState() != null;
-
-        if(hasStateFilter) {
-            return external.createdAt.eq(decodedCursor.getCreatedAt())
-                    .or(
-                            external.createdAt.eq(decodedCursor.getCreatedAt())
-                                    .and(external.id.gt(decodedCursor.getId()))
-                    );
-        }else{
-            NumberExpression<Integer> statusPriorityExpr = getStatusPriorityExpression();
-
-            return statusPriorityExpr.gt(decodedCursor.getStatusPriority())
-                    .or(
-                            statusPriorityExpr.eq(decodedCursor.getStatusPriority())
-                                    .and(external.createdAt.lt(decodedCursor.getCreatedAt()))
-                    )
-                    .or(
-                            statusPriorityExpr.eq(decodedCursor.getStatusPriority())
-                                    .and(external.createdAt.eq(decodedCursor.getCreatedAt()))
-                                    .and(external.id.gt(decodedCursor.getId()))
-                    );
-        }
-
-    }
-
-    private CursorPage<ExternalResponseDTO.ExternalDTO> buildCursorPage(List<External> externals, int size, ExternalSearchCriteria criteria) {
-
-        boolean hasNext = externals.size() > size;
-
-        if(hasNext) {
-            externals = externals.subList(0, size);
-        }
-
-        String nextCursor = null;
-
-        if(hasNext && !externals.isEmpty()) {
-            External last = externals.getLast();
-            ExternalCursor cursor = createCursorFromExternal(last, criteria);
-            nextCursor = cursor.encode();
-        }
-
-
-        List<ExternalResponseDTO.ExternalDTO> externalDTOS = externals.stream()
-                .map(e -> ExternalConverter.toExternalDTO(e, e.getAssignments())).toList();
-
-        return CursorPage.of(externalDTOS, nextCursor, hasNext);
-    }
-
-    private ExternalCursor createCursorFromExternal(External last, ExternalSearchCriteria criteria) {
-        ExternalCursor externalCursor = new ExternalCursor();
-        externalCursor.setId(last.getId());
-        externalCursor.setCreatedAt(last.getCreatedAt());
-        externalCursor.setIsStatusFiltered(criteria.getState() != null);
-
-        if (criteria.getState() == null) {
-            Integer statePriority = switch (last.getState()) {
-                case NONE -> 1;
-                case TODO -> 2;
-                case IN_PROGRESS -> 3;
-                case FINISH -> 4;
-                case REVIEW -> 5;
-                default -> null;
-            };
-            externalCursor.setStatusPriority(statePriority);
-        }
-        return externalCursor;
-    }
-
-    private OrderSpecifier<?>[] buildOrderClause(ExternalSearchCriteria criteria) {
-        if (criteria.getState() != null) {
-            // 상태 필터링이 있는 경우: 생성일 내림차순, ID 오름차순
-            return new OrderSpecifier[]{
-                    external.createdAt.desc(),
-                    external.id.asc()
-            };
-        } else {
-            // 상태 필터링이 없는 경우: 상태 우선순위, 생성일 내림차순, ID 오름차순
-            NumberExpression<Integer> statusPriorityExpr = getStatusPriorityExpression();
-            
-            return new OrderSpecifier[]{
-                    statusPriorityExpr.asc(),
-                    external.createdAt.desc(),
-                    external.id.asc()
-            };
-        }
-    }
-
-    private NumberExpression<Integer> getStatusPriorityExpression() {
-        return new CaseBuilder()
-                .when(external.state.eq(State.NONE)).then(1)
-                .when(external.state.eq(State.TODO)).then(2)
-                .when(external.state.eq(State.IN_PROGRESS)).then(3)
-                .when(external.state.eq(State.FINISH)).then(4)
-                .when(external.state.eq(State.REVIEW)).then(5)
-                .otherwise(6);
-    }
-
     public ExternalGroupedResponseDTO.ExternalGroupedPageResponse findExternalWithGroupedResponse(ExternalSearchCriteria criteria, String cursor, int size) {
         FilterType filterType = criteria.getActiveFilterType();
         
@@ -193,11 +61,164 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
     }
 
     private ExternalGroupedResponseDTO.ExternalGroupedPageResponse findExternalsGroupedByAssignee(ExternalSearchCriteria criteria, String cursor, int size) {
-        JPAQuery<External> baseQuery = queryFactory.selectFrom(external)
-                .leftJoin(external.assignments).fetchJoin()
-                .where(external.team.id.eq(criteria.getTeamId()));
+        // Assignment 테이블을 위한 별도의 Q 인스턴스 생성
+        com.example.Veco.domain.mapping.QAssignment assignment = com.example.Veco.domain.mapping.QAssignment.assignment;
+        
+        // 먼저 팀에 속한 모든 담당자들을 조회 (Assignment 테이블에서)
+        List<com.querydsl.core.Tuple> assigneeResults = queryFactory
+                .select(assignment.assignee.id, assignment.assignee.name)
+                .from(external)
+                .leftJoin(external.assignments, assignment)
+                .leftJoin(assignment.assignee)
+                .where(external.team.id.eq(criteria.getTeamId())
+                        .and(external.deletedAt.isNull())
+                        .and(assignment.assignee.id.isNotNull()))
+                .groupBy(assignment.assignee.id, assignment.assignee.name)
+                .orderBy(assignment.assignee.name.asc())
+                .fetch();
 
-        return buildGroupedResponseForAssignee(baseQuery, cursor, size, criteria);
+        List<ExternalGroupedResponseDTO.FilteredExternalGroup> groups = new java.util.ArrayList<>();
+        int totalFetched = 0;
+        boolean hasNext = false;
+        String nextCursor = null;
+        
+        ExternalCursor decodedCursor = cursor != null ? ExternalCursor.decode(cursor) : null;
+        
+        // "담당자 없음" 그룹 처리 (담당자가 없는 외부 이슈들)
+        if (totalFetched < size) {
+            String displayName = "담당자 없음";
+            
+            // 커서 기반 필터링
+            if (decodedCursor == null || !shouldSkipAssigneeGroup("NULL", decodedCursor)) {
+                // 담당자가 없는 외부 이슈들 조회
+                JPAQuery<External> noAssigneeQuery = queryFactory.selectFrom(external)
+                        .leftJoin(external.assignments).fetchJoin()
+                        .where(external.team.id.eq(criteria.getTeamId())
+                                .and(external.deletedAt.isNull())
+                                .and(external.assignments.isEmpty()));
+                
+                if (decodedCursor != null && isSameAssigneeGroup("NULL", decodedCursor)) {
+                    noAssigneeQuery = noAssigneeQuery.where(buildCursorConditionForGroup(decodedCursor));
+                }
+                
+                noAssigneeQuery = noAssigneeQuery.orderBy(external.createdAt.desc(), external.id.asc());
+                
+                int remainingSize = size - totalFetched;
+                List<External> groupExternals = noAssigneeQuery.limit(remainingSize + 1).fetch();
+                
+                boolean groupHasNext = groupExternals.size() > remainingSize;
+                if (groupHasNext) {
+                    groupExternals = groupExternals.subList(0, remainingSize);
+                    hasNext = true;
+                    if (!groupExternals.isEmpty()) {
+                        External lastExternal = groupExternals.getLast();
+                        ExternalCursor groupCursor = new ExternalCursor();
+                        groupCursor.setId(lastExternal.getId());
+                        groupCursor.setCreatedAt(lastExternal.getCreatedAt());
+                        groupCursor.setGroupValue("NULL");
+                        nextCursor = groupCursor.encode();
+                    }
+                }
+                
+                List<ExternalGroupedResponseDTO.ExternalItemDTO> externalDTOs = groupExternals.stream().map(
+                        ExternalConverter::toExternalItemDTO
+                ).toList();
+
+                ExternalGroupedResponseDTO.FilteredExternalGroup group = ExternalGroupedResponseDTO.FilteredExternalGroup.builder()
+                        .filterName(displayName)
+                        .dataCnt(externalDTOs.size())
+                        .externals(externalDTOs)
+                        .build();
+                        
+                groups.add(group);
+                totalFetched += groupExternals.size();
+            } else {
+                // 건너뛰는 그룹도 빈 그룹으로 추가
+                ExternalGroupedResponseDTO.FilteredExternalGroup emptyGroup = ExternalGroupedResponseDTO.FilteredExternalGroup.builder()
+                        .filterName(displayName)
+                        .dataCnt(0)
+                        .externals(new java.util.ArrayList<>())
+                        .build();
+                groups.add(emptyGroup);
+            }
+        }
+        
+        // 담당자별 그룹 처리
+        for (com.querydsl.core.Tuple assigneeResult : assigneeResults) {
+            if (totalFetched >= size) {
+                hasNext = true;
+                break;
+            }
+            
+            Long assigneeId = assigneeResult.get(assignment.assignee.id);
+            String assigneeName = assigneeResult.get(assignment.assignee.name);
+            String displayName = assigneeName != null ? assigneeName : "Unknown";
+            
+            // 커서 기반 필터링  
+            if (decodedCursor != null && assigneeId != null && shouldSkipAssigneeGroup(assigneeId.toString(), decodedCursor)) {
+                // 건너뛰는 그룹도 빈 그룹으로 추가
+                ExternalGroupedResponseDTO.FilteredExternalGroup emptyGroup = ExternalGroupedResponseDTO.FilteredExternalGroup.builder()
+                        .filterName(displayName)
+                        .dataCnt(0)
+                        .externals(new java.util.ArrayList<>())
+                        .build();
+                groups.add(emptyGroup);
+                continue;
+            }
+            
+            // 해당 담당자가 담당하는 외부 이슈들 조회
+            com.example.Veco.domain.mapping.QAssignment assignmentForFilter = new com.example.Veco.domain.mapping.QAssignment("assignmentForFilter");
+            JPAQuery<External> query = queryFactory.selectFrom(external)
+                    .leftJoin(external.assignments).fetchJoin()
+                    .leftJoin(external.assignments, assignmentForFilter)
+                    .where(external.team.id.eq(criteria.getTeamId())
+                            .and(external.deletedAt.isNull())
+                            .and(assignmentForFilter.assignee.id.eq(assigneeId)));
+            
+            if (decodedCursor != null && assigneeId != null && isSameAssigneeGroup(assigneeId.toString(), decodedCursor)) {
+                query = query.where(buildCursorConditionForGroup(decodedCursor));
+            }
+            
+            query = query.orderBy(external.createdAt.desc(), external.id.asc());
+            
+            int remainingSize = size - totalFetched;
+            List<External> groupExternals = query.limit(remainingSize + 1).fetch();
+            
+            // 데이터가 있든 없든 항상 그룹을 추가
+            boolean groupHasNext = groupExternals.size() > remainingSize;
+            if (groupHasNext) {
+                groupExternals = groupExternals.subList(0, remainingSize);
+                hasNext = true;
+                if (!groupExternals.isEmpty()) {
+                    External lastExternal = groupExternals.getLast();
+                    ExternalCursor groupCursor = new ExternalCursor();
+                    groupCursor.setId(lastExternal.getId());
+                    groupCursor.setCreatedAt(lastExternal.getCreatedAt());
+                    groupCursor.setGroupValue(assigneeId != null ? assigneeId.toString() : "NULL");
+                    nextCursor = groupCursor.encode();
+                }
+            }
+            
+            List<ExternalGroupedResponseDTO.ExternalItemDTO> externalDTOs = groupExternals.stream().map(
+                    ExternalConverter::toExternalItemDTO
+            ).toList();
+
+            ExternalGroupedResponseDTO.FilteredExternalGroup group = ExternalGroupedResponseDTO.FilteredExternalGroup.builder()
+                    .filterName(displayName)
+                    .dataCnt(externalDTOs.size())
+                    .externals(externalDTOs)
+                    .build();
+                    
+            groups.add(group);
+            totalFetched += groupExternals.size();
+        }
+        
+        return ExternalGroupedResponseDTO.ExternalGroupedPageResponse.builder()
+                .data(groups)
+                .hasNext(hasNext)
+                .nextCursor(nextCursor)
+                .pageSize(size)
+                .build();
     }
 
     private ExternalGroupedResponseDTO.ExternalGroupedPageResponse findExternalsGroupedByExtType(ExternalSearchCriteria criteria, String cursor, int size) {
@@ -206,11 +227,100 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
     }
 
     private ExternalGroupedResponseDTO.ExternalGroupedPageResponse findExternalsGroupedByGoal(ExternalSearchCriteria criteria, String cursor, int size) {
-        JPAQuery<External> baseQuery = queryFactory.selectFrom(external)
-                .leftJoin(external.goal).fetchJoin()
-                .where(external.team.id.eq(criteria.getTeamId()));
+        // 먼저 팀에 속한 모든 목표들을 조회
+        List<com.querydsl.core.Tuple> goalResults = queryFactory
+                .select(external.goal.id, external.goal.name)
+                .from(external)
+                .leftJoin(external.goal)
+                .where(external.team.id.eq(criteria.getTeamId()).and(external.deletedAt.isNull()))
+                .groupBy(external.goal.id, external.goal.name)
+                .orderBy(external.goal.name.asc().nullsFirst()) // null 목표(목표 없음)를 먼저 표시
+                .fetch();
 
-        return buildGroupedResponseForGoal(baseQuery, cursor, size, criteria);
+        List<ExternalGroupedResponseDTO.FilteredExternalGroup> groups = new java.util.ArrayList<>();
+        int totalFetched = 0;
+        boolean hasNext = false;
+        String nextCursor = null;
+        
+        ExternalCursor decodedCursor = cursor != null ? ExternalCursor.decode(cursor) : null;
+        
+        for (com.querydsl.core.Tuple goalResult : goalResults) {
+            if (totalFetched >= size) {
+                hasNext = true;
+                break;
+            }
+            
+            Long goalId = goalResult.get(external.goal.id);
+            String goalName = goalResult.get(external.goal.name);
+            String displayName = goalName != null ? goalName : "목표 없음";
+            
+            // 커서 기반 필터링
+            if (decodedCursor != null && shouldSkipGoalGroup(goalId, decodedCursor)) {
+                // 건너뛰는 그룹도 빈 그룹으로 추가
+                ExternalGroupedResponseDTO.FilteredExternalGroup emptyGroup = ExternalGroupedResponseDTO.FilteredExternalGroup.builder()
+                        .filterName(displayName)
+                        .dataCnt(0)
+                        .externals(new java.util.ArrayList<>())
+                        .build();
+                groups.add(emptyGroup);
+                continue;
+            }
+            
+            // 해당 목표의 외부 이슈들 조회
+            BooleanExpression goalCondition = goalId != null ? 
+                external.goal.id.eq(goalId) : external.goal.isNull();
+            
+            JPAQuery<External> query = queryFactory.selectFrom(external)
+                    .leftJoin(external.assignments).fetchJoin()
+                    .leftJoin(external.goal).fetchJoin()
+                    .where(external.team.id.eq(criteria.getTeamId())
+                            .and(external.deletedAt.isNull())
+                            .and(goalCondition));
+            
+            if (decodedCursor != null && isSameGoalGroup(goalId, decodedCursor)) {
+                query = query.where(buildCursorConditionForGroup(decodedCursor));
+            }
+            
+            query = query.orderBy(external.createdAt.desc(), external.id.asc());
+            
+            int remainingSize = size - totalFetched;
+            List<External> groupExternals = query.limit(remainingSize + 1).fetch();
+            
+            // 데이터가 있든 없든 항상 그룹을 추가
+            boolean groupHasNext = groupExternals.size() > remainingSize;
+            if (groupHasNext) {
+                groupExternals = groupExternals.subList(0, remainingSize);
+                hasNext = true;
+                if (!groupExternals.isEmpty()) {
+                    External lastExternal = groupExternals.getLast();
+                    ExternalCursor groupCursor = new ExternalCursor();
+                    groupCursor.setId(lastExternal.getId());
+                    groupCursor.setCreatedAt(lastExternal.getCreatedAt());
+                    groupCursor.setGroupValue(goalId != null ? goalId.toString() : "NULL");
+                    nextCursor = groupCursor.encode();
+                }
+            }
+            
+            List<ExternalGroupedResponseDTO.ExternalItemDTO> externalDTOs = groupExternals.stream().map(
+                    ExternalConverter::toExternalItemDTO
+            ).toList();
+
+            ExternalGroupedResponseDTO.FilteredExternalGroup group = ExternalGroupedResponseDTO.FilteredExternalGroup.builder()
+                    .filterName(displayName)
+                    .dataCnt(externalDTOs.size())
+                    .externals(externalDTOs)
+                    .build();
+                    
+            groups.add(group);
+            totalFetched += groupExternals.size();
+        }
+        
+        return ExternalGroupedResponseDTO.ExternalGroupedPageResponse.builder()
+                .data(groups)
+                .hasNext(hasNext)
+                .nextCursor(nextCursor)
+                .pageSize(size)
+                .build();
     }
 
     private <T extends Enum<T>> ExternalGroupedResponseDTO.ExternalGroupedPageResponse findExternalsGroupedByField(
@@ -229,7 +339,7 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
                 break;
             }
             
-            BooleanExpression condition = external.team.id.eq(criteria.getTeamId());
+            BooleanExpression condition = external.team.id.eq(criteria.getTeamId()).and(external.deletedAt.isNull());
             condition = condition.and(buildEnumCondition(enumValue, fieldType));
             
             JPAQuery<External> query = queryFactory.selectFrom(external)
@@ -332,6 +442,61 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
     private BooleanExpression buildCursorConditionForGroup(ExternalCursor cursor) {
         return external.createdAt.lt(cursor.getCreatedAt())
                 .or(external.createdAt.eq(cursor.getCreatedAt()).and(external.id.gt(cursor.getId())));
+    }
+
+    private boolean shouldSkipGoalGroup(Long goalId, ExternalCursor cursor) {
+        if (cursor.getGroupValue() == null) return false;
+        
+        String currentGoalValue = goalId != null ? goalId.toString() : "NULL";
+        
+        // 커서의 목표보다 이전 목표인지 확인 (목표 없음이 먼저, 그 다음은 ID 순)
+        if ("NULL".equals(cursor.getGroupValue())) {
+            return false; // 목표 없음이 첫 번째이므로 건너뛸 목표 없음
+        }
+        
+        if ("NULL".equals(currentGoalValue)) {
+            return true; // 현재가 목표 없음인데 커서는 특정 목표를 가리키므로 건너뛰기
+        }
+        
+        try {
+            Long cursorGoalId = Long.parseLong(cursor.getGroupValue());
+            return goalId < cursorGoalId;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+    
+    private boolean isSameGoalGroup(Long goalId, ExternalCursor cursor) {
+        if (cursor.getGroupValue() == null) return false;
+        
+        String currentGoalValue = goalId != null ? goalId.toString() : "NULL";
+        return cursor.getGroupValue().equals(currentGoalValue);
+    }
+    
+    private boolean shouldSkipAssigneeGroup(String assigneeValue, ExternalCursor cursor) {
+        if (cursor.getGroupValue() == null) return false;
+        
+        // 담당자 없음("NULL")이 먼저, 그 다음은 담당자 ID 순
+        if ("NULL".equals(cursor.getGroupValue())) {
+            return false; // 담당자 없음이 첫 번째이므로 건너뛸 그룹 없음
+        }
+        
+        if ("NULL".equals(assigneeValue)) {
+            return true; // 현재가 담당자 없음인데 커서는 특정 담당자를 가리키므로 건너뛰기
+        }
+        
+        try {
+            Long currentAssigneeId = Long.parseLong(assigneeValue);
+            Long cursorAssigneeId = Long.parseLong(cursor.getGroupValue());
+            return currentAssigneeId < cursorAssigneeId;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+    
+    private boolean isSameAssigneeGroup(String assigneeValue, ExternalCursor cursor) {
+        if (cursor.getGroupValue() == null) return false;
+        return cursor.getGroupValue().equals(assigneeValue);
     }
 
     private String getDisplayName(Enum<?> enumValue) {
