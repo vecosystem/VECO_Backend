@@ -98,7 +98,7 @@ public class IssueController {
     @GetMapping("/teams/{teamId}/issues")
     public ApiResponse<IssueResponseDTO.Pageable<IssueResponseDTO.FilteringIssue<IssueResponseDTO.IssueWithManagers>>> getTeamIssues (
             @PathVariable Long teamId,
-            @RequestParam(defaultValue = "-1") @Min(value = -1, message = "커서는 -1보다 큰 정수여야 합니다.")
+            @RequestParam(defaultValue = "-1")
             String cursor,
             @RequestParam(defaultValue = "1") @Min(value = 1, message = "불러올 데이터 수는 1 이상이어야 합니다.")
             Integer size,

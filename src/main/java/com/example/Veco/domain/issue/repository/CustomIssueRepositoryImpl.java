@@ -43,6 +43,7 @@ public class CustomIssueRepositoryImpl implements CustomIssueRepository {
                 .leftJoin(goal).on(goal.id.eq(issue.goal.id))
                 .orderBy(issue.id.desc())
                 .groupBy(issue.id, assignee.id)
+                .limit(size)
                 .transform(GroupBy.groupBy(issue.id).list(
                                 Projections.constructor(
                                         IssueResponseDTO.SimpleIssue.class,
@@ -65,6 +66,50 @@ public class CustomIssueRepositoryImpl implements CustomIssueRepository {
                                 )
                         )
                 );
+
+        return result;
+    }
+
+    @Override
+    public List<IssueResponseDTO.SimpleIssue> findUnassignedIssuesByTeamId(
+            Long teamId,
+            Predicate query,
+            int size
+    ) {
+        // 객체 생성
+        QIssue issue = QIssue.issue;
+        QGoal goal = QGoal.goal;
+        QAssignee assignee = QAssignee.assignee;
+
+        // 쿼리 실행
+        List<IssueResponseDTO.SimpleIssue> result = queryFactory
+                .select(Projections.constructor(
+                        IssueResponseDTO.SimpleIssue.class,
+                        issue.id,
+                        issue.name,
+                        issue.title,
+                        issue.state,
+                        issue.priority,
+                        Projections.constructor(
+                                IssueResponseDTO.Deadline.class,
+                                issue.deadlineStart,
+                                issue.deadlineEnd
+                        ),
+                        Projections.constructor(
+                                IssueResponseDTO.GoalInfo.class,
+                                goal.id.coalesce(-1L),
+                                goal.title.coalesce("목표 없음")
+                        )
+                ))
+                .from(issue)
+                .leftJoin(goal).on(goal.id.eq(issue.goal.id))
+                .leftJoin(assignee).on(assignee.type.eq(Category.ISSUE)
+                        .and(assignee.targetId.isNull()))
+                .where(issue.team.id.eq(teamId)
+                        .and(query))
+                .orderBy(issue.id.desc())
+                .limit(size)
+                .fetch();
 
         return result;
     }
@@ -103,7 +148,37 @@ public class CustomIssueRepositoryImpl implements CustomIssueRepository {
     }
 
     @Override
-    public List<IssueResponseDTO.GoalInfo> findGoalInfoByTeamId(
+    public Long findUnassignedIssuesCountByTeamId(Long teamId) {
+        // 객체 생성
+        QIssue issue = QIssue.issue;
+        QAssignee assignee = QAssignee.assignee;
+
+        return queryFactory
+                .select(issue.count())
+                .from(issue)
+                .leftJoin(assignee).on(assignee.type.eq(Category.ISSUE)
+                        .and(assignee.targetId.isNull()))
+                .where(issue.team.id.eq(teamId))
+                .fetchOne();
+    }
+
+    @Override
+    public Long findNoGoalIssuesCountByTeamId(
+            Long teamId
+    ) {
+        // 객체 생성
+        QIssue issue = QIssue.issue;
+
+        return queryFactory
+                .select(issue.count())
+                .from(issue)
+                .where(issue.goal.isNull()
+                        .and(issue.team.id.eq(teamId)))
+                .fetchOne();
+    }
+
+    @Override
+    public List<String> findGoalsByTeamId(
             Long teamId
     ) {
         // 객체 생성
@@ -111,17 +186,12 @@ public class CustomIssueRepositoryImpl implements CustomIssueRepository {
         QGoal goal = QGoal.goal;
 
         return queryFactory
-                .select(Projections.constructor(
-                        IssueResponseDTO.GoalInfo.class,
-                        goal.id.coalesce(-1L),
-                        goal.title.coalesce("목표 없음")
-                ))
+                .select(goal.title)
                 .from(issue)
                 .leftJoin(goal)
                 .on(goal.id.eq(issue.goal.id)
                         .and(goal.deletedAt.isNull()))
-                .where(issue.team.id.eq(teamId)
-                        .or(goal.id.isNull()))
+                .where(goal.team.id.eq(teamId))
                 .fetch();
     }
 
