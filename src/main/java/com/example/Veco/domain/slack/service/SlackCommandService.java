@@ -6,7 +6,6 @@ import com.example.Veco.domain.external.repository.ExternalServiceRepository;
 import com.example.Veco.domain.mapping.converter.LinkConverter;
 import com.example.Veco.domain.mapping.entity.Link;
 import com.example.Veco.domain.mapping.repository.LinkRepository;
-import com.example.Veco.domain.mapping.repository.MemberTeamRepository;
 import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.member.error.MemberErrorStatus;
 import com.example.Veco.domain.member.error.MemberHandler;
@@ -38,7 +37,6 @@ public class SlackCommandService {
     private final ExternalServiceRepository externalServiceRepository;
     private final LinkRepository linkRepository;
     private final MemberRepository memberRepository;
-    private final MemberTeamRepository memberTeamRepository;
 
     // 유틸
     private final JwtUtil jwtUtil;
