@@ -23,6 +23,7 @@ public class WorkspaceConverter {
                 .workspaceImageUrl(workspace.getProfileUrl())
                 .workspaceUrl(workspace.getWorkspaceUrl())
                 .defaultTeamId(workspace.getTeams().get(0).getId())
+                .invitePassword(workspace.getInvitePassword())
                 .build();
     }
 
