@@ -40,7 +40,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
-        String flow = getFlow(request);
+//        String flow = getFlow(request);
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
@@ -70,47 +70,45 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         memberCommandService.saveMember(member);
         // 최초 로그인
         // TODO: 테스트용 주석 처리, 이후 해제 필요
-        if (userDetails.getMember().getWorkSpace() == null) {
-            // 워크스페이스 생성
-            if (flow.equals("create")) {
+//        if (userDetails.getMember().getWorkSpace() == null) {
+//            // 워크스페이스 생성
+//            if (flow.equals("create")) {
 //                redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/onboarding/workspace")
 //                        .build()
 //                        .encode(StandardCharsets.UTF_8)
 //                        .toUriString();
-                // 워크스페이스 참여
-            } else if (flow.equals("join")) {
+//                // 워크스페이스 참여
+//            } else if (flow.equals("join")) {
 //                redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/onboarding/input-pw")
 //                        .build()
 //                        .encode(StandardCharsets.UTF_8)
 //                        .toUriString();
-            } else {
-                throw new OAuth2Exeception(OAuth2ErrorCode.OAUTH2_INVALID_STATE);
-            }
-            // 기존 회원
-        } else {
-            flow = "exist";
+//            } else {
+//                throw new OAuth2Exeception(OAuth2ErrorCode.OAUTH2_INVALID_STATE);
+//            }
+//            // 기존 회원
+//        } else {
 //            redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/workspace")
 //                    .build()
 //                    .encode(StandardCharsets.UTF_8)
 //                    .toUriString();
-        }
+//        }
 
+        // 로딩 화면으로 리다이렉트
         redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/onboarding/loading")
                         .build()
                         .encode(StandardCharsets.UTF_8)
                         .toUriString();
 
-        response.addHeader("Flow", flow);
-
         getRedirectStrategy().sendRedirect(request, response, redirectURL);
     }
 
-    public String getFlow(HttpServletRequest request) {
-
-        HttpSession session = request.getSession();
-        String flow = (String) session.getAttribute("flow");
-        session.removeAttribute("flow");
-
-        return flow != null ? flow : "create";
-    }
+//    public String getFlow(HttpServletRequest request) {
+//
+//        HttpSession session = request.getSession();
+//        String flow = (String) session.getAttribute("flow");
+//        session.removeAttribute("flow");
+//
+//        return flow != null ? flow : "create";
+//    }
 }
