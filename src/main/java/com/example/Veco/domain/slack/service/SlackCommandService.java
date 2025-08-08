@@ -6,11 +6,11 @@ import com.example.Veco.domain.external.repository.ExternalServiceRepository;
 import com.example.Veco.domain.mapping.converter.LinkConverter;
 import com.example.Veco.domain.mapping.entity.Link;
 import com.example.Veco.domain.mapping.repository.LinkRepository;
+import com.example.Veco.domain.mapping.repository.MemberTeamRepository;
 import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.member.error.MemberErrorStatus;
 import com.example.Veco.domain.member.error.MemberHandler;
 import com.example.Veco.domain.member.repository.MemberRepository;
-import com.example.Veco.domain.slack.converter.SlackConverter;
 import com.example.Veco.domain.slack.dto.SlackResDTO;
 import com.example.Veco.domain.slack.exception.SlackException;
 import com.example.Veco.domain.slack.exception.code.SlackErrorCode;
@@ -21,6 +21,7 @@ import com.example.Veco.global.enums.ExtServiceType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +38,7 @@ public class SlackCommandService {
     private final ExternalServiceRepository externalServiceRepository;
     private final LinkRepository linkRepository;
     private final MemberRepository memberRepository;
+    private final MemberTeamRepository memberTeamRepository;
 
     // 유틸
     private final JwtUtil jwtUtil;
@@ -50,10 +52,21 @@ public class SlackCommandService {
 
     // 리다이렉트 링크 생성
     public String redirectSlackOAuth(
-            String token
+            String token,
+            UserDetails user
     ){
+
         // 토큰 Bearer 제거
         token = token.replace("Bearer ", "");
+
+        // 해당 사용자가 특정 워크스페이스에 속해있는지 검증
+        String uid = user.getUsername();
+        Member member = memberRepository.findBySocialUid(uid)
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND));
+
+        if (member.getWorkSpace() == null) {
+            throw new MemberHandler(MemberErrorStatus._MEMBER_WORKSPACE_NOT_FOUND);
+        }
 
         return "https://slack.com/oauth/v2/authorize?" +
                 "client_id="+clientId+
@@ -63,7 +76,7 @@ public class SlackCommandService {
 
     // Slack 연동 비즈니스 로직
     @Transactional
-    public SlackResDTO.InstallApp installApp(
+    public Long installApp(
             String code,
             String state
     ){
@@ -71,6 +84,9 @@ public class SlackCommandService {
         // JWT 토큰 -> Member
         Member member = memberRepository.findBySocialUid(jwtUtil.getUsername(state))
                 .orElseThrow(() -> new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND));
+
+        // 워크스페이스에 속해있는지 확인
+        WorkSpace workspace = member.getWorkSpace();
 
         // Bot Access Token 발급
         SlackResDTO.ExchangeAccessToken tokenResult = slackUtil.ExchangeAccessToken(code);
@@ -117,8 +133,6 @@ public class SlackCommandService {
         }
 
         // 조회한 정보들 모두 저장 (연동)
-        WorkSpace workspace = member.getWorkSpace();
-
         // 이미 존재하면 update
         Optional<Link> link = linkRepository.findLinkByWorkspaceAndExternalService_ServiceType(
                 workspace, ExtServiceType.SLACK
@@ -129,9 +143,6 @@ public class SlackCommandService {
             link.get().getExternalService().updateAccessToken(tokenResult.access_token());
             link.get().updateLinkedAt(now);
 
-            return SlackConverter.toInstallApp(
-                    link.get().getWorkspace().getId(), link.get().getLinkedAt()
-            );
         } else { // 존재하지 않는 경우
 
             // 객체 생성
@@ -144,9 +155,11 @@ public class SlackCommandService {
             Link newLink = LinkConverter.toLink(now, workspace, externalService);
 
             externalServiceRepository.save(externalService);
-            Link result = linkRepository.save(newLink);
+            linkRepository.save(newLink);
 
-            return SlackConverter.toInstallApp(result.getWorkspace().getId(), result.getLinkedAt());
         }
+
+        // 기본 팀 ID로 리다이렉트
+        return workspace.getTeams().getFirst().getId();
     }
 }

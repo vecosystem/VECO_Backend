@@ -1,7 +1,5 @@
 package com.example.Veco.domain.slack.controller;
 
-import com.example.Veco.domain.slack.dto.SlackResDTO;
-import com.example.Veco.domain.slack.exception.code.SlackSuccessCode;
 import com.example.Veco.domain.slack.service.SlackCommandService;
 import com.example.Veco.global.apiPayload.ApiResponse;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -9,7 +7,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,18 +31,21 @@ public class SlackController {
     @GetMapping("/connect")
     public ApiResponse<String> slackConnect(
             @RequestHeader("Authorization") @Parameter(hidden = true)
-            String token
+            String token,
+            @AuthenticationPrincipal UserDetails user
     ){
-        return ApiResponse.onSuccess(slackCommandService.redirectSlackOAuth(token));
+        return ApiResponse.onSuccess(slackCommandService.redirectSlackOAuth(token, user));
     }
 
     // Slack Callback: 비즈니스 로직 시작 지점
     @Hidden
     @GetMapping("/callback")
-    public ApiResponse<SlackResDTO.InstallApp> installApp(
+    public RedirectView installApp(
             @RequestParam String code,
             @RequestParam String state
     ){
-        return ApiResponse.onSuccess(SlackSuccessCode.CONNECTING, slackCommandService.installApp(code, state));
+        Long teamId = slackCommandService.installApp(code, state);
+        String URL = "http://localhost:5173/slack/complete?teamId="+teamId;
+        return new RedirectView(URL);
     }
 }
