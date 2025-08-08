@@ -30,6 +30,7 @@ import com.example.Veco.domain.team.service.NumberSequenceService;
 import com.example.Veco.global.apiPayload.code.ErrorStatus;
 import com.example.Veco.global.apiPayload.exception.VecoException;
 import com.example.Veco.global.apiPayload.page.CursorPage;
+import com.example.Veco.global.auth.user.AuthUser;
 import com.example.Veco.global.enums.Category;
 import com.example.Veco.global.enums.ExtServiceType;
 import lombok.RequiredArgsConstructor;
@@ -65,7 +66,12 @@ public class ExternalService {
     private final GitHubInstallationRepository githubInstallationRepository;
 
     @Transactional
-    public ExternalResponseDTO.CreateResponseDTO createExternal(Long teamId, ExternalRequestDTO.ExternalCreateRequestDTO request){
+    public ExternalResponseDTO.CreateResponseDTO createExternal(Long teamId,
+                                                                ExternalRequestDTO.ExternalCreateRequestDTO request,
+                                                                AuthUser user) {
+
+        Member author = memberRepository.findBySocialUid(user.getSocialUid())
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND));
 
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new TeamException(TeamErrorCode._NOT_FOUND));
@@ -91,7 +97,7 @@ public class ExternalService {
             goal = findGoalById(request.getGoalId());
         }
 
-        External external = ExternalConverter.toExternal(team, goal, request, sequenceDTO.getNextCode());
+        External external = ExternalConverter.toExternal(team, goal, request, sequenceDTO.getNextCode(), author);
 
         members.forEach(member -> {
             Assignment assignment = AssignmentConverter.toAssignment(member, external, Category.EXTERNAL);

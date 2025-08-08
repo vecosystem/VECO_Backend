@@ -1,6 +1,7 @@
 package com.example.Veco.domain.external.controller;
 
 import com.example.Veco.domain.external.dto.response.GitHubApiResponseDTO;
+import com.example.Veco.domain.external.dto.response.GitHubResponseDTO;
 import com.example.Veco.global.apiPayload.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,4 +25,10 @@ public interface GitHubSwaggerDocs {
             description = "GitHub App 설치를 위한 App 설치 페이지 URL을 전달합니다."
     )
     ApiResponse<?> connectGitHub(@RequestParam("teamId") Long teamId);
+
+    @Operation(
+            summary = "GitHub 연동을 마친 팀의 연동 ID를 조회",
+            description = "GitHub 연동을 성공적으로 마친 팀의 ID르 통해서 연동 ID를 조회합니다."
+    )
+    ApiResponse<GitHubResponseDTO.GitHubAppInstallationDTO> getInstallation(@PathVariable("teamId") Long teamId);
 }

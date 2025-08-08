@@ -20,6 +20,7 @@ import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.domain.team.repository.TeamRepository;
 import com.example.Veco.domain.team.service.NumberSequenceService;
 import com.example.Veco.global.enums.Category;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatusCode;
@@ -41,6 +42,7 @@ public class GitHubIssueService {
     private final ExternalRepository externalRepository;
     private final NumberSequenceService numberSequenceService;
     private final GitHubInstallationRepository gitHubInstallationRepository;
+    private ObjectMapper objectMapper = new ObjectMapper();
     private final GitHubTokenService gitHubTokenService;
     private final WebClient webClient = WebClient.builder()
             .baseUrl("https://api.github.com")
@@ -50,30 +52,37 @@ public class GitHubIssueService {
             .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(1024 * 1024)) // 1MB
             .build();
 
-    public void processIssueWebhook(GitHubWebhookPayload payload) {
+    public void processIssueWebhook(String payload) {
 
-        log.info("payload.getIssue: {}", payload.getIssue());
-        log.info("paload.getRepository: {}", payload.getRepository());
-        log.info("paload.getAction: {}", payload.getAction());
-        log.info("paload.getSender: {}", payload.getSender());
-        log.info("payload.getInstallation: {}", payload.getInstallation());
 
-        String action = payload.getAction();
+        try{
+            GitHubWebhookPayload issuePayload = objectMapper.readValue(payload, GitHubWebhookPayload.class);
 
-        GitHubWebhookPayload.Issue issue = payload.getIssue();
+            log.info("payload.getIssue: {}", issuePayload.getIssue());
+            log.info("paload.getRepository: {}", issuePayload.getRepository());
+            log.info("paload.getAction: {}", issuePayload.getAction());
+            log.info("paload.getSender: {}", issuePayload.getSender());
+            log.info("payload.getInstallation: {}", issuePayload.getInstallation());
 
-        switch (action) {
-            case "opened":
-                log.info("Issue {} opened", issue.getNumber());
-                createIssue(payload);
-                break;
-            case "closed":
-                log.info("Issue {} closed", issue.getNumber());
-                closeIssue(payload);
-                break;
-            case "edited":
-                log.info("Issue {} edited", issue.getNumber());
-                updateIssue(payload);
+            String action = issuePayload.getAction();
+
+            GitHubWebhookPayload.Issue issue = issuePayload.getIssue();
+
+            switch (action) {
+                case "opened":
+                    log.info("Issue {} opened", issue.getNumber());
+                    createIssue(issuePayload);
+                    break;
+                case "closed":
+                    log.info("Issue {} closed", issue.getNumber());
+                    closeIssue(issuePayload);
+                    break;
+                case "edited":
+                    log.info("Issue {} edited", issue.getNumber());
+                    updateIssue(issuePayload);
+            }
+        }catch (Exception e){
+
         }
     }
 

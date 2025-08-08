@@ -2,6 +2,8 @@ package com.example.Veco.domain.external.service;
 
 import com.example.Veco.domain.external.converter.GitHubConverter;
 import com.example.Veco.domain.external.dto.response.GitHubResponseDTO;
+import com.example.Veco.domain.external.exception.GitHubException;
+import com.example.Veco.domain.external.exception.code.GitHubErrorCode;
 import com.example.Veco.domain.mapping.GithubInstallation;
 import com.example.Veco.domain.mapping.repository.GitHubInstallationRepository;
 import com.example.Veco.domain.member.entity.Member;
@@ -24,7 +26,7 @@ public class GitHubService {
     private final GitHubInstallationRepository gitHubInstallationRepository;
     private final TeamRepository teamRepository;
 
-    public GitHubResponseDTO.GitHubAppInstallationDTO saveInstallationInfo(Long teamId, Long installationId) {
+    public void saveInstallationInfo(Long teamId, Long installationId) {
 
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new TeamException(TeamErrorCode._NOT_FOUND));
@@ -35,12 +37,19 @@ public class GitHubService {
                 .installationId(installationId)
                 .build();
 
-        GithubInstallation savedInstallationInfo = gitHubInstallationRepository.save(info);
+        gitHubInstallationRepository.save(info);
 
-        return GitHubConverter.toGitHubAppInstallationDTO(savedInstallationInfo);
     }
 
-    public Long getInstallationId(Long teamId) {
+    public GitHubResponseDTO.GitHubAppInstallationDTO getInstallationInfo(Long teamId) {
+
+        GithubInstallation githubInstallation = gitHubInstallationRepository.findById(teamId)
+                .orElseThrow(() -> new GitHubException(GitHubErrorCode.INSTALLATION_INFO_NOT_FOUND));
+
+        return GitHubConverter.toGitHubAppInstallationDTO(githubInstallation);
+    }
+
+    private Long getInstallationId(Long teamId) {
         return gitHubInstallationRepository.findByTeamId(teamId)
                 .orElseThrow().getInstallationId();
     }

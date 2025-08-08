@@ -6,6 +6,7 @@ import com.example.Veco.domain.external.dto.response.ExternalApiResponse;
 import com.example.Veco.domain.external.dto.response.ExternalGroupedResponseDTO;
 import com.example.Veco.domain.external.dto.response.ExternalResponseDTO;
 import com.example.Veco.global.apiPayload.ApiResponse;
+import com.example.Veco.global.auth.user.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -103,8 +105,9 @@ public interface ExternalSwaggerDocs {
             )
     })
     ApiResponse<ExternalResponseDTO.CreateResponseDTO> createExternal(
-            @Parameter(description = "팀 ID", required = true) @PathVariable("teamId") Long teamId,
-            @Valid @RequestBody ExternalRequestDTO.ExternalCreateRequestDTO requestDTO);
+            @PathVariable("teamId") Long teamId,
+            @Valid @RequestBody ExternalRequestDTO.ExternalCreateRequestDTO requestDTO,
+            @AuthenticationPrincipal AuthUser user);
 
     @Operation(
             summary = "팀 내 외부이슈를 수정하는 API",
