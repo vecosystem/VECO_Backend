@@ -57,6 +57,9 @@ public class SlackCommandService {
         // 토큰 Bearer 제거
         token = token.replace("Bearer ", "");
 
+        // 로그
+        log.info("[ .yml 파싱한 Client ID ]:{}", clientId);
+
         // 해당 사용자가 특정 워크스페이스에 속해있는지 검증
         String uid = user.getUsername();
         Member member = memberRepository.findBySocialUid(uid)
