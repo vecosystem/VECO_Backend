@@ -20,6 +20,7 @@ import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.time.LocalDateTime;
 
 @Repository
 public class ExternalCursorRepository implements ExternalCustomRepository{
@@ -147,6 +148,15 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
         for (com.querydsl.core.Tuple assigneeResult : assigneeResults) {
             if (totalFetched >= size) {
                 hasNext = true;
+                // 다음 그룹이 있으므로 현재 그룹의 첫 번째 항목으로 커서 생성
+                Long assigneeId = assigneeResult.get(assignment.assignee.id);
+                if (nextCursor == null) {
+                    ExternalCursor groupCursor = new ExternalCursor();
+                    groupCursor.setId(Long.MAX_VALUE); // 다음 그룹의 시작점을 나타냄
+                    groupCursor.setCreatedAt(java.time.LocalDateTime.of(1970, 1, 1, 0, 0));
+                    groupCursor.setGroupValue(assigneeId != null ? assigneeId.toString() : "NULL");
+                    nextCursor = groupCursor.encode();
+                }
                 break;
             }
             
@@ -247,6 +257,15 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
         for (com.querydsl.core.Tuple goalResult : goalResults) {
             if (totalFetched >= size) {
                 hasNext = true;
+                // 다음 그룹이 있으므로 현재 그룹의 첫 번째 항목으로 커서 생성
+                Long goalId = goalResult.get(external.goal.id);
+                if (nextCursor == null) {
+                    ExternalCursor groupCursor = new ExternalCursor();
+                    groupCursor.setId(Long.MAX_VALUE); // 다음 그룹의 시작점을 나타냄
+                    groupCursor.setCreatedAt(java.time.LocalDateTime.of(1970, 1, 1, 0, 0));
+                    groupCursor.setGroupValue(goalId != null ? goalId.toString() : "NULL");
+                    nextCursor = groupCursor.encode();
+                }
                 break;
             }
             
@@ -336,6 +355,14 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
         for (T enumValue : enumOrder) {
             if (totalFetched >= size) {
                 hasNext = true;
+                // 다음 그룹이 있으므로 현재 그룹의 첫 번째 항목으로 커서 생성
+                if (nextCursor == null) {
+                    ExternalCursor groupCursor = new ExternalCursor();
+                    groupCursor.setId(Long.MAX_VALUE); // 다음 그룹의 시작점을 나타냄
+                    groupCursor.setCreatedAt(java.time.LocalDateTime.of(1970, 1, 1, 0, 0));
+                    groupCursor.setGroupValue(enumValue.name());
+                    nextCursor = groupCursor.encode();
+                }
                 break;
             }
             
