@@ -11,5 +11,5 @@ public interface MemberCommandService {
     
     Member updateProfileImage(MultipartFile file, Member member);
 
-    void deleteProfileImage(Member member);
+    Member deleteProfileImage(Member member);
 }

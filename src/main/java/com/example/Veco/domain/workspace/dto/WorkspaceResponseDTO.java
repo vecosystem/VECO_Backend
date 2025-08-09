@@ -23,6 +23,7 @@ public class WorkspaceResponseDTO {
         private String workspaceName; // name -> workspaceName
         private String workspaceImageUrl; // profileUrl -> workspaceProfileImageUrl
         private String workspaceUrl;
+        private String invitePassword;
         private Long defaultTeamId;
     }
 

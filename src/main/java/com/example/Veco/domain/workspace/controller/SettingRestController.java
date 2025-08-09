@@ -61,7 +61,7 @@ public class SettingRestController {
      * 유저 프로필 이미지 수정 API
      * - 로그인된 유저의 프로필 이미지를 MulipartFile로 수정
      */
-    @PatchMapping(value = "/setting/my-profile/profileImage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/setting/my-profile/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "유저의 프로필 이미지를 수정합니다.")
     public ApiResponse<MemberResponseDTO.MemberProfileImageResponseDto> patchProfileImage(
             @RequestParam MultipartFile image,
@@ -76,13 +76,13 @@ public class SettingRestController {
     /**
      * 유저 프로필 이미지 삭제 API
      */
-    @DeleteMapping("/setting/my-profile/profileImage")
+    @DeleteMapping("/setting/my-profile/profile-image")
     @Operation(summary = "유저의 프로필 이미지를 삭제합니다.")
-    public ApiResponse<Void> deleteProfileImage(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ApiResponse<MemberResponseDTO.MemberProfileImageResponseDto> deleteProfileImage(@AuthenticationPrincipal CustomUserDetails userDetails) {
         Member member = memberQueryService.getMemberBySocialUid(userDetails.getSocialUid());
 
-        memberCommandService.deleteProfileImage(member);
-        return ApiResponse.onSuccess(null);
+        Member member1 = memberCommandService.deleteProfileImage(member);
+        return ApiResponse.onSuccess(MemberConverter.toMemberProfileImageResponseDTO(member1));
     }
 
     /**
