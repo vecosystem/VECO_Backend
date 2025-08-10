@@ -124,10 +124,6 @@ public class ExternalService {
                 commentRoom != null ? commentRoom.getComments() : null);
     }
 
-    public CursorPage<ExternalResponseDTO.ExternalDTO> getExternalsWithPagination(ExternalSearchCriteria criteria, String cursor, int size){
-        return externalCustomRepository.findExternalWithCursor(criteria, cursor, size);
-    }
-
     public ExternalGroupedResponseDTO.ExternalGroupedPageResponse getExternalsWithGroupedPagination(ExternalSearchCriteria criteria, String cursor, int size){
         return ((com.example.Veco.domain.external.repository.ExternalCursorRepository) externalCustomRepository)
                 .findExternalWithGroupedResponse(criteria, cursor, size);

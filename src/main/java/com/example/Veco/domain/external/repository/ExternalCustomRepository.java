@@ -5,5 +5,4 @@ import com.example.Veco.domain.external.dto.paging.ExternalSearchCriteria;
 import com.example.Veco.global.apiPayload.page.CursorPage;
 
 public interface ExternalCustomRepository {
-    CursorPage<ExternalResponseDTO.ExternalDTO> findExternalWithCursor(ExternalSearchCriteria criteria, String cursor, int size);
 }
