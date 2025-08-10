@@ -155,6 +155,7 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
                 // 평문대신 BCrypto 사용해서 암호화 한뒤 저장해야 함
                 .invitePassword(invitePassword)
                 .inviteUrl(inviteUrl)
+                .profileUrl("https://s3.ap-northeast-2.amazonaws.com/s3.veco/default/defalut-workspace.png")
                 .workspaceUrl(workspaceUrl)
                 .members(new ArrayList<>()) // 초기화
                 .teams(new ArrayList<>())   // 초기화
@@ -169,6 +170,7 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
                 .name(workSpace.getName()) // 워크스페이스 이름과 같은 디폴트 팀
                 .workSpace(workSpace)
                 .goalNumber(1L)
+                .profileUrl("https://s3.ap-northeast-2.amazonaws.com/s3.veco/default/defalut-workspace.png") // 기본 팀은 워크스페이스 이미지 사용
                 .build();
 
         workSpace.getTeams().add(defaultTeam);
