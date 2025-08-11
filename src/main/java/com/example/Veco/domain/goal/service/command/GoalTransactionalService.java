@@ -54,7 +54,7 @@ public class GoalTransactionalService {
         String name = team.getWorkSpace().getName()+"-g"+team.getGoalNumber();
         Goal goal = goalRepository.save(GoalConverter.toGoal(dto,team,name));
 
-        // 목표 <-> 담당자 연결
+        // 목표 <-> 담당자 연결: 없으면 null로 저장
         List<Assignee> assigneeList = new ArrayList<>();
         memberTeamList.forEach(
                 value -> assigneeList.add(
@@ -65,6 +65,10 @@ public class GoalTransactionalService {
         );
         assigneeRepository.saveAll(assigneeList);
 
+        if (assigneeList.isEmpty()){
+            assigneeRepository.save(AssigneeConverter.toAssignee(null, Category.GOAL, goal));
+        }
+
         // 목표 <-> 이슈 연결
         issueList.forEach(
                 value -> value.updateGoal(goal)
@@ -74,23 +78,6 @@ public class GoalTransactionalService {
         team.updateGoalNumber(team.getGoalNumber()+1);
 
         return goal.getId();
-    }
-
-    // 목표 삭제
-    @Transactional
-    protected void deleteGoal(
-            Long goalId
-    ){
-
-        // 객체 조회
-        Goal goal = goalRepository.findById(goalId).orElseThrow(() ->
-                new GoalException(GoalErrorCode.NOT_FOUND));
-
-        // 목표 삭제
-        goalRepository.delete(goal);
-
-        // 담당자 삭제
-        assigneeRepository.deleteAllByTypeAndTargetId(Category.GOAL, goal.getId());
     }
 
     // 목표 수정
@@ -136,6 +123,12 @@ public class GoalTransactionalService {
                             AssigneeConverter.toAssignee(value, Category.GOAL, goal)
                     )
             );
+
+            // 신규 담당자가 없는 경우, null로
+            if (memberTeamList.isEmpty()){
+                assigneeRepository.save(AssigneeConverter.toAssignee(null, Category.GOAL, goal));
+            }
+
             isRestore = true;
         }
         // 기한 변경

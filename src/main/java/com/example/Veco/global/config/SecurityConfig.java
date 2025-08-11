@@ -42,7 +42,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/test/login", "/api/token/reissue", "/login-test.html", "/v3/api-docs/**", "/swagger-ui/**",
+                        .requestMatchers("/api/test/**", "/api/teams/*/externals/**", "/api/teams/*/externals", "/api/test/login", "/api/token/reissue", "/login-test.html", "/v3/api-docs/**", "/swagger-ui/**",
                                 "/swagger-resources/**", "/css/**", "/images/**", "/healthcheck",
                                 "/js/**", "/h2-console/**", "/profile","/workspace/create-url","/slack/callback", "/github/**","/api/github/**").permitAll()
                         .anyRequest().authenticated()

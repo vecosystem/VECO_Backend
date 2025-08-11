@@ -23,6 +23,7 @@ public class WorkspaceConverter {
                 .workspaceImageUrl(workspace.getProfileUrl())
                 .workspaceUrl(workspace.getWorkspaceUrl())
                 .defaultTeamId(workspace.getTeams().get(0).getId())
+                .invitePassword(workspace.getInvitePassword())
                 .build();
     }
 
@@ -33,6 +34,7 @@ public class WorkspaceConverter {
         return WorkspaceResponseDTO.WorkspaceTeamDto.builder()
                 .teamId(team.getId())
                 .teamName(team.getName())
+                .teamImageUrl(team.getProfileUrl())
                 .memberCount(memberCount)
                 .createdAt(team.getCreatedAt())
                 .build();

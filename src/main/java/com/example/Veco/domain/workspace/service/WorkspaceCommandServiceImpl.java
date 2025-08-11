@@ -25,6 +25,7 @@ import com.example.Veco.domain.workspace.util.InviteTokenGenerator;
 import com.example.Veco.domain.workspace.util.SlugGenerator;
 import com.example.Veco.global.auth.user.AuthUser;
 import com.example.Veco.global.auth.user.userdetails.CustomUserDetails;
+import com.example.Veco.global.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,10 +54,11 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
      * 3. MemberTeam 엔티티로 연결
      * 4. 연결 저장 후 DTO 반환
      */
+    @Transactional
     @Override
     public WorkspaceResponseDTO.CreateTeamResponseDto createTeam(WorkSpace workspace, WorkspaceRequestDTO.CreateTeamRequestDto request) {
         // 1. 팀 이름 중복 검사
-        if (teamRepository.existsByName(request.getTeamName())) {
+        if (teamRepository.existsByNameAndWorkSpace(request.getTeamName(), workspace)) {
             throw new TeamException(TeamErrorCode._DUPLICATE_TEAM_NAME);
         }
         // 2. 팀 저장
@@ -92,6 +94,7 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
         List<MemberTeam> memberTeams = members.stream()
                 .map(member -> MemberTeam.builder()
                         .member(member)
+                        .role(Role.USER)
                         .team(team)
                         .build())
                 .toList();
@@ -152,6 +155,7 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
                 // 평문대신 BCrypto 사용해서 암호화 한뒤 저장해야 함
                 .invitePassword(invitePassword)
                 .inviteUrl(inviteUrl)
+                .profileUrl("https://s3.ap-northeast-2.amazonaws.com/s3.veco/default/defalut-workspace.png")
                 .workspaceUrl(workspaceUrl)
                 .members(new ArrayList<>()) // 초기화
                 .teams(new ArrayList<>())   // 초기화
@@ -166,6 +170,7 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
                 .name(workSpace.getName()) // 워크스페이스 이름과 같은 디폴트 팀
                 .workSpace(workSpace)
                 .goalNumber(1L)
+                .profileUrl("https://s3.ap-northeast-2.amazonaws.com/s3.veco/default/defalut-workspace.png") // 기본 팀은 워크스페이스 이미지 사용
                 .build();
 
         workSpace.getTeams().add(defaultTeam);

@@ -18,4 +18,6 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
     int countByWorkSpace(WorkSpace workSpace);
 
     boolean existsByName(String name);
+
+    boolean existsByNameAndWorkSpace(String name, WorkSpace workSpace);
 }
