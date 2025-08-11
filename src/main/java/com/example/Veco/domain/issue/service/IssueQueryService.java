@@ -13,6 +13,7 @@ import com.example.Veco.domain.issue.dto.IssueResponseDTO;
 import com.example.Veco.domain.issue.dto.IssueResponseDTO.FilteringIssue;
 import com.example.Veco.domain.issue.dto.IssueResponseDTO.IssueWithManagers;
 import com.example.Veco.domain.issue.dto.IssueResponseDTO.SimpleIssue;
+import com.example.Veco.domain.issue.dto.IssueResponseDTO.Pageable;
 import com.example.Veco.domain.issue.entity.Issue;
 import com.example.Veco.domain.issue.entity.QIssue;
 import com.example.Veco.domain.issue.exception.IssueException;
@@ -49,7 +50,7 @@ public class IssueQueryService {
     private final CommentRepository commentRepository;
     private final TeamRepository teamRepository;
 
-    public IssueResponseDTO.Pageable<FilteringIssue<IssueWithManagers>> getIssuesByTeamId(
+    public Pageable<FilteringIssue<IssueWithManagers>> getIssuesByTeamId(
             Long teamId,
             String cursor,
             Integer size,
@@ -265,10 +266,8 @@ public class IssueQueryService {
                     // firstCursor가 일치할 때, 조회 시작
                     if ((size > 0) && (filter.equals(firstCursor) || isContinue)) {
                         if (filter.equals("담당자 없음")) {
-                            // 담당자가 없는 경우
                             result = issueRepository.findUnassignedIssuesByTeamId(teamId, builder, size);
                         } else {
-                            // 담당자가 있는 경우
                             builder.and(qAssignee.memberTeam.member.name.eq(filter));
                             result = issueRepository.findIssuesByTeamId(builder, size);
                         }
@@ -320,13 +319,12 @@ public class IssueQueryService {
                 }
 
                 // 목표가 없는 이슈의 개수 조회
-                BooleanBuilder noGoalQuery = new BooleanBuilder();
                 Long noGoalCount = issueRepository.findNoGoalIssuesCountByTeamId(teamId);
                 map.put("목표 없음", Math.toIntExact(noGoalCount));
 
-                // firstCursor가 담당자 리스트에 포함되어있는지 확인
+                // firstCursor가 목표 리스트에 포함되어있는지 확인
                 if (!goals.contains(firstCursor)) {
-                    // 없으면 담당자 없음부터
+                    // 없으면 목표 없음부터
                     firstCursor = "목표 없음";
                 }
 
@@ -338,10 +336,8 @@ public class IssueQueryService {
                     if ((size > 0) && (filter.equals(firstCursor) || isContinue)) {
                         builder.and(qIssue.team.id.eq(teamId));
                         if (filter.equals("목표 없음")) {
-                            // 목표가 없는 경우
                             builder.and(qIssue.goal.isNull());
                         } else {
-                            // 목표가 있는 경우
                             builder.and(qIssue.goal.title.eq(filter));
                         }
                         result = issueRepository.findIssuesByTeamId(builder, size);
@@ -395,7 +391,6 @@ public class IssueQueryService {
 
         Map<Long, List<Assignee>> assignees = issueRepository.findManagerInfoByTeamId(teamId);
 
-        // 각 필터 그룹별로 담당자 정보가 포함된 이슈 리스트 생성
         List<FilteringIssue<IssueWithManagers>> resultWithManagers = filterResult.stream()
                 .map(filterGroup -> {
                     // 현재 필터 그룹의 이슈들을 IssueWithManagers로 변환
@@ -405,11 +400,11 @@ public class IssueQueryService {
                                 return IssueConverter.toIssueWithManagers(simpleIssue, IssueConverter.toSimpleManagerInfos(issueManagers));
                             })
                             .collect(Collectors.toList());
-
                     // 담당자 정보가 포함된 새로운 필터 그룹 생성
                     return IssueConverter.toFilteringIssue(issuesWithManagers, filterGroup.filterName(), filterGroup.dataCnt());
                 })
                 .collect(Collectors.toList());
+
 
 
         return IssueConverter.toPageable(resultWithManagers, hasNext, nextCursor, pageSize);

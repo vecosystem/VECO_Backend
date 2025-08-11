@@ -6,8 +6,6 @@ import com.example.Veco.domain.goal.entity.QGoal;
 import com.example.Veco.domain.issue.dto.IssueResponseDTO;
 import com.example.Veco.domain.issue.entity.Issue;
 import com.example.Veco.domain.issue.entity.QIssue;
-import com.example.Veco.domain.issue.exception.IssueException;
-import com.example.Veco.domain.issue.exception.code.IssueErrorCode;
 import com.example.Veco.domain.member.entity.QMember;
 import com.example.Veco.global.enums.Category;
 import com.querydsl.core.group.GroupBy;
@@ -39,7 +37,7 @@ public class CustomIssueRepositoryImpl implements CustomIssueRepository {
                 .from(issue)
                 .where(query)
                 .leftJoin(assignee).on(assignee.type.eq(Category.ISSUE).and(assignee.targetId.eq(issue.id)))
-                .leftJoin(member).on(member.eq(assignee.memberTeam.member))
+                .leftJoin(member).on(member.id.eq(assignee.memberTeam.member.id))
                 .leftJoin(goal).on(goal.id.eq(issue.goal.id))
                 .orderBy(issue.id.desc())
                 .groupBy(issue.id, assignee.id)
@@ -62,7 +60,6 @@ public class CustomIssueRepositoryImpl implements CustomIssueRepository {
                                                 goal.id.coalesce(-1L),
                                                 goal.title.coalesce("목표 없음")
                                         )
-
                                 )
                         )
                 );
@@ -104,9 +101,10 @@ public class CustomIssueRepositoryImpl implements CustomIssueRepository {
                 .from(issue)
                 .leftJoin(goal).on(goal.id.eq(issue.goal.id))
                 .leftJoin(assignee).on(assignee.type.eq(Category.ISSUE)
-                        .and(assignee.targetId.isNull()))
+                        .and(assignee.targetId.eq(issue.id)))
                 .where(issue.team.id.eq(teamId)
-                        .and(query))
+                        .and(query)
+                        .and(assignee.targetId.isNull()))
                 .orderBy(issue.id.desc())
                 .limit(size)
                 .fetch();
@@ -157,8 +155,9 @@ public class CustomIssueRepositoryImpl implements CustomIssueRepository {
                 .select(issue.count())
                 .from(issue)
                 .leftJoin(assignee).on(assignee.type.eq(Category.ISSUE)
+                        .and(assignee.targetId.eq(issue.id)))
+                .where(issue.team.id.eq(teamId)
                         .and(assignee.targetId.isNull()))
-                .where(issue.team.id.eq(teamId))
                 .fetchOne();
     }
 
