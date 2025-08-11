@@ -3,8 +3,6 @@ package com.example.Veco.domain.external.dto.paging;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -14,12 +12,10 @@ class ExternalCursorTest {
     @DisplayName("커서 인코딩 및 디코딩 테스트")
     void testCursorEncodeAndDecode() {
         // Given
-        LocalDateTime testTime = LocalDateTime.of(2024, 1, 1, 12, 0, 0);
         Long testId = 123L;
         String testGroupValue = "TEST_GROUP";
         
         ExternalCursor originalCursor = new ExternalCursor();
-        originalCursor.setCreatedAt(testTime);
         originalCursor.setId(testId);
         originalCursor.setGroupValue(testGroupValue);
 
@@ -28,7 +24,6 @@ class ExternalCursorTest {
         ExternalCursor decodedCursor = ExternalCursor.decode(encoded);
 
         // Then
-        assertEquals(originalCursor.getCreatedAt(), decodedCursor.getCreatedAt());
         assertEquals(originalCursor.getId(), decodedCursor.getId());
         assertEquals(originalCursor.getGroupValue(), decodedCursor.getGroupValue());
     }
@@ -37,11 +32,9 @@ class ExternalCursorTest {
     @DisplayName("null groupValue 처리 테스트")
     void testNullGroupValueHandling() {
         // Given
-        LocalDateTime testTime = LocalDateTime.of(2024, 1, 1, 12, 0, 0);
         Long testId = 123L;
         
         ExternalCursor originalCursor = new ExternalCursor();
-        originalCursor.setCreatedAt(testTime);
         originalCursor.setId(testId);
         originalCursor.setGroupValue(null);
 
@@ -50,7 +43,6 @@ class ExternalCursorTest {
         ExternalCursor decodedCursor = ExternalCursor.decode(encoded);
 
         // Then
-        assertEquals(originalCursor.getCreatedAt(), decodedCursor.getCreatedAt());
         assertEquals(originalCursor.getId(), decodedCursor.getId());
         assertNull(decodedCursor.getGroupValue());
     }
@@ -71,12 +63,10 @@ class ExternalCursorTest {
     @DisplayName("커서 인코딩 결과가 URL Safe Base64인지 확인")
     void testEncodedCursorIsUrlSafe() {
         // Given
-        LocalDateTime testTime = LocalDateTime.of(2024, 1, 1, 12, 0, 0);
         Long testId = 123L;
         String testGroupValue = "TEST_GROUP+/=";
         
         ExternalCursor cursor = new ExternalCursor();
-        cursor.setCreatedAt(testTime);
         cursor.setId(testId);
         cursor.setGroupValue(testGroupValue);
 

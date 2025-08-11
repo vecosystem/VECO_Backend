@@ -251,7 +251,7 @@ public class ExternalConverter {
         List<ExternalGroupedResponseDTO.ManagerInfoDTO> managerInfos = external.getAssignments().stream()
                 .map(assignment -> ExternalGroupedResponseDTO.ManagerInfoDTO.builder()
                         .profileUrl(assignment.getProfileUrl())
-                        .managerName(assignment.getAssigneeName())
+                        .name(assignment.getAssigneeName())
                         .build())
                 .collect(Collectors.toList());
 
