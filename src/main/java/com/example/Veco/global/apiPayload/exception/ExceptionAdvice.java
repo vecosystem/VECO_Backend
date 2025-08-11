@@ -7,6 +7,7 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -72,6 +73,24 @@ public class ExceptionAdvice {
 
         // 에러 코드, 메시지와 함께 errors를 반환
         return ResponseEntity.status(constraintErrorCode.getReasonHttpStatus().getHttpStatus()).body(errorResponse);
+    }
+
+    // 요청 직렬화 실패
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    protected ResponseEntity<ApiResponse<Void>> handleHttpMessageNotReadableException(
+            HttpMessageNotReadableException ex
+    ){
+        log.error("[ 요청 직렬화 실패 ]");
+
+        // 직렬화 실패시, 응답 통일
+        BaseErrorStatus code = ErrorStatus.BODY_TYPE_BAD_REQUEST;
+        ApiResponse<Void> errorResponse = ApiResponse.onFailure(
+                code.getReasonHttpStatus().getCode(),
+                code.getReasonHttpStatus().getMessage(),
+                null
+        );
+
+        return ResponseEntity.status(code.getReasonHttpStatus().getHttpStatus()).body(errorResponse);
     }
 
     // 쿼리 파라미터 검증

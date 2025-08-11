@@ -20,6 +20,7 @@ public enum ErrorStatus implements BaseErrorStatus{
     VALID_FAILED(HttpStatus.BAD_REQUEST,
             "VALID400_1",
             "잘못된 파라미터입니다."),
+    BODY_TYPE_BAD_REQUEST(HttpStatus.BAD_REQUEST,"COMMON400_1", "요청한 Body 타입이 잘못되었습니다.")
     ;
 
     private HttpStatus httpStatus;
