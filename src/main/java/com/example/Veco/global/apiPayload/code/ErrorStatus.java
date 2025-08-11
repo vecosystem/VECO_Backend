@@ -23,9 +23,9 @@ public enum ErrorStatus implements BaseErrorStatus{
     BODY_TYPE_BAD_REQUEST(HttpStatus.BAD_REQUEST,"COMMON400_1", "요청한 Body 타입이 잘못되었습니다.")
     ;
 
-    private HttpStatus httpStatus;
-    private String code;
-    private String message;
+    private final HttpStatus httpStatus;
+    private final String code;
+    private final String message;
 
     public ErrorReasonDTO getReasonHttpStatus() {
         return ErrorReasonDTO.builder()

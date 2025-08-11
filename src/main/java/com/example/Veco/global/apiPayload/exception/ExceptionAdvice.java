@@ -80,7 +80,7 @@ public class ExceptionAdvice {
     protected ResponseEntity<ApiResponse<Void>> handleHttpMessageNotReadableException(
             HttpMessageNotReadableException ex
     ){
-        log.error("[ 요청 직렬화 실패 ]");
+        log.error("[ 요청 직렬화 실패 ]: {}", ex.getMessage());
 
         // 직렬화 실패시, 응답 통일
         BaseErrorStatus code = ErrorStatus.BODY_TYPE_BAD_REQUEST;

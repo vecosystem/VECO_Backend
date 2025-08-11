@@ -19,7 +19,6 @@ public class GoalReqDTO {
             State state,
             Priority priority,
             List<Long> managersId,
-            Boolean isIncludeMe,
             Deadline deadline,
             List<Long> issueId
     ){}
