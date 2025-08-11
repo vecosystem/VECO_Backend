@@ -114,6 +114,6 @@ public class ExternalGroupedResponseDTO {
         private String profileUrl;
         
         @Schema(description = "담당자 이름")
-        private String managerName;
+        private String name;
     }
 }
