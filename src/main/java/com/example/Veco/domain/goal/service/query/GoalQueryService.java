@@ -372,9 +372,9 @@ public class GoalQueryService {
         List<Issue> issues = issueRepository.findAllByGoal(goal)
                 .orElse(new ArrayList<>());
 
-        // 댓글 조회(댓글방 조회 -> 댓글 조회, 댓글 최신순): 없으면 []
+        // 댓글 조회(댓글방 조회 -> 댓글 조회, 댓글 오래된순): 없으면 []
         CommentRoom commentRooms = commentRoomRepository.findByRoomTypeAndTargetId(Category.GOAL, goalId);
-        List<Comment> comments = commentRepository.findAllByCommentRoomOrderByIdDesc(commentRooms);
+        List<Comment> comments = commentRepository.findAllByCommentRoomOrderByIdAsc(commentRooms);
 
         // 조회한 요소들 DTO 변환
         return GoalConverter.toFullGoal(
