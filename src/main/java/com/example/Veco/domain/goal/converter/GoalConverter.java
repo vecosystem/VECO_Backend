@@ -55,10 +55,12 @@ public class GoalConverter {
             List<GoalResDTO.CommentInfo> comment
     ){
         return GoalResDTO.FullGoal.builder()
+                .id(goal.getId())
                 .name(goal.getName())
                 .title(goal.getTitle())
                 .content(goal.getContent())
-                .priority(goal.getPriority().toString())
+                .state(goal.getState().name())
+                .priority(goal.getPriority().name())
                 .managers(toData(assignee))
                 .deadline(toDeadline(goal))
                 .issues(toData(issue))

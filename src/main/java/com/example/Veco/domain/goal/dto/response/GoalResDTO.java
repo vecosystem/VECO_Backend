@@ -42,9 +42,11 @@ public class GoalResDTO {
     // 자세한 조회: 목표 상세 조회
     @Builder
     public record FullGoal (
+            Long id,
             String name,
             String title,
             String content,
+            String state,
             String priority,
             Data<ManagerInfo> managers,
             Deadline deadline,
