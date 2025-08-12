@@ -1,7 +1,9 @@
 package com.example.Veco.domain.external.service;
 
 import com.example.Veco.domain.assignee.repository.AssigneeRepository;
+import com.example.Veco.domain.comment.entity.Comment;
 import com.example.Veco.domain.comment.entity.CommentRoom;
+import com.example.Veco.domain.comment.repository.CommentRepository;
 import com.example.Veco.domain.external.converter.ExternalConverter;
 import com.example.Veco.domain.external.dto.request.ExternalRequestDTO;
 import com.example.Veco.domain.external.dto.response.ExternalResponseDTO;
@@ -64,6 +66,7 @@ public class ExternalService {
     private final CommentRoomRepository commentRoomRepository;
     private final GitHubIssueService gitHubIssueService;
     private final GitHubInstallationRepository githubInstallationRepository;
+    private final CommentRepository commentRepository;
 
     @Transactional
     public ExternalResponseDTO.CreateResponseDTO createExternal(Long teamId,
@@ -118,10 +121,15 @@ public class ExternalService {
         CommentRoom commentRoom = commentRoomRepository
                 .findByRoomTypeAndTargetId(com.example.Veco.global.enums.Category.EXTERNAL, externalId);
 
+        List<Comment> comments = new ArrayList<>();
+
+        if (commentRoom != null) {
+            comments = commentRepository.findAllByCommentRoomOrderByIdAsc(commentRoom);
+        }
+
         External external = findExternalById(externalId);
 
-        return ExternalConverter.toExternalInfoDTO(external, external.getAssignments(),
-                commentRoom != null ? commentRoom.getComments() : null);
+        return ExternalConverter.toExternalInfoDTO(external, external.getAssignments(), comments);
     }
 
     public ExternalGroupedResponseDTO.ExternalGroupedPageResponse getExternalsWithGroupedPagination(ExternalSearchCriteria criteria, String cursor, int size){
