@@ -102,6 +102,9 @@ public class External extends BaseEntity {
     }
 
     public void updateExternal(ExternalRequestDTO.ExternalUpdateRequestDTO requestDTO) {
+
+        startDate = null;
+
         if(requestDTO.getTitle() != null) {
             this.title = requestDTO.getTitle();
         }
@@ -111,15 +114,17 @@ public class External extends BaseEntity {
         if(requestDTO.getState() != null) {
             this.state = requestDTO.getState();
         }
-        if (requestDTO.getDeadline().getStart() != null) {
-            this.startDate = requestDTO.getDeadline().getStart();
-        }
-        if (requestDTO.getDeadline().getEnd() != null) {
-            this.endDate = requestDTO.getDeadline().getEnd() ;
-        }
         if(requestDTO.getPriority() != null) {
             this.priority = requestDTO.getPriority();
         }
+    }
+
+    public void updateStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public void updateEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     public void closeIssue(){

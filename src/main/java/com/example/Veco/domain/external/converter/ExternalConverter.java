@@ -1,6 +1,8 @@
 package com.example.Veco.domain.external.converter;
 
 import com.example.Veco.domain.comment.entity.Comment;
+import com.example.Veco.domain.external.exception.ExternalException;
+import com.example.Veco.domain.external.exception.code.ExternalErrorCode;
 import com.example.Veco.domain.github.dto.webhook.GitHubPullRequestPayload;
 import com.example.Veco.domain.external.dto.request.ExternalRequestDTO;
 import com.example.Veco.domain.external.dto.response.ExternalResponseDTO;
@@ -8,6 +10,8 @@ import com.example.Veco.domain.external.dto.response.ExternalGroupedResponseDTO;
 import com.example.Veco.domain.github.dto.webhook.GitHubWebhookPayload;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.goal.entity.Goal;
+import com.example.Veco.domain.goal.exception.GoalException;
+import com.example.Veco.domain.goal.exception.code.GoalErrorCode;
 import com.example.Veco.domain.mapping.Assignment;
 import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.team.entity.Team;
@@ -15,6 +19,8 @@ import com.example.Veco.global.enums.ExtServiceType;
 import com.example.Veco.global.enums.Priority;
 import com.example.Veco.global.enums.State;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,12 +46,26 @@ public class ExternalConverter {
                                       ExternalRequestDTO.ExternalCreateRequestDTO dto,
                                       String externalCode,
                                       Member author){
+
+        LocalDate start = null;
+        LocalDate end = null;
+        try {
+            if (dto.getDeadline().getStart() != null) {
+                start = LocalDate.parse(dto.getDeadline().getStart());
+            }
+            if (dto.getDeadline().getEnd() != null) {
+                end = LocalDate.parse(dto.getDeadline().getEnd());
+            }
+        } catch (DateTimeParseException e) {
+            throw new ExternalException(ExternalErrorCode.DEADLINE_INVALID);
+        }
+
         External external = External.builder()
                 .member(author)
                 .description(dto.getContent())
                 .name(externalCode)
-                .startDate(dto.getDeadline() != null ? dto.getDeadline().getStart() : null)
-                .endDate(dto.getDeadline() != null ? dto.getDeadline().getEnd() : null)
+                .startDate(start)
+                .endDate(end)
                 .type(dto.getExtServiceType())
                 .priority(dto.getPriority())
                 .title(dto.getTitle())

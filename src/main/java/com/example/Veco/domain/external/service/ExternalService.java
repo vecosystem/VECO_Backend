@@ -40,8 +40,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -166,10 +168,36 @@ public class ExternalService {
             external.setGoal(goal);
         }
 
+        if(request.getDeadline() != null){
+            updateExternalDates(external, request.getDeadline());
+        }
+
         external.updateExternal(request);
 
         return ExternalConverter.updateResponseDTO(external);
     }
+
+    private void updateExternalDates(External external, ExternalRequestDTO.DeadlineRequestDTO deadline) {
+
+        if (deadline.shouldUpdateStartDate()) {
+            Optional<LocalDate> startDate = deadline.getParsedStartDate();
+            external.updateStartDate(startDate.orElse(null));
+        }
+
+        if (deadline.shouldUpdateEndDate()) {
+            Optional<LocalDate> endDate = deadline.getParsedEndDate();
+            external.updateEndDate(endDate.orElse(null));
+        }
+
+        validateDates(external.getStartDate(), external.getEndDate());
+    }
+
+    private void validateDates(LocalDate startDate, LocalDate endDate) {
+        if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("시작일은 마감일보다 늦을 수 없습니다.");
+        }
+    }
+
 
     public String getExternalName(Long teamId) {
         Team team = teamRepository.findById(teamId)

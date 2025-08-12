@@ -13,7 +13,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Optional;
 
 public class ExternalRequestDTO {
 
@@ -35,13 +37,38 @@ public class ExternalRequestDTO {
     }
 
     @Getter
-    @JsonDeserialize
-    @Validated
     public static class DeadlineRequestDTO{
-        private LocalDate start;
-        @NotNull(message = "마감 일자는 반드시 설정해야합니다.")
-        private LocalDate end;
+        private String start;
+        private String end;
+
+        public Optional<LocalDate> getParsedStartDate() {
+            return parseDate(start);
+        }
+
+        public Optional<LocalDate> getParsedEndDate() {
+            return parseDate(end);
+        }
+
+        private Optional<LocalDate> parseDate(String dateStr) {
+            if (dateStr == null) return Optional.empty(); // 필드 생략 = 변경하지 않음
+            if ("null".equalsIgnoreCase(dateStr)) return Optional.of(null); // 명시적 삭제
+
+            try {
+                return Optional.of(LocalDate.parse(dateStr));
+            } catch (DateTimeParseException e) {
+                throw new IllegalArgumentException("Invalid date format: " + dateStr);
+            }
+        }
+
+        public boolean shouldUpdateStartDate() {
+            return start != null;
+        }
+
+        public boolean shouldUpdateEndDate() {
+            return end != null;
+        }
     }
+
 
     @Getter
     public static class ExternalDeleteRequestDTO{
