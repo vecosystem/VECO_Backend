@@ -10,6 +10,18 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum GoalErrorCode implements BaseErrorStatus {
 
+    CURSOR_INVALID(HttpStatus.BAD_REQUEST,
+            "GOAL400_0",
+            "커서값이 잘못되었습니다."),
+    QUERY_INVALID(HttpStatus.BAD_REQUEST,
+            "GOAL400_1",
+            "query값이 잘못되었습니다."),
+    NOT_A_DELETED(HttpStatus.BAD_REQUEST,
+            "GOAL400_2",
+            "복원할 목표가 없습니다."),
+    DEADLINE_INVALID(HttpStatus.BAD_REQUEST,
+            "GOAL400_3",
+            "기한의 형식이 잘못되었습니다."),
     FORBIDDEN(HttpStatus.FORBIDDEN,
             "GOAL403_0",
             "권한이 없습니다."),
@@ -19,18 +31,9 @@ public enum GoalErrorCode implements BaseErrorStatus {
     NOT_FOUND(HttpStatus.NOT_FOUND,
             "GOAL404_1",
             "해당 목표가 존재하지 않습니다."),
-    CURSOR_INVALID(HttpStatus.BAD_REQUEST,
-            "GOAL400_0",
-            "커서값이 잘못되었습니다."),
-    QUERY_INVALID(HttpStatus.BAD_REQUEST,
-            "GOAL400_1",
-            "query값이 잘못되었습니다."),
     NOT_FOUND_DELETE_GOALS(HttpStatus.NOT_FOUND,
             "GOAL404_2",
             "해당 팀에 삭제된 목표가 존재하지 않습니다."),
-    NOT_A_DELETED(HttpStatus.BAD_REQUEST,
-            "GOAL400_2",
-            "복원할 목표가 없습니다.")
     ;
 
     private final HttpStatus httpStatus;

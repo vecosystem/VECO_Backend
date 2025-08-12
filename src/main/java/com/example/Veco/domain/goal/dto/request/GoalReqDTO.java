@@ -5,7 +5,6 @@ import com.example.Veco.global.enums.State;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public class GoalReqDTO {
@@ -20,13 +19,11 @@ public class GoalReqDTO {
             Priority priority,
             List<Long> managersId,
             Deadline deadline,
-            List<Long> issueId
+            List<Long> issuesId
     ){}
 
     // 목표 수정
     public record UpdateGoal(
-            @Size(max = 20, message = "최대 20자까지 작성할 수 있습니다.")
-            @NotBlank(message = "제목은 반드시 작성해야 합니다.")
             String title,
             String content,
             State state,
@@ -44,7 +41,7 @@ public class GoalReqDTO {
     // 세부 속성들
     // 기한
     public record Deadline (
-            LocalDate start,
-            LocalDate end
+            String start,
+            String end
     ){}
 }

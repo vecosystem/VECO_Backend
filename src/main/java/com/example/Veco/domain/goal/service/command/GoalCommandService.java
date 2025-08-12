@@ -35,7 +35,9 @@ import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -98,9 +100,21 @@ public class GoalCommandService {
         }
 
         // 이슈 존재 여부 검증: 하나라도 없으면 X
-        List<Issue> issueList = issueRepository.findAllById(dto.issueId());
-        if (issueList.size() != dto.issueId().size()) {
+        List<Issue> issueList = issueRepository.findAllById(dto.issuesId());
+        if (issueList.size() != dto.issuesId().size()) {
             throw new IssueException(IssueErrorCode.NOT_FOUND);
+        }
+
+        // 기한 입력값이 정확한지 검증
+        try {
+            if (dto.deadline().start() != null){
+                LocalDate.parse(dto.deadline().start());
+            }
+            if (dto.deadline().end() != null){
+                LocalDate.parse(dto.deadline().end());
+            }
+        } catch (DateTimeParseException e) {
+            throw new GoalException(GoalErrorCode.DEADLINE_INVALID);
         }
 
         // 목표 생성: DTO, Team, Name 필요, @Transactional
