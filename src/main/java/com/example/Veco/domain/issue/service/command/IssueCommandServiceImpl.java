@@ -77,12 +77,13 @@ public class IssueCommandServiceImpl implements IssueCommandService {
             throw new IssueException(IssueErrorCode.NOT_FOUND);
         }
 
+        // 사용자 검증
         Member member = memberRepository.findBySocialUid(user.getSocialUid())
                 .orElseThrow(() -> new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND));
 
+        // 팀 존재 검증
         teamRepository.findById(teamId)
                         .orElseThrow(() -> new TeamException(TeamErrorCode._NOT_FOUND));
-
         memberTeamRepository.findByMemberIdAndTeamId(member.getId(), teamId)
                 .orElseThrow(() -> new MemberHandler(MemberErrorStatus._FORBIDDEN));
 
@@ -101,27 +102,32 @@ public class IssueCommandServiceImpl implements IssueCommandService {
     @Override
     public IssueResponseDTO.CreateIssue createIssue(AuthUser user, Long teamId, IssueReqDTO.CreateIssue dto){
 
+        // 사용자 검증
+        Member member = memberRepository.findBySocialUid(user.getSocialUid())
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND));
+
+        // 담당자 검증
         List<Long> memberIds = new ArrayList<>(dto.managersId());
-        if (dto.isIncludeMe()) {
-            Member member = memberRepository.findBySocialUid(user.getSocialUid()).orElseThrow(() ->
-                    new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND));
-            memberIds.add(member.getId());
-        }
 
         List<Member> memberList = memberRepository.findAllById(memberIds);
         if (memberList.size() != memberIds.size()) {
             throw new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND);
         }
 
+        // 팀 존재 검증
         if (!teamRepository.existsById(teamId)) {
             throw new TeamException(TeamErrorCode._NOT_FOUND);
         }
 
+        // 팀원 검증
         List<MemberTeam> memberTeamList = memberTeamRepository.findAllByMemberIdInAndTeamId(memberIds, teamId);
         if (memberTeamList.size() != memberIds.size()) {
             throw new MemberHandler(MemberErrorStatus._FORBIDDEN);
         }
+        memberTeamRepository.findByMemberIdAndTeamId(member.getId(), teamId)
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus._FORBIDDEN));
 
+        // 목표 존재 검증
         Goal goal = goalRepository.findById(dto.goalId()).orElseThrow(()->
                 new GoalException(GoalErrorCode.NOT_FOUND));
 
