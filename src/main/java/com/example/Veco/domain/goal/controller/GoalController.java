@@ -39,7 +39,8 @@ public class GoalController {
             summary = "팀 내 모든 목표 조회 API By 김주헌",
             description = "팀의 모든 목표를 조회합니다. 쿼리를 이용해서 필터 적용이 가능합니다." +
                     " 디폴트로 상태(진행 중, 진행 완료)를 기준으로 조회합니다." +
-                    "커서 기반 페이지네이션, 최신 순으로 정렬합니다."
+                    "커서 기반 페이지네이션, 최신 순으로 정렬합니다." +
+                    "query는 state, priority, manager 가능합니다."
     )
     @GetMapping("/teams/{teamId}/goals")
     public ApiResponse<Pageable<FilteringGoal<SimpleGoal>>> getTeamGoals(
