@@ -189,7 +189,7 @@ public class GoalController {
     public ApiResponse<UpdateGoal> updateGoal(
             @PathVariable Long teamId,
             @PathVariable Long goalId,
-            @RequestBody @Valid GoalReqDTO.UpdateGoal dto,
+            @RequestBody GoalReqDTO.UpdateGoal dto,
             @AuthenticationPrincipal AuthUser user
     ){
         UpdateGoal result = goalCommandService.updateGoal(dto, teamId, goalId, user);

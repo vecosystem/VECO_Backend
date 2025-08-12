@@ -25,8 +25,6 @@ public class GoalReqDTO {
 
     // 목표 수정
     public record UpdateGoal(
-            @Size(max = 20, message = "최대 20자까지 작성할 수 있습니다.")
-            @NotBlank(message = "제목은 반드시 작성해야 합니다.")
             String title,
             String content,
             State state,
