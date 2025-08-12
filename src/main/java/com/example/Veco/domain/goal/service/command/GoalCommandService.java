@@ -67,18 +67,21 @@ public class GoalCommandService {
             GoalReqDTO.CreateGoal dto,
             AuthUser user
     ) {
-        // 담당자 존재 여부, 같은 팀 여부 검증 + 본인 포함 여부 확인 후 업데이트
-        List<Long> memberIds = new ArrayList<>(dto.managersId());
-        if (dto.isIncludeMe()) {
-            // 인증 객체에서 가져오기
-            Member member = memberRepository.findBySocialUid(user.getSocialUid()).orElseThrow(() ->
-                    new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND));
-            memberIds.add(member.getId());
+
+        // 작성자가 같은 팀인지 검증
+        Member author = memberRepository.findBySocialUid(user.getSocialUid())
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND));
+        if (!memberTeamRepository.existsByMemberIdAndTeamId(author.getId(), teamId)) {
+            throw new GoalException(GoalErrorCode.FORBIDDEN);
         }
 
-        // 사용자 존재 여부 검증
-        List<Member> memberList = memberRepository.findAllById(memberIds);
-        if (memberList.size() != memberIds.size()) {
+        // 사용자 존재 여부 검증: 한명이라도 없으면 생성 X
+        List<Long> memberIds = memberRepository.findAllById(dto.managersId())
+                .stream()
+                .map(Member::getId)
+                .toList();
+
+        if (memberIds.size() != dto.managersId().size()) {
             throw new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND);
         }
 
@@ -88,13 +91,13 @@ public class GoalCommandService {
             throw new TeamException(TeamErrorCode._NOT_FOUND);
         }
 
-        // 같은 팀원 여부 검증
+        // 같은 팀원 여부 검증: 한명이라도 같은 팀이 아니면 X
         List<MemberTeam> memberTeamList = memberTeamRepository.findAllByMemberIdInAndTeamId(memberIds, teamId);
         if (memberTeamList.size() != memberIds.size()) {
             throw new MemberHandler(MemberErrorStatus._FORBIDDEN);
         }
 
-        // 이슈 존재 여부 검증
+        // 이슈 존재 여부 검증: 하나라도 없으면 X
         List<Issue> issueList = issueRepository.findAllById(dto.issueId());
         if (issueList.size() != dto.issueId().size()) {
             throw new IssueException(IssueErrorCode.NOT_FOUND);

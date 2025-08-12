@@ -1,6 +1,7 @@
 package com.example.Veco.domain.mapping.repository;
 
 import com.example.Veco.domain.mapping.entity.MemberTeam;
+import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.domain.workspace.dto.TeamMemberCountDto;
 import io.lettuce.core.dynamic.annotation.Param;
@@ -32,4 +33,6 @@ public interface MemberTeamRepository extends JpaRepository<MemberTeam, Long> {
     boolean existsByMemberIdAndTeamId(Long memberId, Long teamId);
 
     List<MemberTeam> findAllByMemberIdAndTeamIn(Long memberId, Collection<Team> teams);
+
+    List<Long> member(Member member);
 }

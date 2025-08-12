@@ -11,10 +11,12 @@ import com.example.Veco.global.apiPayload.code.BaseErrorStatus;
 import com.example.Veco.global.auth.user.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,6 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 @Tag(name = "목표 API")
+@Validated
 public class GoalController {
 
     // 리포지토리
@@ -143,7 +146,7 @@ public class GoalController {
     @PostMapping("/teams/{teamId}/goals")
     public ApiResponse<CreateGoal> createGoal(
             @PathVariable Long teamId,
-            @RequestBody GoalReqDTO.CreateGoal dto,
+            @RequestBody @Valid GoalReqDTO.CreateGoal dto,
             @AuthenticationPrincipal AuthUser user
     ){
         return ApiResponse.onSuccess(GoalSuccessCode.CREATE, goalCommandService.createGoal(teamId, dto, user));
@@ -185,7 +188,7 @@ public class GoalController {
     public ApiResponse<UpdateGoal> updateGoal(
             @PathVariable Long teamId,
             @PathVariable Long goalId,
-            @RequestBody GoalReqDTO.UpdateGoal dto,
+            @RequestBody @Valid GoalReqDTO.UpdateGoal dto,
             @AuthenticationPrincipal AuthUser user
     ){
         UpdateGoal result = goalCommandService.updateGoal(dto, teamId, goalId, user);
