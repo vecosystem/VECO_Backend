@@ -5,7 +5,6 @@ import com.example.Veco.global.enums.State;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public class GoalReqDTO {
@@ -42,7 +41,7 @@ public class GoalReqDTO {
     // 세부 속성들
     // 기한
     public record Deadline (
-            LocalDate start,
-            LocalDate end
+            String start,
+            String end
     ){}
 }

@@ -142,7 +142,9 @@ public class GoalController {
     // 목표 작성: 변경 가능성 O
     @Operation(
             summary = "목표 작성 API By 김주헌",
-            description = "목표를 작성합니다."
+            description = "목표를 작성합니다." +
+                    "기한은 YYYY-MM-DD 형식으로 보내주세요. start 또는 end 없이 요청하면" +
+                    "기한이 null로 표기됩니다."
     )
     @PostMapping("/teams/{teamId}/goals")
     public ApiResponse<CreateGoal> createGoal(
@@ -183,7 +185,8 @@ public class GoalController {
             summary = "목표 수정 API By 김주헌",
             description = "목표를 수정합니다. " +
                     "수정할 내용을 추가하면 됩니다. 담당자, 이슈를 수정할 경우 수정된 리스트를 업로드하시면 됩니다. " +
-                    "변경 사항이 없는 속성은 RequestBody에서 제거 후 요청하면 됩니다."
+                    "변경 사항이 없는 속성은 RequestBody에서 제거 후 요청하면 됩니다. " +
+                    "기한은 YYYY-MM-DD 형식으로, null으로 전송시 해당 기한이 삭제(null)처리 됩니다."
     )
     @PatchMapping("/teams/{teamId}/goals/{goalId}")
     public ApiResponse<UpdateGoal> updateGoal(

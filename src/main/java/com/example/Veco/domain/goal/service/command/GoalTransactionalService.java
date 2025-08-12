@@ -24,6 +24,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -113,11 +115,15 @@ public class GoalTransactionalService {
         }
         // 담당자 변경
         if (dto.managersId() != null) {
-            // 기존 담당자 삭제
-            assigneeRepository.deleteAllByTypeAndTargetId(Category.GOAL, goalId);
-            // 신규 담당자 추가
+
+            // 신규 담당자 존재여부 확인, 조회
             List<MemberTeam> memberTeamList = memberTeamRepository
                     .findAllByMemberIdInAndTeamId(dto.managersId(), teamId);
+
+            // 기존 담당자 삭제
+            assigneeRepository.deleteAllByTypeAndTargetId(Category.GOAL, goalId);
+
+            // 신규 담당자 추가
             memberTeamList.forEach(
                     value -> assigneeRepository.save(
                             AssigneeConverter.toAssignee(value, Category.GOAL, goal)
@@ -133,24 +139,46 @@ public class GoalTransactionalService {
         }
         // 기한 변경
         if (dto.deadline() != null) {
-            goal.updateDeadlineStart(dto.deadline().start());
-            goal.updateDeadlineEnd(dto.deadline().end());
-            isRestore = true;
+
+            try {
+                if (dto.deadline().start() != null) {
+                    LocalDate start;
+                    if (dto.deadline().start().equals("null")){
+                        start = null;
+                    } else {
+                        start = LocalDate.parse(dto.deadline().start());
+                    }
+                    goal.updateDeadlineStart(start);
+                }
+                if (dto.deadline().end() != null) {
+                    LocalDate end;
+                    if (dto.deadline().end().equals("null")){
+                        end = null;
+                    } else {
+                        end = LocalDate.parse(dto.deadline().end());
+                    }
+                    goal.updateDeadlineEnd(end);
+                }
+                isRestore = true;
+            } catch (DateTimeParseException e) {
+                throw new GoalException(GoalErrorCode.DEADLINE_INVALID);
+            }
+
         }
         // 이슈 변경
         if (dto.issuesId() != null){
-
-            // 기존 이슈 조회, 목표 해제
-            List<Issue> oldIssueList = issueRepository.findAllByGoal(goal).orElse(new ArrayList<>());
-            oldIssueList.forEach(
-                    value -> value.updateGoal(null)
-            );
 
             // 새로운 이슈 존재 여부 검증
             List<Issue> issueList = issueRepository.findAllById(dto.issuesId());
             if (issueList.size() != dto.issuesId().size()){
                 throw new IssueException(IssueErrorCode.NOT_FOUND);
             }
+
+            // 기존 이슈 조회, 목표 해제
+            List<Issue> oldIssueList = issueRepository.findAllByGoal(goal).orElse(new ArrayList<>());
+            oldIssueList.forEach(
+                    value -> value.updateGoal(null)
+            );
 
             // 이슈 목표 변경
             issueList.forEach(
