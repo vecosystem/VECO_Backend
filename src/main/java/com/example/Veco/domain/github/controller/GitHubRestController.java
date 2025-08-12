@@ -1,11 +1,9 @@
-package com.example.Veco.domain.external.controller;
+package com.example.Veco.domain.github.controller;
 
-import com.example.Veco.domain.external.config.GitHubConfig;
-import com.example.Veco.domain.external.dto.response.GitHubApiResponseDTO;
-import com.example.Veco.domain.external.dto.response.GitHubResponseDTO;
-import com.example.Veco.domain.external.exception.code.GitHubSuccessCode;
-import com.example.Veco.domain.external.service.GitHubRepositoryService;
-import com.example.Veco.domain.external.service.GitHubService;
+import com.example.Veco.domain.github.dto.response.GitHubApiResponseDTO;
+import com.example.Veco.domain.github.dto.response.GitHubResponseDTO;
+import com.example.Veco.domain.github.service.GitHubRepositoryService;
+import com.example.Veco.domain.github.service.GitHubService;
 import com.example.Veco.global.apiPayload.ApiResponse;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -20,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-public class GitHubRestController implements GitHubSwaggerDocs{
+public class GitHubRestController implements GitHubSwaggerDocs {
 
     private final GitHubService gitHubService;
     private final GitHubRepositoryService gitHubRepositoryService;

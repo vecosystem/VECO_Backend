@@ -1,11 +1,11 @@
 package com.example.Veco.domain.external.converter;
 
 import com.example.Veco.domain.comment.entity.Comment;
-import com.example.Veco.domain.external.dto.GitHubPullRequestPayload;
+import com.example.Veco.domain.github.dto.webhook.GitHubPullRequestPayload;
 import com.example.Veco.domain.external.dto.request.ExternalRequestDTO;
 import com.example.Veco.domain.external.dto.response.ExternalResponseDTO;
 import com.example.Veco.domain.external.dto.response.ExternalGroupedResponseDTO;
-import com.example.Veco.domain.external.dto.GitHubWebhookPayload;
+import com.example.Veco.domain.github.dto.webhook.GitHubWebhookPayload;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.goal.entity.Goal;
 import com.example.Veco.domain.mapping.Assignment;

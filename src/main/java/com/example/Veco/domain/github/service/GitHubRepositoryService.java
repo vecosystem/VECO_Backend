@@ -1,7 +1,6 @@
-package com.example.Veco.domain.external.service;
+package com.example.Veco.domain.github.service;
 
-import com.example.Veco.domain.external.dto.response.GitHubApiResponseDTO;
-import com.example.Veco.domain.external.util.GitHubJwtProvider;
+import com.example.Veco.domain.github.dto.response.GitHubApiResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

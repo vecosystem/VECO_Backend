@@ -1,8 +1,7 @@
-package com.example.Veco.domain.external.dto;
+package com.example.Veco.domain.github.dto.webhook;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.List;

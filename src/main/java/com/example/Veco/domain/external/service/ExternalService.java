@@ -12,6 +12,7 @@ import com.example.Veco.domain.external.dto.paging.ExternalSearchCriteria;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.external.repository.ExternalCustomRepository;
 import com.example.Veco.domain.external.repository.ExternalRepository;
+import com.example.Veco.domain.github.service.GitHubIssueService;
 import com.example.Veco.domain.goal.entity.Goal;
 import com.example.Veco.domain.goal.repository.GoalRepository;
 import com.example.Veco.domain.mapping.Assignment;
@@ -31,7 +32,6 @@ import com.example.Veco.domain.team.repository.TeamRepository;
 import com.example.Veco.domain.team.service.NumberSequenceService;
 import com.example.Veco.global.apiPayload.code.ErrorStatus;
 import com.example.Veco.global.apiPayload.exception.VecoException;
-import com.example.Veco.global.apiPayload.page.CursorPage;
 import com.example.Veco.global.auth.user.AuthUser;
 import com.example.Veco.global.enums.Category;
 import com.example.Veco.global.enums.ExtServiceType;
@@ -42,7 +42,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service

@@ -1,8 +1,7 @@
-package com.example.Veco.domain.external.controller;
+package com.example.Veco.domain.github.controller;
 
-import com.example.Veco.domain.external.dto.GitHubWebhookPayload;
-import com.example.Veco.domain.external.service.GitHubIssueService;
-import com.example.Veco.domain.external.service.GitHubPullRequestService;
+import com.example.Veco.domain.github.service.GitHubIssueService;
+import com.example.Veco.domain.github.service.GitHubPullRequestService;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,7 @@
-package com.example.Veco.domain.external.controller;
+package com.example.Veco.domain.github.controller;
 
-import com.example.Veco.domain.external.dto.response.GitHubApiResponseDTO;
-import com.example.Veco.domain.external.dto.response.GitHubResponseDTO;
+import com.example.Veco.domain.github.dto.response.GitHubApiResponseDTO;
+import com.example.Veco.domain.github.dto.response.GitHubResponseDTO;
 import com.example.Veco.global.apiPayload.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

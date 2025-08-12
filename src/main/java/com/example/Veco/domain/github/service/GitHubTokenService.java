@@ -1,6 +1,6 @@
-package com.example.Veco.domain.external.service;
+package com.example.Veco.domain.github.service;
 
-import com.example.Veco.domain.external.dto.response.GitHubTokenResponse;
+import com.example.Veco.domain.github.dto.response.GitHubTokenResponse;
 import com.example.Veco.domain.external.util.GitHubJwtProvider;
 import lombok.AllArgsConstructor;
 import lombok.Data;

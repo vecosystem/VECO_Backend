@@ -1,4 +1,4 @@
-package com.example.Veco.domain.external.entity;
+package com.example.Veco.domain.github.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

@@ -3,12 +3,14 @@ package com.example.Veco.domain.external.dto.request;
 import com.example.Veco.global.enums.ExtServiceType;
 import com.example.Veco.global.enums.Priority;
 import com.example.Veco.global.enums.State;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -33,8 +35,11 @@ public class ExternalRequestDTO {
     }
 
     @Getter
+    @JsonDeserialize
+    @Validated
     public static class DeadlineRequestDTO{
         private LocalDate start;
+        @NotNull(message = "마감 일자는 반드시 설정해야합니다.")
         private LocalDate end;
     }
 

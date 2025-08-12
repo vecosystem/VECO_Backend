@@ -1,9 +1,9 @@
 package com.example.Veco.domain.external.entity;
 
 import com.example.Veco.domain.common.BaseEntity;
-import com.example.Veco.domain.external.dto.GitHubPullRequestPayload;
+import com.example.Veco.domain.github.dto.webhook.GitHubPullRequestPayload;
 import com.example.Veco.domain.external.dto.request.ExternalRequestDTO;
-import com.example.Veco.domain.external.dto.GitHubWebhookPayload;
+import com.example.Veco.domain.github.dto.webhook.GitHubWebhookPayload;
 import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.domain.goal.entity.Goal;
 import com.example.Veco.domain.mapping.Assignment;

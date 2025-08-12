@@ -1,4 +1,4 @@
-package com.example.Veco.domain.external.dto;
+package com.example.Veco.domain.github.dto.webhook;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
