@@ -20,7 +20,7 @@ public class GoalReqDTO {
             Priority priority,
             List<Long> managersId,
             Deadline deadline,
-            List<Long> issueId
+            List<Long> issuesId
     ){}
 
     // 목표 수정

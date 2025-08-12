@@ -98,8 +98,8 @@ public class GoalCommandService {
         }
 
         // 이슈 존재 여부 검증: 하나라도 없으면 X
-        List<Issue> issueList = issueRepository.findAllById(dto.issueId());
-        if (issueList.size() != dto.issueId().size()) {
+        List<Issue> issueList = issueRepository.findAllById(dto.issuesId());
+        if (issueList.size() != dto.issuesId().size()) {
             throw new IssueException(IssueErrorCode.NOT_FOUND);
         }
 
