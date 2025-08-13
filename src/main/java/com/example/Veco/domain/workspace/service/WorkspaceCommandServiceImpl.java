@@ -61,11 +61,13 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
         if (teamRepository.existsByNameAndWorkSpace(request.getTeamName(), workspace)) {
             throw new TeamException(TeamErrorCode._DUPLICATE_TEAM_NAME);
         }
+        int maxOrder = teamRepository.findMaxOrderByWorkSpace(workspace).orElse(-1);
         // 2. 팀 저장
         Team team = teamRepository.save(Team.builder()
                 .name(request.getTeamName())
                 .workSpace(workspace)
                 .goalNumber(1L)
+                .order(maxOrder + 1) // 새로 만든 팀은 자동으로 맨 뒤 배치
                 .build());
 
         // 3. 요청으로 전달된 멤버 ID 리스트로 멤버 조회
@@ -113,6 +115,12 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
         int currentTeamCount = teamRepository.countByWorkSpace(workspace);
         if (teamIdList.size() != currentTeamCount) {
             throw new TeamException(TeamErrorCode._TEAM_COUNT_MISMATCH);
+        }
+
+        Long defaultTeamId = teamRepository.findMinTeamIdByWorkSpace(workspace);
+
+        if (!teamIdList.get(0).equals(defaultTeamId)) {
+            throw new TeamException(TeamErrorCode._DEFAULT_TEAM_MUST_BE_FIRST);
         }
 
         for (int i = 0; i < teamIdList.size(); i++) {
