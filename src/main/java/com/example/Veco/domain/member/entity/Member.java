@@ -10,6 +10,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "member")
 @Getter
@@ -54,9 +56,13 @@ public class Member extends BaseEntity {
     @JoinColumn(name = "profile_id", nullable = true)
     private Profile profile;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     // update
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
     public void updateWorkspace(WorkSpace workSpace) { this.workSpace = workSpace; }
+    public void softDelete(){ deletedAt = LocalDateTime.now(); }
 }

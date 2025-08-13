@@ -9,18 +9,23 @@ import com.example.Veco.domain.workspace.converter.WorkspaceConverter;
 import com.example.Veco.domain.workspace.dto.WorkspaceRequestDTO;
 import com.example.Veco.domain.workspace.dto.WorkspaceResponseDTO;
 import com.example.Veco.domain.workspace.entity.WorkSpace;
+import com.example.Veco.domain.workspace.error.SettingSuccessCode;
 import com.example.Veco.domain.workspace.service.WorkspaceCommandService;
 import com.example.Veco.domain.workspace.service.WorkspaceQueryService;
 import com.example.Veco.global.apiPayload.ApiResponse;
+import com.example.Veco.global.auth.jwt.util.JwtUtil;
 import com.example.Veco.global.auth.user.userdetails.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +44,7 @@ public class SettingRestController {
     private final WorkspaceCommandService workspaceCommandService;
     private final MemberQueryService memberQueryService;
     private final MemberCommandService memberCommandService;
+    private final JwtUtil jwtUtil;
 
     /**
      * 유저 프로필 조회 API
@@ -185,10 +191,32 @@ public class SettingRestController {
     )
     public ApiResponse<WorkspaceResponseDTO.InviteInfoResponseDto> inviteWorkspace(
             @AuthenticationPrincipal CustomUserDetails userDetails
-    ){
+    ) {
         Member member = memberQueryService.getMemberBySocialUid(userDetails.getSocialUid());
         WorkSpace workspace = workspaceQueryService.getWorkspaceBySocialUid(userDetails.getSocialUid());
 
         return ApiResponse.onSuccess(WorkspaceConverter.toInviteInfoResponseDto(workspace, member));
+    }
+
+    @DeleteMapping("/setting/my-profile")
+    @Operation(summary = "유저의 계정을 삭제합니다.")
+    public ApiResponse<?> softDeleteMember(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        Member member = memberQueryService.getMemberBySocialUid(userDetails.getSocialUid());
+        memberCommandService.withdrawMember(userDetails);
+
+        // 액세스 토큰 블랙리스트 처리
+        String token = request.getHeader("Authorization")
+                .replace("Bearer ", "");
+        jwtUtil.setBlackList(token);
+
+        // 리프레쉬 토큰 쿠키 삭제
+        ResponseCookie refreshTokenCookie = jwtUtil.expireRefreshTokenCookie();
+        response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+
+        return ApiResponse.onSuccess(SettingSuccessCode.DELETE, null);
     }
 }
