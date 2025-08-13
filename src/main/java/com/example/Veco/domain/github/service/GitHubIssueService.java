@@ -81,7 +81,7 @@ public class GitHubIssueService {
                     updateIssue(issuePayload);
             }
         }catch (Exception e){
-
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -140,32 +140,29 @@ public class GitHubIssueService {
 
         createVecoExternal(payload);
 
-        GitHubIssue issue = GitHubIssue.builder()
-                .githubIssueId(issueData.getId())
-                .nodeId(issueData.getNodeId())
-                .number(issueData.getNumber())
-                .title(issueData.getTitle())
-                .body(issueData.getBody())
-                .state(GitHubIssue.IssueState.valueOf(issueData.getState().toUpperCase()))
-                .repositoryFullName(repoData.getFullName())
-                .repositoryUrl(repoData.getUrl())
-                .htmlUrl(issueData.getHtmlUrl())
-                .creatorLogin(issueData.getUser().getLogin())
-                .creatorId(issueData.getUser().getId())
-                .creatorAvatarUrl(issueData.getUser().getAvatarUrl())
-                .assigneeLogin(issueData.getAssignee() != null ? issueData.getAssignee().getLogin() : null)
-                .assigneeId(issueData.getAssignee() != null ? issueData.getAssignee().getId() : null)
-                .labels(extractLabelNames(issueData.getLabels()))
-                .githubCreatedAt(issueData.getCreatedAt())
-                .githubUpdatedAt(issueData.getUpdatedAt())
-                .githubClosedAt(issueData.getClosedAt())
-                .commentsCount(issueData.getComments())
-                .locked(issueData.getLocked())
-                .lockReason(issueData.getActiveLockReason())
-                .build();
-
-        gitHubIssueRepository.save(issue);
-        log.info("Created new issue: #{} - {}", issue.getNumber(), issue.getTitle());
+//        GitHubIssue issue = GitHubIssue.builder()
+//                .githubIssueId(issueData.getId())
+//                .nodeId(issueData.getNodeId())
+//                .number(issueData.getNumber())
+//                .title(issueData.getTitle())
+//                .body(issueData.getBody())
+//                .state(GitHubIssue.IssueState.valueOf(issueData.getState().toUpperCase()))
+//                .repositoryFullName(repoData.getFullName())
+//                .repositoryUrl(repoData.getUrl())
+//                .htmlUrl(issueData.getHtmlUrl())
+//                .creatorLogin(issueData.getUser().getLogin())
+//                .creatorId(issueData.getUser().getId())
+//                .creatorAvatarUrl(issueData.getUser().getAvatarUrl())
+//                .assigneeLogin(issueData.getAssignee() != null ? issueData.getAssignee().getLogin() : null)
+//                .assigneeId(issueData.getAssignee() != null ? issueData.getAssignee().getId() : null)
+//                .labels(extractLabelNames(issueData.getLabels()))
+//                .commentsCount(issueData.getComments())
+//                .locked(issueData.getLocked())
+//                .lockReason(issueData.getActiveLockReason())
+//                .build();
+//
+//        gitHubIssueRepository.save(issue);
+//        log.info("Created new issue: #{} - {}", issue.getNumber(), issue.getTitle());
     }
 
     private void createVecoExternal(GitHubWebhookPayload payload) {

@@ -18,6 +18,7 @@ import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.global.enums.ExtServiceType;
 import com.example.Veco.global.enums.Priority;
 import com.example.Veco.global.enums.State;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class ExternalConverter {
 
     public static ExternalResponseDTO.SimpleListDTO toSimpleListDTO(List<External> externals) {
@@ -201,6 +203,11 @@ public class ExternalConverter {
     }
 
     public static External byGitHubPullRequest(GitHubPullRequestPayload payload, Team team, String externalCode){
+
+        log.info("GitHub pull request started");
+
+        log.info("pr 제목 : {} pr 내용 : {}" , payload.getPullRequest().getTitle(), payload.getPullRequest().getBody());
+
         return External.builder()
                 .title(payload.getPullRequest().getTitle())
                 .githubDataId(payload.getPullRequest().getId())

@@ -35,7 +35,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private static final AntPathMatcher pathMatcher = new AntPathMatcher();
     private static final String[] excludePaths = {"/healthcheck", "/api/test/login/", "/api/token/reissue", "/login-test.html",
             "/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**", "/css/**", "/images/**", "/js/**",
-            "/h2-console/**", "/profile", "/github/**", "/api/github/webhook/**", "/**"};
+            "/h2-console/**", "/profile", "/github/**", "/api/github/webhook/**"};
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {

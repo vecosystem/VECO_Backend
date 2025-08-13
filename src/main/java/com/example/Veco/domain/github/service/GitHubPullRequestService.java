@@ -58,6 +58,8 @@ public class GitHubPullRequestService {
 
     private void handlePullRequestOpened(GitHubPullRequestPayload payload) {
 
+        log.info(payload.toString());
+
         Long installationId = payload.getInstallation().getId();
 
         GithubInstallation installInfo = gitHubInstallationRepository.findByInstallationId(installationId)
@@ -70,9 +72,15 @@ public class GitHubPullRequestService {
                         team.getId(),
                         Category.EXTERNAL);
 
+        log.info("다음 외부이슈 코드 : " + code.getNextCode());
+
         External external = ExternalConverter.byGitHubPullRequest(payload, installInfo.getTeam(), code.getNextCode());
 
+        log.info("외부 이슈 제목 : {} 내용 : {}", external.getTitle(), external.getDescription());
+
         externalRepository.save(external);
+
+        log.info("외부 이슈 id : {} ", external.getId());
 
     }
 
