@@ -3,8 +3,6 @@ package com.example.Veco.domain.issue.service.command;
 import com.example.Veco.domain.assignee.converter.AssigneeConverter;
 import com.example.Veco.domain.assignee.entity.Assignee;
 import com.example.Veco.domain.assignee.repository.AssigneeRepository;
-import com.example.Veco.domain.goal.converter.GoalConverter;
-import com.example.Veco.domain.goal.dto.request.GoalReqDTO;
 import com.example.Veco.domain.goal.entity.Goal;
 import com.example.Veco.domain.goal.exception.GoalException;
 import com.example.Veco.domain.goal.exception.code.GoalErrorCode;
@@ -26,6 +24,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -113,9 +113,39 @@ public class IssueTransactionalService {
         }
 
         if (dto.deadline() != null) {
-            issue.updateDeadlineStart(dto.deadline().start());
-            issue.updateDeadlineEnd(dto.deadline().end());
-            isRestore = true;
+
+            try {
+                if (dto.deadline().start() != null && dto.deadline().end() != null) {
+                    String start = dto.deadline().start();
+                    String end = dto.deadline().end();
+                    if(!start.equals("null") && !end.equals("null")) {
+                        if(LocalDate.parse(start).isAfter(LocalDate.parse(end))){
+                            throw new IssueException(IssueErrorCode.DEADLINE_ORDER_INVALID);
+                        }
+                    }
+                }
+                if (dto.deadline().start() != null) {
+                    LocalDate start;
+                    if (dto.deadline().start().equals("null")){     // LocalDate -> String 변경
+                        start = null;
+                    } else {
+                        start = LocalDate.parse(dto.deadline().start());
+                    }
+                    issue.updateDeadlineStart(start);
+                }
+                if (dto.deadline().end() != null) {
+                    LocalDate end;
+                    if (dto.deadline().end().equals("null")){
+                        end = null;
+                    } else {
+                        end = LocalDate.parse(dto.deadline().end());
+                    }
+                    issue.updateDeadlineEnd(end);
+                }
+                isRestore = true;
+            } catch (DateTimeParseException e) {
+                throw new IssueException(IssueErrorCode.DEADLINE_INVALID);
+            }
         }
 
         if (dto.goalId() != null) {

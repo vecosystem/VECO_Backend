@@ -29,8 +29,8 @@ public class IssueReqDTO {
     ){}
 
     public record Deadline (
-            LocalDate start,
-            LocalDate end
+            String start,
+            String end
     ){}
 
     public record DeleteIssue(
