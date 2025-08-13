@@ -115,7 +115,8 @@ public class WorkspaceConverter {
     /**
      * 워크스페이스 내 멤버 + 소속 팀 리스트 응답 DTO 변환
      */
-    public static WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto toWorkspaceMemberWithTeamsDto(
+    public static WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto
+    toWorkspaceMemberWithTeamsDto(
             Member member,
             List<Team> teams,
             LocalDateTime joinedAt
