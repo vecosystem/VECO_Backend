@@ -368,6 +368,12 @@ public class GoalQueryService {
         List<Assignee> assignees = assigneeRepository.findAllByTypeAndTargetId(Category.GOAL, goalId)
                 .orElse(new ArrayList<>());
 
+        // Assignee 무조건 있음: MemberTeam = null / MemberTeam >= 1
+        // 조회했을때 MemberTeam이 null이면 []
+        if (assignees.getFirst().getMemberTeam() == null){
+            assignees = new ArrayList<>();
+        }
+
         // 이슈 조회: 없으면 []
         List<Issue> issues = issueRepository.findAllByGoal(goal)
                 .orElse(new ArrayList<>());
