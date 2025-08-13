@@ -196,6 +196,9 @@ public class IssueConverter {
         } catch (DateTimeParseException e) {
             throw new IssueException(IssueErrorCode.DEADLINE_INVALID);
         }
+        if (start != null && end != null && start.isAfter(end)) {
+            throw new IssueException(IssueErrorCode.DEADLINE_ORDER_INVALID);
+        }
         
         return Issue.builder()
                 .state(dto.state())

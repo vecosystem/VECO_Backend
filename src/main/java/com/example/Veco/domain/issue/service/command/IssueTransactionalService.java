@@ -115,6 +115,15 @@ public class IssueTransactionalService {
         if (dto.deadline() != null) {
 
             try {
+                if (dto.deadline().start() != null && dto.deadline().end() != null) {
+                    String start = dto.deadline().start();
+                    String end = dto.deadline().end();
+                    if(!start.equals("null") && !end.equals("null")) {
+                        if(LocalDate.parse(start).isAfter(LocalDate.parse(end))){
+                            throw new IssueException(IssueErrorCode.DEADLINE_ORDER_INVALID);
+                        }
+                    }
+                }
                 if (dto.deadline().start() != null) {
                     LocalDate start;
                     if (dto.deadline().start().equals("null")){     // LocalDate -> String 변경
