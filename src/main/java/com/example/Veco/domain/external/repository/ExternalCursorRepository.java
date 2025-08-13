@@ -25,6 +25,12 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
     private final JPAQueryFactory queryFactory;
     private final QExternal external = QExternal.external;
 
+    /**
+     * NULL 값 처리를 위한 상수
+     */
+    private static final String NULL_GROUP_VALUE = "NULL_GROUP";
+
+
     public ExternalCursorRepository(EntityManager entityManager) {
         this.queryFactory = new JPAQueryFactory(entityManager);
     }
@@ -210,6 +216,14 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
 
         ExternalCursor decodedCursor = cursor != null ? ExternalCursor.decode(cursor) : null;
 
+        // 디버깅을 위한 상세 로그
+        if (decodedCursor != null) {
+            log.info("=== CURSOR ANALYSIS ===");
+            log.info("Decoded cursor - ID: {}, GroupValue: {}", decodedCursor.getId(), decodedCursor.getGroupValue());
+        } else {
+            log.info("=== FIRST REQUEST (NO CURSOR) ===");
+        }
+
         // 커서가 있는 경우 시작 인덱스 찾기
         int startIndex = 0;
         if (decodedCursor != null && decodedCursor.getGroupValue() != null) {
@@ -227,10 +241,11 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
                 Long goalId = goalResult.get(external.goal.id);
                 if (nextCursor == null) {
                     ExternalCursor groupCursor = new ExternalCursor();
-                    groupCursor.setId(0L); // 다음 그룹의 시작점
-                    groupCursor.setGroupValue(goalId != null ? goalId.toString() : "NULL_GROUP");
+                    groupCursor.setId(0L); // 다음 그룹의 첫 번째부터 시작
+                    // ✅ 일관된 NULL 처리 사용
+                    groupCursor.setGroupValue(goalIdToGroupValue(goalId));
                     nextCursor = groupCursor.encode();
-                    log.info("Created next cursor for goal: {}", goalId);
+                    log.info("Created next cursor for goal: {} with ID: 0", goalId);
                 }
                 break;
             }
@@ -238,6 +253,8 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
             Long goalId = goalResult.get(external.goal.id);
             String goalName = goalResult.get(external.goal.name);
             String displayName = goalName != null ? goalName : "목표 없음";
+
+            log.info("=== PROCESSING GOAL: {} (ID: {}) ===", displayName, goalId);
 
             // 해당 목표의 외부 이슈들 조회
             BooleanExpression goalCondition = goalId != null ?
@@ -251,15 +268,28 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
                             .and(goalCondition));
 
             // 같은 그룹인 경우 커서 조건 적용 (ID 기준으로 이후 데이터 조회)
-            if (decodedCursor != null && isSameGoalGroup(goalId, decodedCursor)) {
+            boolean isSameGroup = decodedCursor != null && isSameGoalGroup(goalId, decodedCursor);
+            if (isSameGroup) {
                 query = query.where(external.id.gt(decodedCursor.getId()));
-                log.info("Applied cursor condition for goal: {} with id > {}", goalId, decodedCursor.getId());
+                log.info("✅ APPLIED CURSOR CONDITION: external.id > {} for goal: {}",
+                        decodedCursor.getId(), goalId);
+            } else {
+                log.info("❌ NO CURSOR CONDITION: isSameGroup = false for goal: {}", goalId);
             }
 
             query = query.orderBy(external.id.asc());
 
             int remainingSize = size - totalFetched;
             List<External> groupExternals = query.limit(remainingSize + 1).fetch();
+
+            log.info("Goal: {} - Query returned {} items (remainingSize: {}, limit: {})",
+                    displayName, groupExternals.size(), remainingSize, remainingSize + 1);
+
+            // 실제 조회된 External ID들 로그
+            if (!groupExternals.isEmpty()) {
+                List<Long> ids = groupExternals.stream().map(External::getId).toList();
+                log.info("Retrieved External IDs: {}", ids);
+            }
 
             // 그룹 내에서 페이지네이션 처리
             boolean groupHasNext = groupExternals.size() > remainingSize;
@@ -270,7 +300,8 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
                     External lastExternal = groupExternals.getLast();
                     ExternalCursor groupCursor = new ExternalCursor();
                     groupCursor.setId(lastExternal.getId());
-                    groupCursor.setGroupValue(goalId != null ? goalId.toString() : "NULL_GROUP");
+                    // ✅ 일관된 NULL 처리 사용
+                    groupCursor.setGroupValue(goalIdToGroupValue(goalId));
                     nextCursor = groupCursor.encode();
                     log.info("Created cursor for same goal: {} with lastId: {}", goalId, lastExternal.getId());
                 }
@@ -293,6 +324,10 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
                     displayName, goalId, groupExternals.size(), totalFetched);
         }
 
+        log.info("=== FINAL RESULT ===");
+        log.info("TotalFetched: {}, hasNext: {}, nextCursor: {}",
+                totalFetched, hasNext, nextCursor);
+
         return ExternalGroupedResponseDTO.ExternalGroupedPageResponse.builder()
                 .data(groups)
                 .hasNext(hasNext)
@@ -302,24 +337,30 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
     }
 
     private int findGoalStartIndex(List<com.querydsl.core.Tuple> goalResults, String cursorGroupValue) {
-        if ("NULL_GROUP".equals(cursorGroupValue)) {
+        log.info("Finding start index for cursor group value: {}", cursorGroupValue);
+
+        if (NULL_GROUP_VALUE.equals(cursorGroupValue)) {
             // NULL 목표를 찾기 (name이 null인 경우)
             for (int i = 0; i < goalResults.size(); i++) {
-                String goalName = goalResults.get(i).get(QExternal.external.goal.name);
+                String goalName = goalResults.get(i).get(external.goal.name);
                 if (goalName == null) {
+                    log.info("Found NULL goal at index: {}", i);
                     return i;
                 }
             }
+            log.warn("NULL goal not found in results");
         } else {
             // 특정 goalId를 찾기
             try {
                 Long targetGoalId = Long.parseLong(cursorGroupValue);
                 for (int i = 0; i < goalResults.size(); i++) {
-                    Long goalId = goalResults.get(i).get(QExternal.external.goal.id);
+                    Long goalId = goalResults.get(i).get(external.goal.id);
                     if (targetGoalId.equals(goalId)) {
+                        log.info("Found goal {} at index: {}", targetGoalId, i);
                         return i;
                     }
                 }
+                log.warn("Goal {} not found in results", targetGoalId);
             } catch (NumberFormatException e) {
                 log.warn("Invalid goal ID in cursor: {}", cursorGroupValue);
             }
@@ -474,12 +515,21 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
             return false;
         }
     }
-    
+
     private boolean isSameGoalGroup(Long goalId, ExternalCursor cursor) {
-        if (cursor.getGroupValue() == null) return false;
-        
-        String currentGoalValue = goalId != null ? goalId.toString() : "NULL";
-        return cursor.getGroupValue().equals(currentGoalValue);
+        if (cursor.getGroupValue() == null) {
+            log.debug("Cursor group value is null, returning false");
+            return false;
+        }
+
+        // ✅ 일관된 NULL 처리
+        String currentGoalValue = goalId != null ? goalId.toString() : NULL_GROUP_VALUE;
+        boolean isSame = cursor.getGroupValue().equals(currentGoalValue);
+
+        log.info("Comparing goal groups - current: {}, cursor: {}, isSame: {}",
+                currentGoalValue, cursor.getGroupValue(), isSame);
+
+        return isSame;
     }
     
     private boolean shouldSkipAssigneeGroup(String assigneeValue, ExternalCursor cursor) {
@@ -594,6 +644,10 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
 
         public Long getId() { return id; }
         public String getName() { return name; }
+    }
+
+    private String goalIdToGroupValue(Long goalId) {
+        return goalId != null ? goalId.toString() : NULL_GROUP_VALUE;
     }
 
 }
