@@ -1,7 +1,8 @@
 package com.example.Veco.domain.issue.converter;
 
-import com.example.Veco.domain.goal.dto.response.GoalResDTO;
 import com.example.Veco.domain.issue.dto.IssueReqDTO;
+import com.example.Veco.domain.issue.exception.IssueException;
+import com.example.Veco.domain.issue.exception.code.IssueErrorCode;
 import com.example.Veco.domain.team.entity.Team;
 import org.springframework.stereotype.Component;
 import com.example.Veco.domain.assignee.entity.Assignee;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.Collections;
 import java.util.List;
 
@@ -183,12 +185,24 @@ public class IssueConverter {
             String name,
             Goal goal
     ){
+        LocalDate start = null, end = null;
+        try {
+            if (dto.deadline().start() != null) {
+                start = LocalDate.parse(dto.deadline().start());
+            }
+            if (dto.deadline().end() != null) {
+                end = LocalDate.parse(dto.deadline().end());
+            }
+        } catch (DateTimeParseException e) {
+            throw new IssueException(IssueErrorCode.DEADLINE_INVALID);
+        }
+        
         return Issue.builder()
                 .state(dto.state())
                 .content(dto.content())
                 .title(dto.title())
-                .deadlineStart(dto.deadline().start())
-                .deadlineEnd(dto.deadline().end())
+                .deadlineStart(start)
+                .deadlineEnd(end)
                 .priority(dto.priority())
                 .team(team)
                 .name(name)
