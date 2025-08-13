@@ -10,10 +10,14 @@ import com.example.Veco.domain.external.dto.response.ExternalResponseDTO;
 import com.example.Veco.domain.external.dto.response.ExternalGroupedResponseDTO;
 import com.example.Veco.domain.external.dto.paging.ExternalSearchCriteria;
 import com.example.Veco.domain.external.entity.External;
+import com.example.Veco.domain.external.exception.ExternalException;
+import com.example.Veco.domain.external.exception.code.ExternalErrorCode;
 import com.example.Veco.domain.external.repository.ExternalCustomRepository;
 import com.example.Veco.domain.external.repository.ExternalRepository;
 import com.example.Veco.domain.github.service.GitHubIssueService;
 import com.example.Veco.domain.goal.entity.Goal;
+import com.example.Veco.domain.goal.exception.GoalException;
+import com.example.Veco.domain.goal.exception.code.GoalErrorCode;
 import com.example.Veco.domain.goal.repository.GoalRepository;
 import com.example.Veco.domain.mapping.Assignment;
 import com.example.Veco.domain.mapping.converter.AssignmentConverter;
@@ -41,6 +45,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -179,14 +184,32 @@ public class ExternalService {
 
     private void updateExternalDates(External external, ExternalRequestDTO.DeadlineRequestDTO deadline) {
 
-        if (deadline.shouldUpdateStartDate()) {
-            Optional<LocalDate> startDate = deadline.getParsedStartDate();
-            external.updateStartDate(startDate.orElse(null));
-        }
+        // 기한 변경
+        if (deadline != null) {
 
-        if (deadline.shouldUpdateEndDate()) {
-            Optional<LocalDate> endDate = deadline.getParsedEndDate();
-            external.updateEndDate(endDate.orElse(null));
+            try {
+                if (deadline.getStart() != null) {
+                    LocalDate start;
+                    if (deadline.getStart().equals("null")){
+                        start = null;
+                    } else {
+                        start = LocalDate.parse(deadline.getStart());
+                    }
+                    external.updateStartDate(start);
+                }
+                if (deadline.getEnd() != null) {
+                    LocalDate end;
+                    if (deadline.getEnd().equals("null")){
+                        end = null;
+                    } else {
+                        end = LocalDate.parse(deadline.getEnd());
+                    }
+                    external.updateEndDate(end);
+                }
+            } catch (DateTimeParseException e) {
+                throw new ExternalException(ExternalErrorCode.DEADLINE_INVALID);
+            }
+
         }
 
         validateDates(external.getStartDate(), external.getEndDate());
