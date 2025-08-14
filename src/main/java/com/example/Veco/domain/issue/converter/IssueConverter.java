@@ -132,6 +132,7 @@ public class IssueConverter {
             Comment comment
     ) {
         return IssueResponseDTO.CommentInfo.builder()
+                .id(comment.getId())
                 .name(comment.getMember().getName())
                 .profileUrl(comment.getMember().getProfile().getProfileImageUrl())
                 .content(comment.getContent())
