@@ -38,8 +38,9 @@ public class ExternalController implements ExternalSwaggerDocs{
     }
 
     @GetMapping("/{externalId}")
-    public ApiResponse<ExternalResponseDTO.ExternalInfoDTO> getExternal(@PathVariable Long externalId) {
-        return ApiResponse.onSuccess(externalService.getExternalById(externalId));
+    public ApiResponse<ExternalResponseDTO.ExternalInfoDTO> getExternal(@PathVariable Long teamId,
+                                                                        @PathVariable Long externalId) {
+        return ApiResponse.onSuccess(externalService.getExternalById(externalId, teamId));
     }
 
 

@@ -39,7 +39,7 @@ public interface ExternalSwaggerDocs {
                     responseCode = "200",
                     description = "외부이슈 조회 성공",
                     content = @Content(
-                            schema = @Schema(implementation = ExternalApiResponse.class)
+                            schema = @Schema(implementation = ExternalResponseDTO.ExternalInfoDTO.class)
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -54,7 +54,7 @@ public interface ExternalSwaggerDocs {
                     )
             )
     })
-    ApiResponse<ExternalResponseDTO.ExternalInfoDTO> getExternal(@Parameter(description = "외부이슈 ID", required = true) @PathVariable Long externalId);
+    ApiResponse<ExternalResponseDTO.ExternalInfoDTO> getExternal(@Parameter(description = "외부이슈 ID", required = true) @PathVariable Long externalId, @PathVariable Long teamId);
 
     @Operation(
             summary = "팀 내 외부이슈 전체 조회 API",

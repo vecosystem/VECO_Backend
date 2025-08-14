@@ -143,10 +143,16 @@ public class ExternalService {
         return ExternalConverter.createResponseDTO(external);
     }
 
-    public ExternalResponseDTO.ExternalInfoDTO getExternalById(Long externalId) {
+    public ExternalResponseDTO.ExternalInfoDTO getExternalById(Long externalId, Long teamId) {
+
+        External external = findExternalById(externalId);
 
         CommentRoom commentRoom = commentRoomRepository
                 .findByRoomTypeAndTargetId(com.example.Veco.global.enums.Category.EXTERNAL, externalId);
+
+        if(!external.getTeam().getId().equals(teamId)){
+            throw new ExternalException(ExternalErrorCode.NOT_SAME_TEAM);
+        }
 
         List<Comment> comments = new ArrayList<>();
 
@@ -154,7 +160,6 @@ public class ExternalService {
             comments = commentRepository.findAllByCommentRoomOrderByIdAsc(commentRoom);
         }
 
-        External external = findExternalById(externalId);
 
         return ExternalConverter.toExternalInfoDTO(external, external.getAssignments(), comments);
     }

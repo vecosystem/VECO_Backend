@@ -106,7 +106,7 @@ public class ExternalConverter {
 
                 ExternalResponseDTO.CommentResponseDTO commentDTO = ExternalResponseDTO.CommentResponseDTO.builder()
                         .profileUrl(comment.getMember().getProfile().getProfileImageUrl())
-                        .nickname(comment.getMember().getNickname())
+                        .name(comment.getMember().getNickname())
                         .createdAt(comment.getCreatedAt())
                         .content(comment.getContent())
                         .build();

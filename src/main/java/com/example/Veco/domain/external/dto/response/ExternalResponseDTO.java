@@ -191,7 +191,7 @@ public class ExternalResponseDTO {
     @Builder
     public static class CommentResponseDTO {
         private String profileUrl;
-        private String nickname;
+        private String name;
         private LocalDateTime createdAt;
         private String content;
     }
