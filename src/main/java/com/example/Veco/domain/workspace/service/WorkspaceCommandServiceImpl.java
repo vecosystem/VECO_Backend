@@ -148,7 +148,7 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
         String slug = slugGenerator.generate(request.getWorkspaceName());
         String token = inviteTokenGenerator.generate();
         String invitePassword = invitePasswordGenerator.generate();
-        String workspaceUrl = "https://veco-eight.vercel.app/" + slug;
+        String workspaceUrl = "https://web.vecoservice.shop/" + slug;
         String inviteUrl = workspaceUrl + "/invite?token=" + token;
 
         // 4. 워크스페이스 생성
