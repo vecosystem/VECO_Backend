@@ -1,7 +1,7 @@
 package com.example.Veco.domain.mapping;
 
 import com.example.Veco.domain.common.BaseEntity;
-import com.example.Veco.domain.external.entity.GitHubRepository;
+import com.example.Veco.domain.github.entity.GitHubRepository;
 import com.example.Veco.domain.team.entity.Team;
 import jakarta.persistence.*;
 import lombok.*;

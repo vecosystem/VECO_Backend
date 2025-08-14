@@ -1,14 +1,12 @@
-package com.example.Veco.domain.external.service;
+package com.example.Veco.domain.github.service;
 
 import com.example.Veco.domain.external.converter.ExternalConverter;
-import com.example.Veco.domain.external.dto.GitHubPullRequestPayload;
-import com.example.Veco.domain.external.dto.GitHubWebhookPayload;
+import com.example.Veco.domain.github.dto.webhook.GitHubPullRequestPayload;
 import com.example.Veco.domain.external.entity.External;
-import com.example.Veco.domain.external.entity.GitHubIssue;
 import com.example.Veco.domain.external.exception.ExternalException;
-import com.example.Veco.domain.external.exception.GitHubException;
+import com.example.Veco.domain.github.exception.GitHubException;
 import com.example.Veco.domain.external.exception.code.ExternalErrorCode;
-import com.example.Veco.domain.external.exception.code.GitHubErrorCode;
+import com.example.Veco.domain.github.exception.code.GitHubErrorCode;
 import com.example.Veco.domain.external.repository.ExternalRepository;
 import com.example.Veco.domain.mapping.GithubInstallation;
 import com.example.Veco.domain.mapping.repository.GitHubInstallationRepository;
@@ -21,8 +19,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -62,6 +58,8 @@ public class GitHubPullRequestService {
 
     private void handlePullRequestOpened(GitHubPullRequestPayload payload) {
 
+        log.info(payload.toString());
+
         Long installationId = payload.getInstallation().getId();
 
         GithubInstallation installInfo = gitHubInstallationRepository.findByInstallationId(installationId)
@@ -74,9 +72,15 @@ public class GitHubPullRequestService {
                         team.getId(),
                         Category.EXTERNAL);
 
+        log.info("다음 외부이슈 코드 : " + code.getNextCode());
+
         External external = ExternalConverter.byGitHubPullRequest(payload, installInfo.getTeam(), code.getNextCode());
 
+        log.info("외부 이슈 제목 : {} 내용 : {}", external.getTitle(), external.getDescription());
+
         externalRepository.save(external);
+
+        log.info("외부 이슈 id : {} ", external.getId());
 
     }
 

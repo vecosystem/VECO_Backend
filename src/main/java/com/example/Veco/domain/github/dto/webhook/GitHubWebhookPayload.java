@@ -1,13 +1,14 @@
-package com.example.Veco.domain.external.dto;
+package com.example.Veco.domain.github.dto.webhook;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GitHubWebhookPayload {
 
     private String action;
@@ -17,6 +18,7 @@ public class GitHubWebhookPayload {
     private Installation installation;
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Issue {
         private Long id;
 
@@ -48,19 +50,20 @@ public class GitHubWebhookPayload {
         private Integer comments;
 
         @JsonProperty("closed_at")
-        private LocalDateTime closedAt;
+        private String closedAt;
 
         @JsonProperty("created_at")
-        private LocalDateTime createdAt;
+        private String createdAt;
 
         @JsonProperty("updated_at")
-        private LocalDateTime updatedAt;
+        private String updatedAt;
 
         @JsonProperty("author_association")
         private String authorAssociation;
     }
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Repository {
         private Long id;
 
@@ -85,13 +88,14 @@ public class GitHubWebhookPayload {
         private String url;
 
         @JsonProperty("created_at")
-        private LocalDateTime createdAt;
+        private String createdAt;
 
         @JsonProperty("updated_at")
-        private LocalDateTime updatedAt;
+        private String updatedAt;
     }
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class User {
         private Long id;
 
@@ -118,6 +122,7 @@ public class GitHubWebhookPayload {
     }
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Label {
         private Long id;
 
@@ -134,6 +139,7 @@ public class GitHubWebhookPayload {
     }
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Milestone {
         private Long id;
 
@@ -158,19 +164,20 @@ public class GitHubWebhookPayload {
         private Integer closedIssues;
 
         @JsonProperty("created_at")
-        private LocalDateTime createdAt;
+        private String createdAt;
 
         @JsonProperty("updated_at")
-        private LocalDateTime updatedAt;
+        private String updatedAt;
 
         @JsonProperty("closed_at")
-        private LocalDateTime closedAt;
+        private String closedAt;
 
         @JsonProperty("due_on")
-        private LocalDateTime dueOn;
+        private String dueOn;
     }
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Installation {
         @JsonProperty("id")
         private Long id;

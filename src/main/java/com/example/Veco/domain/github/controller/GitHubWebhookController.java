@@ -1,8 +1,7 @@
-package com.example.Veco.domain.external.controller;
+package com.example.Veco.domain.github.controller;
 
-import com.example.Veco.domain.external.dto.GitHubWebhookPayload;
-import com.example.Veco.domain.external.service.GitHubIssueService;
-import com.example.Veco.domain.external.service.GitHubPullRequestService;
+import com.example.Veco.domain.github.service.GitHubIssueService;
+import com.example.Veco.domain.github.service.GitHubPullRequestService;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -24,30 +23,25 @@ public class GitHubWebhookController {
     public ResponseEntity<String> handleWebhook(
             @RequestBody String payload,
             @RequestHeader("X-GitHub-Event") String eventType,
-            @RequestHeader("X-GitHub-Delivery") String deliveryId,
-            @RequestHeader(value = "X-Hub-Signature-256", required = false) String signature,
-            HttpServletRequest request) {
+            @RequestHeader("X-GitHub-Delivery") String deliveryId) {
 
         log.info("Received GitHub webhook. Event: {}, Delivery: {}", eventType, deliveryId);
 
         try {
-            // 서명 검증
-//            if (!webhookSecurityService.verifySignature(request, signature)) {
-//                log.warn("Invalid webhook signature for delivery: {}", deliveryId);
-//                return ResponseEntity.status(401).body("Unauthorized");
-//            }
 
             switch (eventType) {
                 case "issues":
                     gitHubIssueService.processIssueWebhook(payload);
                     break;
                 case "pull_request":
+
+                    log.info(payload);
+
                     gitHubPullRequestService.handlePullRequestEvent(payload);
                     break;
                 case "issue_comment":
                     break;
             }
-
 
             return ResponseEntity.ok().build();
 

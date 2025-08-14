@@ -3,15 +3,19 @@ package com.example.Veco.domain.external.dto.request;
 import com.example.Veco.global.enums.ExtServiceType;
 import com.example.Veco.global.enums.Priority;
 import com.example.Veco.global.enums.State;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Optional;
 
 public class ExternalRequestDTO {
 
@@ -34,9 +38,37 @@ public class ExternalRequestDTO {
 
     @Getter
     public static class DeadlineRequestDTO{
-        private LocalDate start;
-        private LocalDate end;
+        private String start;
+        private String end;
+
+        public Optional<LocalDate> getParsedStartDate() {
+            return parseDate(start);
+        }
+
+        public Optional<LocalDate> getParsedEndDate() {
+            return parseDate(end);
+        }
+
+        private Optional<LocalDate> parseDate(String dateStr) {
+            if (dateStr == null) return Optional.empty(); // 필드 생략 = 변경하지 않음
+            if ("null".equalsIgnoreCase(dateStr)) return Optional.of(null); // 명시적 삭제
+
+            try {
+                return Optional.of(LocalDate.parse(dateStr));
+            } catch (DateTimeParseException e) {
+                throw new IllegalArgumentException("Invalid date format: " + dateStr);
+            }
+        }
+
+        public boolean shouldUpdateStartDate() {
+            return start != null;
+        }
+
+        public boolean shouldUpdateEndDate() {
+            return end != null;
+        }
     }
+
 
     @Getter
     public static class ExternalDeleteRequestDTO{

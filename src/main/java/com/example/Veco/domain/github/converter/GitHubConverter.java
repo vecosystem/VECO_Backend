@@ -1,11 +1,9 @@
-package com.example.Veco.domain.external.converter;
+package com.example.Veco.domain.github.converter;
 
 import com.example.Veco.domain.external.dto.request.ExternalRequestDTO;
-import com.example.Veco.domain.external.dto.request.GitHubApiRequestDTO;
-import com.example.Veco.domain.external.dto.response.GitHubResponseDTO;
+import com.example.Veco.domain.github.dto.request.GitHubApiRequestDTO;
+import com.example.Veco.domain.github.dto.response.GitHubResponseDTO;
 import com.example.Veco.domain.mapping.GithubInstallation;
-
-import java.util.List;
 
 public class GitHubConverter {
 

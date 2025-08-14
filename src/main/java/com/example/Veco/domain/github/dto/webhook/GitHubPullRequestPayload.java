@@ -1,4 +1,4 @@
-package com.example.Veco.domain.external.dto;
+package com.example.Veco.domain.github.dto.webhook;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,15 +9,18 @@ import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
+@Data
 public class GitHubPullRequestPayload {
     private String action;      // PR 액션 타입
-    private Long number;        // PR 번호
+    private Long number;
+    @JsonProperty("pull_request")
     private PullRequest pullRequest; // PR 상세 정보
     private Repository repository;   // 저장소 정보
     private Installation installation; // GitHub App 설치 정보
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     @Getter
+    @Data
     public static class PullRequest {
         private Long id;           // PR 고유 ID
         private String nodeId;     // GraphQL Node ID
@@ -60,6 +63,7 @@ public class GitHubPullRequestPayload {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
+    @Data
     public static class Branch {
         private String label;       // "owner:branch_name"
         private String ref;         // "branch_name"
@@ -71,6 +75,7 @@ public class GitHubPullRequestPayload {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
+    @Data
     public static class Repository {
         private Long id;
         private String nodeId;

@@ -1,4 +1,4 @@
-package com.example.Veco.domain.external.exception.code;
+package com.example.Veco.domain.github.exception.code;
 
 import com.example.Veco.global.apiPayload.ErrorReasonDTO;
 import com.example.Veco.global.apiPayload.code.BaseErrorStatus;

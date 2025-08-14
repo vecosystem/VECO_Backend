@@ -10,9 +10,14 @@ import com.example.Veco.domain.external.dto.response.ExternalResponseDTO;
 import com.example.Veco.domain.external.dto.response.ExternalGroupedResponseDTO;
 import com.example.Veco.domain.external.dto.paging.ExternalSearchCriteria;
 import com.example.Veco.domain.external.entity.External;
+import com.example.Veco.domain.external.exception.ExternalException;
+import com.example.Veco.domain.external.exception.code.ExternalErrorCode;
 import com.example.Veco.domain.external.repository.ExternalCustomRepository;
 import com.example.Veco.domain.external.repository.ExternalRepository;
+import com.example.Veco.domain.github.service.GitHubIssueService;
 import com.example.Veco.domain.goal.entity.Goal;
+import com.example.Veco.domain.goal.exception.GoalException;
+import com.example.Veco.domain.goal.exception.code.GoalErrorCode;
 import com.example.Veco.domain.goal.repository.GoalRepository;
 import com.example.Veco.domain.mapping.Assignment;
 import com.example.Veco.domain.mapping.converter.AssignmentConverter;
@@ -31,7 +36,6 @@ import com.example.Veco.domain.team.repository.TeamRepository;
 import com.example.Veco.domain.team.service.NumberSequenceService;
 import com.example.Veco.global.apiPayload.code.ErrorStatus;
 import com.example.Veco.global.apiPayload.exception.VecoException;
-import com.example.Veco.global.apiPayload.page.CursorPage;
 import com.example.Veco.global.auth.user.AuthUser;
 import com.example.Veco.global.enums.Category;
 import com.example.Veco.global.enums.ExtServiceType;
@@ -40,6 +44,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -167,10 +173,54 @@ public class ExternalService {
             external.setGoal(goal);
         }
 
+        if(request.getDeadline() != null){
+            updateExternalDates(external, request.getDeadline());
+        }
+
         external.updateExternal(request);
 
         return ExternalConverter.updateResponseDTO(external);
     }
+
+    private void updateExternalDates(External external, ExternalRequestDTO.DeadlineRequestDTO deadline) {
+
+        // 기한 변경
+        if (deadline != null) {
+
+            try {
+                if (deadline.getStart() != null) {
+                    LocalDate start;
+                    if (deadline.getStart().equals("null")){
+                        start = null;
+                    } else {
+                        start = LocalDate.parse(deadline.getStart());
+                    }
+                    external.updateStartDate(start);
+                }
+                if (deadline.getEnd() != null) {
+                    LocalDate end;
+                    if (deadline.getEnd().equals("null")){
+                        end = null;
+                    } else {
+                        end = LocalDate.parse(deadline.getEnd());
+                    }
+                    external.updateEndDate(end);
+                }
+            } catch (DateTimeParseException e) {
+                throw new ExternalException(ExternalErrorCode.DEADLINE_INVALID);
+            }
+
+        }
+
+        validateDates(external.getStartDate(), external.getEndDate());
+    }
+
+    private void validateDates(LocalDate startDate, LocalDate endDate) {
+        if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("시작일은 마감일보다 늦을 수 없습니다.");
+        }
+    }
+
 
     public String getExternalName(Long teamId) {
         Team team = teamRepository.findById(teamId)

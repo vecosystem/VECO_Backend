@@ -1,23 +1,22 @@
-package com.example.Veco.domain.external.service;
+package com.example.Veco.domain.github.service;
 
 import com.example.Veco.domain.external.converter.ExternalConverter;
-import com.example.Veco.domain.external.converter.GitHubConverter;
-import com.example.Veco.domain.external.dto.GitHubWebhookPayload;
+import com.example.Veco.domain.github.converter.GitHubConverter;
+import com.example.Veco.domain.github.dto.webhook.GitHubWebhookPayload;
 import com.example.Veco.domain.external.dto.request.ExternalRequestDTO;
-import com.example.Veco.domain.external.dto.response.GitHubApiResponseDTO;
+import com.example.Veco.domain.github.dto.response.GitHubApiResponseDTO;
 import com.example.Veco.domain.external.entity.External;
-import com.example.Veco.domain.external.entity.GitHubIssue;
+import com.example.Veco.domain.github.entity.GitHubIssue;
 import com.example.Veco.domain.external.exception.ExternalException;
-import com.example.Veco.domain.external.exception.GitHubException;
+import com.example.Veco.domain.github.exception.GitHubException;
 import com.example.Veco.domain.external.exception.code.ExternalErrorCode;
-import com.example.Veco.domain.external.exception.code.GitHubErrorCode;
+import com.example.Veco.domain.github.exception.code.GitHubErrorCode;
 import com.example.Veco.domain.external.repository.ExternalRepository;
-import com.example.Veco.domain.external.repository.GitHubIssueRepository;
+import com.example.Veco.domain.github.repository.GitHubIssueRepository;
 import com.example.Veco.domain.mapping.GithubInstallation;
 import com.example.Veco.domain.mapping.repository.GitHubInstallationRepository;
 import com.example.Veco.domain.team.dto.NumberSequenceResponseDTO;
 import com.example.Veco.domain.team.entity.Team;
-import com.example.Veco.domain.team.repository.TeamRepository;
 import com.example.Veco.domain.team.service.NumberSequenceService;
 import com.example.Veco.global.enums.Category;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -82,7 +81,7 @@ public class GitHubIssueService {
                     updateIssue(issuePayload);
             }
         }catch (Exception e){
-
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -141,32 +140,29 @@ public class GitHubIssueService {
 
         createVecoExternal(payload);
 
-        GitHubIssue issue = GitHubIssue.builder()
-                .githubIssueId(issueData.getId())
-                .nodeId(issueData.getNodeId())
-                .number(issueData.getNumber())
-                .title(issueData.getTitle())
-                .body(issueData.getBody())
-                .state(GitHubIssue.IssueState.valueOf(issueData.getState().toUpperCase()))
-                .repositoryFullName(repoData.getFullName())
-                .repositoryUrl(repoData.getUrl())
-                .htmlUrl(issueData.getHtmlUrl())
-                .creatorLogin(issueData.getUser().getLogin())
-                .creatorId(issueData.getUser().getId())
-                .creatorAvatarUrl(issueData.getUser().getAvatarUrl())
-                .assigneeLogin(issueData.getAssignee() != null ? issueData.getAssignee().getLogin() : null)
-                .assigneeId(issueData.getAssignee() != null ? issueData.getAssignee().getId() : null)
-                .labels(extractLabelNames(issueData.getLabels()))
-                .githubCreatedAt(issueData.getCreatedAt())
-                .githubUpdatedAt(issueData.getUpdatedAt())
-                .githubClosedAt(issueData.getClosedAt())
-                .commentsCount(issueData.getComments())
-                .locked(issueData.getLocked())
-                .lockReason(issueData.getActiveLockReason())
-                .build();
-
-        gitHubIssueRepository.save(issue);
-        log.info("Created new issue: #{} - {}", issue.getNumber(), issue.getTitle());
+//        GitHubIssue issue = GitHubIssue.builder()
+//                .githubIssueId(issueData.getId())
+//                .nodeId(issueData.getNodeId())
+//                .number(issueData.getNumber())
+//                .title(issueData.getTitle())
+//                .body(issueData.getBody())
+//                .state(GitHubIssue.IssueState.valueOf(issueData.getState().toUpperCase()))
+//                .repositoryFullName(repoData.getFullName())
+//                .repositoryUrl(repoData.getUrl())
+//                .htmlUrl(issueData.getHtmlUrl())
+//                .creatorLogin(issueData.getUser().getLogin())
+//                .creatorId(issueData.getUser().getId())
+//                .creatorAvatarUrl(issueData.getUser().getAvatarUrl())
+//                .assigneeLogin(issueData.getAssignee() != null ? issueData.getAssignee().getLogin() : null)
+//                .assigneeId(issueData.getAssignee() != null ? issueData.getAssignee().getId() : null)
+//                .labels(extractLabelNames(issueData.getLabels()))
+//                .commentsCount(issueData.getComments())
+//                .locked(issueData.getLocked())
+//                .lockReason(issueData.getActiveLockReason())
+//                .build();
+//
+//        gitHubIssueRepository.save(issue);
+//        log.info("Created new issue: #{} - {}", issue.getNumber(), issue.getTitle());
     }
 
     private void createVecoExternal(GitHubWebhookPayload payload) {

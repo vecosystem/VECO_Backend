@@ -1,4 +1,4 @@
-package com.example.Veco.domain.external.dto.request;
+package com.example.Veco.domain.github.dto.request;
 
 import lombok.Builder;
 import lombok.Data;

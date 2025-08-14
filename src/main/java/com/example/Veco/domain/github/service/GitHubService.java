@@ -1,17 +1,15 @@
-package com.example.Veco.domain.external.service;
+package com.example.Veco.domain.github.service;
 
-import com.example.Veco.domain.external.converter.GitHubConverter;
-import com.example.Veco.domain.external.dto.response.GitHubResponseDTO;
-import com.example.Veco.domain.external.exception.GitHubException;
-import com.example.Veco.domain.external.exception.code.GitHubErrorCode;
+import com.example.Veco.domain.github.converter.GitHubConverter;
+import com.example.Veco.domain.github.dto.response.GitHubResponseDTO;
+import com.example.Veco.domain.github.exception.GitHubException;
+import com.example.Veco.domain.github.exception.code.GitHubErrorCode;
 import com.example.Veco.domain.mapping.GithubInstallation;
 import com.example.Veco.domain.mapping.repository.GitHubInstallationRepository;
-import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.domain.team.exception.TeamException;
 import com.example.Veco.domain.team.exception.code.TeamErrorCode;
 import com.example.Veco.domain.team.repository.TeamRepository;
-import com.example.Veco.global.apiPayload.exception.VecoException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
