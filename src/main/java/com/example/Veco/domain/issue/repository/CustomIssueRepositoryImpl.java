@@ -141,9 +141,8 @@ public class CustomIssueRepositoryImpl implements CustomIssueRepository {
                 .from(issue)
                 .leftJoin(assignee).on(assignee.type.eq(Category.ISSUE)
                         .and(assignee.targetId.eq(issue.id))
-                        .and(assignee.memberTeam.member.deletedAt.isNull())
                 )
-                .where(issue.goal.team.id.eq(teamId))
+                .where(issue.team.id.eq(teamId))
                 .fetch();
     }
 
@@ -209,7 +208,6 @@ public class CustomIssueRepositoryImpl implements CustomIssueRepository {
                 .from(issue)
                 .leftJoin(assignee).on(assignee.type.eq(Category.ISSUE)
                         .and(assignee.targetId.eq(issue.id))
-                        .and(assignee.memberTeam.member.deletedAt.isNull())
                 )
                 .transform(
                         GroupBy.groupBy(issue.id).as(

@@ -2,12 +2,16 @@ package com.example.Veco.domain.mapping.entity;
 
 
 
+import com.example.Veco.domain.assignee.entity.Assignee;
 import com.example.Veco.domain.common.BaseEntity;
 import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.global.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -33,4 +37,7 @@ public class MemberTeam extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "team_id")
     private Team team;
+
+    @OneToMany(mappedBy = "memberTeam", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Assignee> assignees = new ArrayList<>();
 }
