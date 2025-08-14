@@ -1,0 +1,30 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/github-actions
+          chmod 600 ~/.ssh/github-actions
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to EC2
+        run: |
+          ssh -i ~/.ssh/github-actions ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "
+            cd /home/ubuntu/app &&
+            git pull origin develop &&
+            ./gradlew build -x test &&
+            sudo systemctl restart myapp
+          "
