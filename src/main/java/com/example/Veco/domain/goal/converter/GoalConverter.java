@@ -175,6 +175,7 @@ public class GoalConverter {
             Comment comment
     ){
         return GoalResDTO.CommentInfo.builder()
+                .id(comment.getId())
                 .profileUrl(comment.getMember().getProfile().getProfileImageUrl())
                 .nickname(comment.getMember().getNickname())
                 .createdAt(comment.getCreatedAt())
