@@ -48,7 +48,7 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
     private final InvitePasswordGenerator invitePasswordGenerator;
 
     /**
-     * 팀 생성 및 멤버 할당 로직 ~
+     * 팀 생성 및 멤버 할당 로직
      */
     @Transactional
     @Override
