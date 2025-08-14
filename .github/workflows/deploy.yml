@@ -15,10 +15,10 @@ jobs:
         uses: actions/checkout@v3
 
       # 2. JDK 설정
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
 
       # 3. Gradle 캐시
@@ -34,7 +34,7 @@ jobs:
 
       # 4. Gradle 빌드
       - name: Build with Gradle
-        run: ./gradlew clean build -x test
+        run: ./gradlew clean bootjar -x test
 
       # 5. EC2 접속을 위한 SSH 키 설정
       - name: Set up SSH key
