@@ -30,6 +30,13 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ExternalConverter {
 
+    public static ExternalResponseDTO.SimpleExternalDTO toSimpleExternalDTO(External external) {
+        return ExternalResponseDTO.SimpleExternalDTO.builder()
+                .id(external.getId())
+                .title(external.getTitle())
+                .build();
+    }
+
     public static ExternalResponseDTO.SimpleListDTO toSimpleListDTO(List<External> externals) {
         List<ExternalResponseDTO.SimpleExternalDTO> simpleDTOs = externals.stream().map(
                 external -> ExternalResponseDTO.SimpleExternalDTO.builder()

@@ -15,6 +15,9 @@ import com.example.Veco.domain.external.exception.code.ExternalErrorCode;
 import com.example.Veco.domain.external.repository.ExternalCustomRepository;
 import com.example.Veco.domain.external.repository.ExternalRepository;
 import com.example.Veco.domain.github.service.GitHubIssueService;
+import com.example.Veco.domain.goal.converter.GoalConverter;
+import com.example.Veco.domain.goal.dto.request.GoalReqDTO;
+import com.example.Veco.domain.goal.dto.response.GoalResDTO;
 import com.example.Veco.domain.goal.entity.Goal;
 import com.example.Veco.domain.goal.repository.GoalRepository;
 import com.example.Veco.domain.mapping.Assignment;
@@ -48,6 +51,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -170,9 +175,45 @@ public class ExternalService {
 
     @Transactional
     public void softDeleteExternals(ExternalRequestDTO.ExternalDeleteRequestDTO request) {
+
+        log.info("Delete external {}", request.getExternalIds());
+
         List<External> externals = externalRepository.findByIdIn(request.getExternalIds());
 
         externals.forEach(External::softDelete);
+    }
+
+    // 삭제된 목표 리스트 조회
+    public List<ExternalResponseDTO.SimpleExternalDTO> getDeletedExternals(
+            Long teamId
+    ) {
+
+        List<External> result = externalRepository.findAllByTeamIdAndDeleted(teamId);
+
+        if (result.isEmpty()){
+            throw new ExternalException(ExternalErrorCode.NOT_FOUND_DELETE_EXTERNALS);
+        }
+
+        return result.stream().map(ExternalConverter::toSimpleExternalDTO).toList();
+    }
+
+
+    @Transactional
+    public List<ExternalResponseDTO.SimpleExternalDTO> restoreGoals(
+            ExternalRequestDTO.ExternalDeleteRequestDTO dto
+    ) {
+        // 삭제된 목표들 조회
+        List<External> result = externalRepository.findDeletedExternalsById(dto.getExternalIds());
+
+        if (result.isEmpty()){
+            throw new ExternalException(ExternalErrorCode.NOT_A_DELETE);
+        }
+
+        for (External external : result) {
+            external.restore();
+        }
+
+        return result.stream().map(ExternalConverter::toSimpleExternalDTO).collect(Collectors.toList());
     }
 
     @Transactional

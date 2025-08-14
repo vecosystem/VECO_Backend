@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 public interface ExternalSwaggerDocs {
 
 
@@ -184,4 +186,17 @@ public interface ExternalSwaggerDocs {
     )
     ApiResponse<ExternalResponseDTO.LinkInfoResponseDTO> getExternalLinks(@PathVariable("teamId") Long teamId);
 
+    @Operation(
+            summary = "삭제된 외부이슈 복원 API",
+            description = "삭제된 외부이슈를 복원합니다."
+    )
+    ApiResponse<List<ExternalResponseDTO.SimpleExternalDTO>> restoreGoals(
+            @RequestBody ExternalRequestDTO.ExternalDeleteRequestDTO dto
+    );
+
+    @Operation(
+            summary = "삭제된 외부이슈 목록 가져오기",
+            description = "삭제된 모든 외부이슈들을 가져옵니다."
+    )
+    ApiResponse<List<ExternalResponseDTO.SimpleExternalDTO>> getDeletedExternals(@PathVariable("teamId") Long teamId);
 }

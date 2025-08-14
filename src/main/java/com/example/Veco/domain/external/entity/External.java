@@ -131,6 +131,8 @@ public class External extends BaseEntity {
         this.state = State.FINISH;
     }
 
+    public void restore(){ this.deletedAt = null; }
+
     public void updateExternalByGithubIssue(GitHubWebhookPayload.Issue issue ){
 
         if(issue.getTitle() != null) {
