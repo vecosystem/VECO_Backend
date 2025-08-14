@@ -59,10 +59,17 @@ public class Member extends BaseEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+
+
     // update
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
     public void updateWorkspace(WorkSpace workSpace) { this.workSpace = workSpace; }
-    public void softDelete(){ deletedAt = LocalDateTime.now(); }
+    public void softDelete(){
+        deletedAt = LocalDateTime.now();
+        socialUid = null;
+        workSpace = null;
+        email = "";
+    }
 }
