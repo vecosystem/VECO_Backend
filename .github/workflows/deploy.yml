@@ -56,7 +56,7 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "*.jar"
-          target: "/home/ubuntu/app.jar"
+          target: "/home/ubuntu"
 
       - name: Run jar on EC2
         uses: appleboy/ssh-action@v0.1.6
