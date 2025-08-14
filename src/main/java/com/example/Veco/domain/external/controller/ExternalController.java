@@ -6,6 +6,8 @@ import com.example.Veco.domain.external.dto.response.ExternalResponseDTO;
 import com.example.Veco.domain.external.dto.response.ExternalGroupedResponseDTO;
 import com.example.Veco.domain.external.exception.code.ExternalSuccessCode;
 import com.example.Veco.domain.external.service.ExternalService;
+import com.example.Veco.domain.goal.dto.request.GoalReqDTO;
+import com.example.Veco.domain.goal.dto.response.GoalResDTO;
 import com.example.Veco.global.apiPayload.ApiResponse;
 import com.example.Veco.global.auth.user.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,6 +21,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,8 +38,9 @@ public class ExternalController implements ExternalSwaggerDocs{
     }
 
     @GetMapping("/{externalId}")
-    public ApiResponse<ExternalResponseDTO.ExternalInfoDTO> getExternal(@PathVariable Long externalId) {
-        return ApiResponse.onSuccess(externalService.getExternalById(externalId));
+    public ApiResponse<ExternalResponseDTO.ExternalInfoDTO> getExternal(@PathVariable Long teamId,
+                                                                        @PathVariable Long externalId) {
+        return ApiResponse.onSuccess(externalService.getExternalById(externalId, teamId));
     }
 
 
@@ -55,6 +60,21 @@ public class ExternalController implements ExternalSwaggerDocs{
 
     }
 
+    @GetMapping("/external-name")
+    public ApiResponse<?> getExternalName(@PathVariable("teamId") Long teamId) {
+        return ApiResponse.onSuccess(externalService.getExternalName(teamId));
+    }
+
+    @GetMapping("/links")
+    public ApiResponse<ExternalResponseDTO.LinkInfoResponseDTO> getExternalLinks(@PathVariable("teamId") Long teamId) {
+        return ApiResponse.onSuccess(externalService.getExternalServices(teamId));
+    }
+
+    @GetMapping("/deleted-externals")
+    public ApiResponse<List<ExternalResponseDTO.SimpleExternalDTO>> getDeletedExternals(@PathVariable("teamId") Long teamId) {
+        return ApiResponse.onSuccess(externalService.getDeletedExternals(teamId));
+    }
+
     // TODO : 깃허브 REST API 를 통해서 깃허브 레포지토리에도 이슈가 등록되도록! -> 양방향 동기화
 
     @PostMapping
@@ -62,8 +82,14 @@ public class ExternalController implements ExternalSwaggerDocs{
             @PathVariable("teamId") Long teamId,
             @Valid @RequestBody ExternalRequestDTO.ExternalCreateRequestDTO requestDTO,
             @AuthenticationPrincipal AuthUser user) {
-
         return ApiResponse.onSuccess(externalService.createExternal(teamId, requestDTO, user));
+    }
+
+    @PostMapping("/restore")
+    public ApiResponse<List<ExternalResponseDTO.SimpleExternalDTO>> restoreGoals(
+            @RequestBody ExternalRequestDTO.ExternalDeleteRequestDTO dto
+    ){
+        return ApiResponse.onSuccess(externalService.restoreGoals(dto));
     }
 
     @PatchMapping("/{externalId}")
@@ -76,17 +102,7 @@ public class ExternalController implements ExternalSwaggerDocs{
 
     @DeleteMapping
     public ApiResponse<?> deleteExternal(@Valid @RequestBody ExternalRequestDTO.ExternalDeleteRequestDTO requestDTO) {
-        externalService.deleteExternals(requestDTO);
+        externalService.softDeleteExternals(requestDTO);
         return ApiResponse.onSuccess(ExternalSuccessCode.DELETE);
-    }
-
-    @GetMapping("/external-name")
-    public ApiResponse<?> getExternalName(@PathVariable("teamId") Long teamId) {
-        return ApiResponse.onSuccess(externalService.getExternalName(teamId));
-    }
-
-    @GetMapping("/links")
-    public ApiResponse<ExternalResponseDTO.LinkInfoResponseDTO> getExternalLinks(@PathVariable("teamId") Long teamId) {
-        return ApiResponse.onSuccess(externalService.getExternalServices(teamId));
     }
 }
