@@ -91,7 +91,7 @@ public class AssigneeQueryDslImpl implements AssigneeQueryDsl {
     }
 
     @Override
-    public List<Assignee> findByTypeAndTargetId(Category type, Long issueId) {
+    public List<Assignee> findByTypeAndTargetId(Category type, Long targetId) {
         QAssignee assignee = QAssignee.assignee;
         QMember member = QMember.member;
 
@@ -99,7 +99,7 @@ public class AssigneeQueryDslImpl implements AssigneeQueryDsl {
                 .innerJoin(member).on(member.id.eq(assignee.memberTeam.member.id))
                 .where(
                         assignee.type.eq(type),
-                        assignee.targetId.eq(issueId),
+                        assignee.targetId.eq(targetId),
                         member.deletedAt.isNull()
                 )
                 .fetch();

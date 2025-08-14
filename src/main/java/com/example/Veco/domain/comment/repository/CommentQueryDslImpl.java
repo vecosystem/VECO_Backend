@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
 import java.util.List;
 
 @Repository
@@ -22,10 +23,13 @@ public class CommentQueryDslImpl implements CommentQueryDsl {
     public List<Comment> findByCommentRoomOrderByIdDesc(CommentRoom commentRoom) {
         QComment comment = QComment.comment;
 
+        if (commentRoom == null) {
+            return Collections.emptyList();
+        }
+
         return queryFactory
                 .selectFrom(comment)
-                .where(comment.commentRoom.eq(commentRoom)
-                        .and(comment.member.deletedAt.isNull()))
+                .where(comment.commentRoom.eq(commentRoom))
                 .orderBy(comment.id.desc())
                 .fetch();
     }

@@ -1,5 +1,7 @@
 package com.example.Veco.domain.member.service;
 
+import com.example.Veco.domain.comment.repository.CommentRepository;
+import com.example.Veco.domain.mapping.repository.MemberTeamRepository;
 import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.member.enums.Provider;
 import com.example.Veco.domain.member.error.MemberErrorStatus;
@@ -34,6 +36,8 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     private final S3Util s3Util;
     private final OAuth2AuthorizedClientService clientService;
     private final OAuth2UserService oAuth2UserService;
+    private final MemberTeamRepository memberTeamRepository;
+    private final CommentRepository commentRepository;
 
 
     @Transactional
@@ -92,12 +96,14 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     @Transactional
     @Override
     public Member softDeleteMember(Member member) {
+        memberTeamRepository.deleteAllByMember(member);
+        commentRepository.deleteAllByMember(member);
         member.softDelete();
-
         return memberRepository.save(member);
     }
 
     @Override
+    @Transactional
     public Member withdrawMember(CustomUserDetails customUserDetails) {
 
         Member member = memberRepository.findBySocialUid(customUserDetails.getSocialUid())
