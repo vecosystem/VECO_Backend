@@ -1,0 +1,67 @@
+name: Build and Deploy to EC2 (JAR)
+
+on:
+  push:
+    branches: [ "develop" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Add application.yml
+        run: |
+          mkdir -p src/main/resources
+          echo "${{ secrets.APPLICATION_YML_DEV }}" > src/main/resources/application.yml
+
+      - name: Gradle Permission
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew clean bootJar -x test
+
+      - name: Check jar file
+        run: ls -al build/libs
+
+      - name: Upload jar artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-jar
+          path: build/libs/*.jar
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download jar artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: app-jar
+          path: .
+
+      - name: Deploy to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "*.jar"
+          target: "/home/ubuntu"
+
+      - name: Run jar on EC2
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: bash /home/ubuntu/deploy.sh
