@@ -72,7 +72,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         memberCommandService.saveMember(member);
 
         // 로딩 화면으로 리다이렉트
-        redirectURL = UriComponentsBuilder.fromUriString("http://localhost:5173/onboarding/loading")
+        redirectURL = UriComponentsBuilder.fromUriString("https://web.vecoservice.shop/onboarding/loading")
                         .build()
                         .encode(StandardCharsets.UTF_8)
                         .toUriString();

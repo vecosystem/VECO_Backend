@@ -22,7 +22,7 @@ public class GitHubRestController implements GitHubSwaggerDocs {
 
     private final GitHubService gitHubService;
     private final GitHubRepositoryService gitHubRepositoryService;
-    private static final String FRONTEND_URL = "http://localhost:5173";
+    private static final String FRONTEND_URL = "https://web.vecoservice.shop";
 
     @Hidden
     @GetMapping("/github/installation/callback")
