@@ -1,4 +1,4 @@
-name: Deploy to EC2
+name: Build and Deploy to EC2
 
 on:
   push:
@@ -6,13 +6,37 @@ on:
       - develop
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. 코드 체크아웃
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # 2. JDK 설정
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # 3. Gradle 캐시
+      - name: Cache Gradle packages
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      # 4. Gradle 빌드
+      - name: Build with Gradle
+        run: ./gradlew clean build -x test
+
+      # 5. EC2 접속을 위한 SSH 키 설정
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
@@ -20,11 +44,16 @@ jobs:
           chmod 600 ~/.ssh/github-actions
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy to EC2
+      # 6. 빌드된 JAR 전송
+      - name: Copy JAR to EC2
         run: |
-          ssh -i ~/.ssh/github-actions ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "
-            cd /home/ubuntu/app &&
-            git pull origin develop &&
-            ./gradlew build -x test &&
-            sudo systemctl restart myapp
-          "
+          scp -i ~/.ssh/github-actions build/libs/*.jar \
+            ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:/home/ubuntu/app/app.jar
+
+      # 7. EC2에서 앱 실행
+      - name: Deploy on EC2
+        run: |
+          ssh -i ~/.ssh/github-actions ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} << 'EOF'
+          pkill -f 'java -jar' || true
+          nohup java -jar /home/ubuntu/app/app.jar > /home/ubuntu/app/app.log 2>&1 &
+          EOF
