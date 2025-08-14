@@ -9,4 +9,6 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comment, Long>, CommentQueryDsl {
     List<Comment> findAllByCommentRoomOrderByIdDesc(CommentRoom commentRoom);
     List<Comment> findAllByCommentRoomOrderByIdAsc(CommentRoom commentRoom);
+
+    List<Comment> findByCommentRoomOrderByIdAsc(CommentRoom commentRoom);
 }

@@ -1,15 +1,14 @@
 package com.example.Veco.domain.issue.converter;
 
-import com.example.Veco.domain.issue.dto.IssueReqDTO;
-import com.example.Veco.domain.issue.exception.IssueException;
-import com.example.Veco.domain.issue.exception.code.IssueErrorCode;
-import com.example.Veco.domain.team.entity.Team;
-import org.springframework.stereotype.Component;
 import com.example.Veco.domain.assignee.entity.Assignee;
 import com.example.Veco.domain.comment.entity.Comment;
 import com.example.Veco.domain.goal.entity.Goal;
-import com.example.Veco.domain.issue.entity.Issue;
+import com.example.Veco.domain.issue.dto.IssueReqDTO;
 import com.example.Veco.domain.issue.dto.IssueResponseDTO;
+import com.example.Veco.domain.issue.entity.Issue;
+import com.example.Veco.domain.issue.exception.IssueException;
+import com.example.Veco.domain.issue.exception.code.IssueErrorCode;
+import com.example.Veco.domain.team.entity.Team;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;

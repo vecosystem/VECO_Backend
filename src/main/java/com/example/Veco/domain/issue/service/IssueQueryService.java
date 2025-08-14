@@ -436,7 +436,7 @@ public class IssueQueryService {
         CommentRoom commentRooms = commentRoomRepository.findByRoomTypeAndTargetId(Category.ISSUE, issueId);
         List<Comment> comments = null;
         if (commentRooms != null) {
-            comments = commentRepository.findByCommentRoomOrderByIdDesc(commentRooms);
+            comments = commentRepository.findByCommentRoomOrderByIdAsc(commentRooms);
         }
 
         return IssueConverter.toDetailIssue(
