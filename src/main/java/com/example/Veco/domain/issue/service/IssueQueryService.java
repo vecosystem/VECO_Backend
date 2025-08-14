@@ -385,7 +385,7 @@ public class IssueQueryService {
         // 데이터들이 없는 경우
         if (filterResult.stream().allMatch(
                 value -> value.dataCnt().equals(0))
-        ){
+        ) {
             return null;
         }
 
@@ -406,7 +406,6 @@ public class IssueQueryService {
                 .collect(Collectors.toList());
 
 
-
         return IssueConverter.toPageable(resultWithManagers, hasNext, nextCursor, pageSize);
     }
 
@@ -415,8 +414,7 @@ public class IssueQueryService {
                 new IssueException(IssueErrorCode.NOT_FOUND));
 
         // 담당자 조회: 없으면 []
-        List<Assignee> assignees = assigneeRepository.findAllByTypeAndTargetId(Category.ISSUE, issueId)
-                .orElse(new ArrayList<>());
+        List<Assignee> assignees = assigneeRepository.findByTypeAndTargetId(Category.ISSUE, issueId);
 
         // 목표 조회
         Goal goal = null;
@@ -436,7 +434,10 @@ public class IssueQueryService {
         }
 
         CommentRoom commentRooms = commentRoomRepository.findByRoomTypeAndTargetId(Category.ISSUE, issueId);
-        List<Comment> comments = commentRepository.findAllByCommentRoomOrderByIdDesc(commentRooms);
+        List<Comment> comments = null;
+        if (commentRooms != null) {
+            comments = commentRepository.findByCommentRoomOrderByIdDesc(commentRooms);
+        }
 
         return IssueConverter.toDetailIssue(
                 issue,

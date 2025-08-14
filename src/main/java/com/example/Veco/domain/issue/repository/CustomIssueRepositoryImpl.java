@@ -140,7 +140,9 @@ public class CustomIssueRepositoryImpl implements CustomIssueRepository {
                 .select(assignee.memberTeam.member.name)
                 .from(issue)
                 .leftJoin(assignee).on(assignee.type.eq(Category.ISSUE)
-                        .and(assignee.targetId.eq(issue.id)))
+                        .and(assignee.targetId.eq(issue.id))
+                        .and(assignee.memberTeam.member.deletedAt.isNull())
+                )
                 .where(issue.goal.team.id.eq(teamId))
                 .fetch();
     }
@@ -206,8 +208,9 @@ public class CustomIssueRepositoryImpl implements CustomIssueRepository {
         Map<Long, List<Assignee>> result = queryFactory
                 .from(issue)
                 .leftJoin(assignee).on(assignee.type.eq(Category.ISSUE)
-                        .and(assignee.targetId.eq(issue.id)))
-                .leftJoin(member).on(member.id.eq(assignee.memberTeam.member.id))
+                        .and(assignee.targetId.eq(issue.id))
+                        .and(assignee.memberTeam.member.deletedAt.isNull())
+                )
                 .transform(
                         GroupBy.groupBy(issue.id).as(
                                 GroupBy.list(assignee)
