@@ -49,10 +49,6 @@ public class WorkspaceCommandServiceImpl implements WorkspaceCommandService {
 
     /**
      * 팀 생성 및 멤버 할당 로직
-     * 1. 팀 저장
-     * 2. 멤버 ID로 멤버 조회
-     * 3. MemberTeam 엔티티로 연결
-     * 4. 연결 저장 후 DTO 반환
      */
     @Transactional
     @Override
