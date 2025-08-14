@@ -40,33 +40,6 @@ public class ExternalRequestDTO {
     public static class DeadlineRequestDTO{
         private String start;
         private String end;
-
-        public Optional<LocalDate> getParsedStartDate() {
-            return parseDate(start);
-        }
-
-        public Optional<LocalDate> getParsedEndDate() {
-            return parseDate(end);
-        }
-
-        private Optional<LocalDate> parseDate(String dateStr) {
-            if (dateStr == null) return Optional.empty(); // 필드 생략 = 변경하지 않음
-            if ("null".equalsIgnoreCase(dateStr)) return Optional.of(null); // 명시적 삭제
-
-            try {
-                return Optional.of(LocalDate.parse(dateStr));
-            } catch (DateTimeParseException e) {
-                throw new IllegalArgumentException("Invalid date format: " + dateStr);
-            }
-        }
-
-        public boolean shouldUpdateStartDate() {
-            return start != null;
-        }
-
-        public boolean shouldUpdateEndDate() {
-            return end != null;
-        }
     }
 
 
