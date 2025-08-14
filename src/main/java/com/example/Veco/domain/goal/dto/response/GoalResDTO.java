@@ -113,6 +113,7 @@ public class GoalResDTO {
     // 댓글 정보
     @Builder
     public record CommentInfo (
+            Long id,
             String profileUrl,
             String nickname,
             LocalDateTime createdAt,

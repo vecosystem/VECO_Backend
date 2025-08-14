@@ -83,7 +83,7 @@ public class GoalController {
     // 목표 상세 조회
     @Operation(
             summary = "목표 상세 조회 API By 김주헌",
-            description = "목표 상세 정보를 조회합니다. 댓글 데이터는 최신순으로 정렬되어 있습니다."
+            description = "목표 상세 정보를 조회합니다. 댓글 데이터는 오래된순으로 정렬되어 있습니다."
     )
     @GetMapping("/goals/{goalId}")
     public ApiResponse<FullGoal> getGoalDetail(

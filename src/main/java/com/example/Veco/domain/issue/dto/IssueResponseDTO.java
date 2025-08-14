@@ -97,6 +97,7 @@ public class IssueResponseDTO {
 
     @Builder
     public record CommentInfo(
+            Long id,
             String name,
             String profileUrl,
             String content,
