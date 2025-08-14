@@ -44,8 +44,9 @@ VECO는 **AI를 활용해 분산된 정보를 한곳에 모으고, 목표를 명
 - 마크/김주헌: 목표, Slack 연동
 ---
 ## 🛜 서버 현황
-<img width="776" height="567" alt="스크린샷 2025-08-09 04 46 30" src="https://github.com/user-attachments/assets/f109d3c6-85dd-4725-9ae0-59a8ef432026" />
+<img width="776" height="567" alt="476164894-f109d3c6-85dd-4725-9ae0-59a8ef432026" src="https://github.com/user-attachments/assets/aa079cd7-2711-4502-9db8-69738e3ae9c0" />
 
 - main-develop 브랜치 구조에 따라 배포환경, 개발환경을 따로 구성
 - 개발 환경(localhost:5173)과 배포 환경(web.vecoservice.shop)간 테스트를 진행
 - 추후, 서버를 통합 관리해 무중단 배포 전략(블루-그린) 사용
+
