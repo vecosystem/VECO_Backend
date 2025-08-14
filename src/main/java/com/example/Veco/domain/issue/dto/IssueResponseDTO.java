@@ -20,12 +20,11 @@ public class IssueResponseDTO {
             Priority priority,
             Deadline deadline,
             GoalInfo goal
-    ) {
-    }
+    ){}
 
     // 데이터 틀: 이슈 정보, 댓글 정보, 담당자 정보
     @Builder
-    public record Data<T> (
+    public record Data<T>(
             Integer cnt,
             List<T> info
     ){}
@@ -34,31 +33,19 @@ public class IssueResponseDTO {
     public record Deadline(
             LocalDate start,
             LocalDate end
-    ) {
-    }
-
-    @Builder
-    public record ManagerInfo(
-            Long id,
-            Long issueId,
-            String profileImage,
-            String name
-    ) {
-    }
+    ){}
 
     @Builder
     public record SimpleManagerInfo(
             String profileUrl,
             String name
-    ) {
-    }
+    ){}
 
     @Builder
     public record GoalInfo(
             Long id,
             String title
-    ) {
-    }
+    ){}
 
     // 필터 적용 틀: 팀 내 모든 이슈 조회
     @Builder
@@ -66,8 +53,7 @@ public class IssueResponseDTO {
             String filterName,
             Integer dataCnt,
             List<T> issues
-    ) {
-    }
+    ){}
 
     // 이슈 + 담당자 정보 응답용 DTO
     @Builder
@@ -93,8 +79,7 @@ public class IssueResponseDTO {
             Boolean hasNext,
             String nextCursor,
             Integer pageSize
-    ) {
-    }
+    ){}
 
     @Builder
     public record DetailIssue(
@@ -108,17 +93,16 @@ public class IssueResponseDTO {
             GoalInfo goal,
             Data<SimpleManagerInfo> managers,
             Data<CommentInfo> comments
-    ) {
-    }
+    ){}
 
     @Builder
     public record CommentInfo(
+            Long id,
             String name,
             String profileUrl,
             String content,
             LocalDateTime createdAt
-    ) {
-    }
+    ){}
 
     @Builder
     public record UpdateIssue(
@@ -127,7 +111,7 @@ public class IssueResponseDTO {
     ){}
 
     @Builder
-    public record CreateIssue (
+    public record CreateIssue(
             Long issueId,
             LocalDateTime createdAt
     ){}
@@ -136,7 +120,6 @@ public class IssueResponseDTO {
     public record IssueInfo(
             Long id,
             String title
-    ) {
-    }
+    ){}
 
 }

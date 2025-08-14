@@ -12,5 +12,6 @@ public interface AssigneeQueryDsl {
     List<Assignee> findByGoalIdIn(List<Long> goalIds);
     List<Assignee> findByExternalIdIn(List<Long> externalIds);
     void deleteAllByTypeAndTargetIds(Category type, List<Long> targetIds);
+    List<Assignee> findByTypeAndTargetId(Category type, Long targetId);
 }
 

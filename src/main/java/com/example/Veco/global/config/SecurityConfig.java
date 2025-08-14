@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.web.SecurityFilterChain;
@@ -39,17 +40,17 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(AbstractHttpConfigurer::disable)
-                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()))
+                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/test/login", "/api/token/reissue", "/login-test.html", "/v3/api-docs/**", "/swagger-ui/**",
+                        .requestMatchers("/api/test/**", "/api/teams/*/externals/**", "/api/teams/*/externals", "/api/test/login", "/api/token/reissue", "/login-test.html", "/v3/api-docs/**", "/swagger-ui/**",
                                 "/swagger-resources/**", "/css/**", "/images/**", "/healthcheck",
-                                "/js/**", "/h2-console/**", "/profile","/workspace/create-url", "/github/**","/api/github/**").permitAll()
+                                "/js/**", "/h2-console/**", "/profile","/workspace/create-url","/slack/callback", "/github/**","/api/github/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class)
-                .logout(logout -> logout.logoutSuccessUrl("/"))
+                .logout(logout -> logout.logoutSuccessUrl("http://localhost:5173/onboarding"))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2Login(oauth2 -> oauth2
@@ -57,12 +58,13 @@ public class SecurityConfig {
                                 .authorizationRequestRepository(new HttpSessionOAuth2AuthorizationRequestRepository())
                                 .authorizationRequestResolver(customAuthorizationRequestResolver)
                         )
+                        .loginPage("http://localhost:5173/onboarding")
                         .successHandler(oAuth2SuccessHandler)
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                         .failureHandler((request, response, exception) -> {
                             // 로그인 실패 시 처리 로직
                             log.error("OAuth2 로그인 실패: {}", exception.getMessage());
-                            response.sendRedirect("/login?error");
+                            response.sendRedirect("http://localhost:5173/onboarding");
                         })
                 );
         return http.build();

@@ -12,5 +12,7 @@ public interface AssigneeRepository extends JpaRepository<Assignee, Long> , Assi
 
     void deleteAllByTypeAndTargetId(Category type, Long targetId);
 
-    List<Assignee> findAllByTypeAndMemberTeam_Team_id(Category type, Long memberTeamTeamId);
+    List<Assignee> findAllByMemberTeamIdIn(List<Long> memberTeamIds);
+
+    List<Assignee> findAllByGoal_TeamIdAndMemberTeamIsNull(Long teamId);
 }

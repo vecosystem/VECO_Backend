@@ -20,8 +20,9 @@ public class Profile extends BaseEntity {
     @Column(name = "name")
     private String name;
 
+    @Builder.Default
     @Column(name = "profile_image_url")
-    private String profileImageUrl;
+    private String profileImageUrl = "https://s3.ap-northeast-2.amazonaws.com/s3.veco/default/default-profile.png";
 
     public void updateProfileImageUrl(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;

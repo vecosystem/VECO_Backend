@@ -1,8 +1,9 @@
 package com.example.Veco.domain.external.entity;
 
 import com.example.Veco.domain.common.BaseEntity;
+import com.example.Veco.domain.github.dto.webhook.GitHubPullRequestPayload;
 import com.example.Veco.domain.external.dto.request.ExternalRequestDTO;
-import com.example.Veco.domain.external.dto.GitHubWebhookPayload;
+import com.example.Veco.domain.github.dto.webhook.GitHubWebhookPayload;
 import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.domain.goal.entity.Goal;
 import com.example.Veco.domain.mapping.Assignment;
@@ -82,7 +83,7 @@ public class External extends BaseEntity {
     @JoinColumn(name = "goal_id")
     private Goal goal;
 
-    @OneToMany(mappedBy = "external")
+    @OneToMany(mappedBy = "external", cascade = CascadeType.PERSIST)
     @Builder.Default
     private List<Assignment> assignments = new ArrayList<>();
 
@@ -101,6 +102,9 @@ public class External extends BaseEntity {
     }
 
     public void updateExternal(ExternalRequestDTO.ExternalUpdateRequestDTO requestDTO) {
+
+        startDate = null;
+
         if(requestDTO.getTitle() != null) {
             this.title = requestDTO.getTitle();
         }
@@ -110,23 +114,24 @@ public class External extends BaseEntity {
         if(requestDTO.getState() != null) {
             this.state = requestDTO.getState();
         }
-        if (requestDTO.getDeadline().getStart() != null) {
-            this.startDate = requestDTO.getDeadline().getStart();
-        }
-        if (requestDTO.getDeadline().getEnd() != null) {
-            this.endDate = requestDTO.getDeadline().getEnd() ;
-        }
         if(requestDTO.getPriority() != null) {
             this.priority = requestDTO.getPriority();
         }
-        if(requestDTO.getExtServiceType() != null) {
-            this.type = requestDTO.getExtServiceType();
-        }
+    }
+
+    public void updateStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public void updateEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     public void closeIssue(){
         this.state = State.FINISH;
     }
+
+    public void restore(){ this.deletedAt = null; }
 
     public void updateExternalByGithubIssue(GitHubWebhookPayload.Issue issue ){
 
@@ -135,6 +140,16 @@ public class External extends BaseEntity {
         }
         if(issue.getBody() != null) {
             this.description = issue.getBody();
+        }
+    }
+
+    public void updateByPullRequest(GitHubPullRequestPayload.PullRequest pullRequest){
+
+        if(pullRequest.getTitle() != null) {
+            this.title = pullRequest.getTitle();
+        }
+        if(pullRequest.getBody() != null) {
+            this.description = pullRequest.getBody();
         }
     }
 

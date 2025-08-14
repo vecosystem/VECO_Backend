@@ -1,0 +1,34 @@
+package com.example.Veco.global.auth.oauth2.userinfo;
+
+import java.util.Map;
+
+public class KakaoOAuth2UserInfo extends OAuth2UserInfo {
+
+    public static Map<String, Object> account;
+    public static Map<String, Object> profile;
+
+    public KakaoOAuth2UserInfo(Map<String, Object> attributes) {
+        super(attributes);
+        account = (Map<String, Object>) attributes.get("kakao_account");
+        profile = (Map<String, Object>) account.get("profile");
+    }
+
+    @Override
+    public String getSocialId() {
+        return String.valueOf(attributes.get("id"));
+    }
+
+    @Override
+    public String getEmail() {
+        return (String) account.get("email");
+    }
+
+    @Override
+    public String getName() {
+        return (String) profile.get("nickname");
+    }
+    @Override
+    public String getPicture() {
+        return (String) profile.get("thumbnail_image_url");
+    }
+}

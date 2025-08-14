@@ -12,7 +12,10 @@ public enum MemberErrorStatus implements BaseErrorStatus {
     _MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER4001", "해당 멤버가 없습니다."),
     _PROFILE_NOT_FOUND(HttpStatus.NOT_FOUND, "PROFILE4001", "프로필 정보가 존재하지 않습니다."),
     _FORBIDDEN(HttpStatus.FORBIDDEN, "MEMBER403_0", "접근이 금지되었습니다."),
-    _PROFILE_IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "PROFILE4002", "프로필 이미지가 존재하지 않습니다.")
+    _PROFILE_IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "PROFILE4002", "프로필 이미지가 존재하지 않습니다."),
+    _MEMBER_NOT_IN_WORKSPACE(HttpStatus.NOT_FOUND, "MEMBER4002", "멤버가 해당 워크스페이스에 없습니다."),
+    _INVALID_MEMBER_INCLUDE(HttpStatus.NOT_FOUND, "MEMBER4003", "존재하지 않는 멤버가 포함되어 있습니다."),
+    _MEMBER_WORKSPACE_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER404_3","해당 사용자의 워크스페이스를 찾을 수 없습니다.")
     ;
 
     private final HttpStatus httpStatus;

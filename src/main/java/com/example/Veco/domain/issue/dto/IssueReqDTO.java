@@ -14,7 +14,6 @@ public class IssueReqDTO {
             State state,
             Priority priority,
             List<Long> managersId,
-            Boolean isIncludeMe,
             Deadline deadline,
             Long goalId
     ){}
@@ -30,8 +29,8 @@ public class IssueReqDTO {
     ){}
 
     public record Deadline (
-            LocalDate start,
-            LocalDate end
+            String start,
+            String end
     ){}
 
     public record DeleteIssue(

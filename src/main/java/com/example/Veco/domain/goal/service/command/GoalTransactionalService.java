@@ -24,6 +24,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +56,7 @@ public class GoalTransactionalService {
         String name = team.getWorkSpace().getName()+"-g"+team.getGoalNumber();
         Goal goal = goalRepository.save(GoalConverter.toGoal(dto,team,name));
 
-        // 목표 <-> 담당자 연결
+        // 목표 <-> 담당자 연결: 없으면 null로 저장
         List<Assignee> assigneeList = new ArrayList<>();
         memberTeamList.forEach(
                 value -> assigneeList.add(
@@ -65,6 +67,10 @@ public class GoalTransactionalService {
         );
         assigneeRepository.saveAll(assigneeList);
 
+        if (assigneeList.isEmpty()){
+            assigneeRepository.save(AssigneeConverter.toAssignee(null, Category.GOAL, goal));
+        }
+
         // 목표 <-> 이슈 연결
         issueList.forEach(
                 value -> value.updateGoal(goal)
@@ -74,23 +80,6 @@ public class GoalTransactionalService {
         team.updateGoalNumber(team.getGoalNumber()+1);
 
         return goal.getId();
-    }
-
-    // 목표 삭제
-    @Transactional
-    protected void deleteGoal(
-            Long goalId
-    ){
-
-        // 객체 조회
-        Goal goal = goalRepository.findById(goalId).orElseThrow(() ->
-                new GoalException(GoalErrorCode.NOT_FOUND));
-
-        // 목표 삭제
-        goalRepository.delete(goal);
-
-        // 담당자 삭제
-        assigneeRepository.deleteAllByTypeAndTargetId(Category.GOAL, goal.getId());
     }
 
     // 목표 수정
@@ -126,38 +115,70 @@ public class GoalTransactionalService {
         }
         // 담당자 변경
         if (dto.managersId() != null) {
-            // 기존 담당자 삭제
-            assigneeRepository.deleteAllByTypeAndTargetId(Category.GOAL, goalId);
-            // 신규 담당자 추가
+
+            // 신규 담당자 존재여부 확인, 조회
             List<MemberTeam> memberTeamList = memberTeamRepository
                     .findAllByMemberIdInAndTeamId(dto.managersId(), teamId);
+
+            // 기존 담당자 삭제
+            assigneeRepository.deleteAllByTypeAndTargetId(Category.GOAL, goalId);
+
+            // 신규 담당자 추가
             memberTeamList.forEach(
                     value -> assigneeRepository.save(
                             AssigneeConverter.toAssignee(value, Category.GOAL, goal)
                     )
             );
+
+            // 신규 담당자가 없는 경우, null로
+            if (memberTeamList.isEmpty()){
+                assigneeRepository.save(AssigneeConverter.toAssignee(null, Category.GOAL, goal));
+            }
+
             isRestore = true;
         }
         // 기한 변경
         if (dto.deadline() != null) {
-            goal.updateDeadlineStart(dto.deadline().start());
-            goal.updateDeadlineEnd(dto.deadline().end());
-            isRestore = true;
+
+            try {
+                if (dto.deadline().start() != null) {
+                    LocalDate start;
+                    if (dto.deadline().start().equals("null")){
+                        start = null;
+                    } else {
+                        start = LocalDate.parse(dto.deadline().start());
+                    }
+                    goal.updateDeadlineStart(start);
+                }
+                if (dto.deadline().end() != null) {
+                    LocalDate end;
+                    if (dto.deadline().end().equals("null")){
+                        end = null;
+                    } else {
+                        end = LocalDate.parse(dto.deadline().end());
+                    }
+                    goal.updateDeadlineEnd(end);
+                }
+                isRestore = true;
+            } catch (DateTimeParseException e) {
+                throw new GoalException(GoalErrorCode.DEADLINE_INVALID);
+            }
+
         }
         // 이슈 변경
         if (dto.issuesId() != null){
-
-            // 기존 이슈 조회, 목표 해제
-            List<Issue> oldIssueList = issueRepository.findAllByGoal(goal).orElse(new ArrayList<>());
-            oldIssueList.forEach(
-                    value -> value.updateGoal(null)
-            );
 
             // 새로운 이슈 존재 여부 검증
             List<Issue> issueList = issueRepository.findAllById(dto.issuesId());
             if (issueList.size() != dto.issuesId().size()){
                 throw new IssueException(IssueErrorCode.NOT_FOUND);
             }
+
+            // 기존 이슈 조회, 목표 해제
+            List<Issue> oldIssueList = issueRepository.findAllByGoal(goal).orElse(new ArrayList<>());
+            oldIssueList.forEach(
+                    value -> value.updateGoal(null)
+            );
 
             // 이슈 목표 변경
             issueList.forEach(

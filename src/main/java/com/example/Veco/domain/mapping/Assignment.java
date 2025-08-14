@@ -1,12 +1,11 @@
 package com.example.Veco.domain.mapping;
 
-import com.example.Veco.domain.assignee.entity.Assignee;
 import com.example.Veco.domain.common.BaseEntity;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.goal.entity.Goal;
 import com.example.Veco.domain.issue.entity.Issue;
 import com.example.Veco.domain.member.entity.Member;
-import com.example.Veco.domain.team.enums.Category;
+import com.example.Veco.global.enums.Category;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,6 +20,7 @@ public class Assignment extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     private Category category;
 
     private String assigneeName;

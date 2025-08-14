@@ -27,8 +27,9 @@ public class Team extends BaseEntity {
     @Column(name = "name")
     private String name;
 
+    @Builder.Default
     @Column(name = "profile_url")
-    private String profileUrl;
+    private String profileUrl = "https://s3.ap-northeast-2.amazonaws.com/s3.veco/default/default-team.png";
 
     @Column(name = "goal_number")
     private Long goalNumber;

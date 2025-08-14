@@ -4,6 +4,7 @@ import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.workspace.dto.WorkspaceRequestDTO;
 import com.example.Veco.domain.workspace.dto.WorkspaceResponseDTO;
 import com.example.Veco.domain.workspace.entity.WorkSpace;
+import com.example.Veco.global.auth.user.AuthUser;
 import com.example.Veco.global.auth.user.userdetails.CustomUserDetails;
 import org.springframework.stereotype.Service;
 
@@ -18,5 +19,7 @@ public interface WorkspaceCommandService {
 
     WorkspaceResponseDTO.JoinWorkspace joinWorkspace(WorkspaceRequestDTO.JoinWorkspace dto, CustomUserDetails user);
 
-    WorkspaceResponseDTO.CreateWorkspaceResponseDto createWorkspace(Member member, WorkspaceRequestDTO.CreateWorkspaceRequestDto request);
+    WorkspaceResponseDTO.CreateWorkspaceResponseDto createWorkspace(Member member, WorkspaceRequestDTO.WorkspaceRequestDto request);
+
+    String unlinkWorkspace(AuthUser user);
 }

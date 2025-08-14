@@ -13,6 +13,11 @@ public enum OAuth2ErrorCode implements BaseErrorStatus {
             HttpStatus.BAD_REQUEST,
             "OAUTH2401_0",
             "state 값이 유효하지 않습니다."
+    ),
+    _SOCIAL_UNLINK_FAILED(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "MEMBER500_1",
+            "소셜 계정 연동 해제에 실패했습니다."
     );
 
     private final HttpStatus httpStatus;

@@ -23,6 +23,7 @@ public class WorkspaceResponseDTO {
         private String workspaceName; // name -> workspaceName
         private String workspaceImageUrl; // profileUrl -> workspaceProfileImageUrl
         private String workspaceUrl;
+        private String invitePassword;
         private Long defaultTeamId;
     }
 
@@ -82,13 +83,18 @@ public class WorkspaceResponseDTO {
         }
     }
 
-    // 워크스페이스 참여
+    /**
+     * 워크스페이스 참여 DTO
+     */
     @Builder
     public record JoinWorkspace(
             Long workspaceId,
             LocalDateTime joinedAt
     ){}
 
+    /**
+     * 워크스페이스 내 멤버 및 속한 팀 정보 DTO
+     */
     @Getter
     @Builder
     public static class WorkspaceMemberWithTeamsDto {
@@ -99,6 +105,9 @@ public class WorkspaceResponseDTO {
         private List<TeamInfoDto> teams;
         private LocalDateTime joinedAt;
 
+        /**
+         * 멤버가 속한 팀 정보 DTO
+         */
         @Getter
         @Builder
         public static class TeamInfoDto {
@@ -108,12 +117,18 @@ public class WorkspaceResponseDTO {
         }
     }
 
+    /**
+     * 워크스페이스 URL 미리보기 응답 DTO
+     */
     @Getter
     @Builder
     public static class PreviewUrlResponseDto {
         private String workspaceUrl;
     }
 
+    /**
+     * 워크스페이스 생성 응답 DTO
+     */
     @Getter
     @Builder
     @NoArgsConstructor
@@ -128,6 +143,9 @@ public class WorkspaceResponseDTO {
         private Long defaultTeamId;
     }
 
+    /**
+     * 워크스페이스 초대 정보 응답 DTO
+     */
     @Getter
     @Builder
     @NoArgsConstructor

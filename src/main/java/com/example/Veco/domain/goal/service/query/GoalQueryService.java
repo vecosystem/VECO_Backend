@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -103,7 +104,7 @@ public class GoalQueryService {
                 throw new GoalException(GoalErrorCode.CURSOR_INVALID);
             }
         } else {
-            // 커서가 없는 경우, 기본값 NONE 설정, 담당자는 null
+            // 커서가 없는 경우, 기본값 NONE 설정, 담당자는 없음
             switch (query.toLowerCase()) {
                 case "state": {
                     firstCursor = State.NONE.name();
@@ -111,6 +112,10 @@ public class GoalQueryService {
                 }
                 case "priority": {
                     firstCursor = Priority.NONE.name();
+                    break;
+                }
+                case "manager": {
+                    firstCursor = "없음";
                     break;
                 }
             }
@@ -245,6 +250,7 @@ public class GoalQueryService {
                 // 담당자 리스트 뽑아와서 Map 처리: 담당자 이름 : 개수
                 List<String> managers = goalRepository.findGoalsAssigneeInTeam(teamId);
                 Map<String, Integer> map = new HashMap<>();
+
                 for (String name : managers){
                     if (map.containsKey(name)){
                         map.put(name, map.get(name) + 1);
@@ -255,17 +261,30 @@ public class GoalQueryService {
 
                 // firstCursor가 담당자 리스트에 포함되어있는지 확인
                 if (!managers.contains(firstCursor)){
-                    // 없으면 사전순 처음으로 설정
-                    firstCursor = managers.stream().sorted().toList().getFirst();
+                    // 없으면 없음으로 설정, 담당자 없는 목표 조회
+                    firstCursor = "없음";
                 }
 
-                // 담당자 별 데이터 분류
-                for (String filter : map.keySet().stream().sorted().toList()){
+                // 담당자 별 데이터 분류, 없음 먼저 조회
+                List<String> filterQueue = map.keySet().stream().sorted().collect(Collectors.toList());
+
+                // 담당자가 없는 경우 조회
+                Integer notAssigned = assigneeRepository.findAllByGoal_TeamIdAndMemberTeamIsNull(teamId).size();
+                map.put("없음", notAssigned);
+
+                filterQueue.addFirst("없음");
+                for (String filter : filterQueue){
                     List<SimpleGoal> result = new ArrayList<>();
 
                     // firstCursor가 일치할때, 그떄 조회 시작
                     if ((size > 0) && (filter.equals(firstCursor) || isContinue)){
-                        builder.and(assignee.memberTeam.member.name.eq(filter));
+
+                        // 담당자 없음 / 특정 담당자 조건 설정
+                        if (!filter.equals("없음")) {
+                            builder.and(assignee.memberTeam.member.name.eq(filter));
+                        } else {
+                            builder.and(assignee.memberTeam.isNull());
+                        }
 
                         result = goalRepository.findGoalsByTeamId(builder, size);
 
@@ -349,13 +368,19 @@ public class GoalQueryService {
         List<Assignee> assignees = assigneeRepository.findAllByTypeAndTargetId(Category.GOAL, goalId)
                 .orElse(new ArrayList<>());
 
+        // Assignee 무조건 있음: MemberTeam = null / MemberTeam >= 1
+        // 조회했을때 MemberTeam이 null이면 []
+        if (assignees.getFirst().getMemberTeam() == null){
+            assignees = new ArrayList<>();
+        }
+
         // 이슈 조회: 없으면 []
         List<Issue> issues = issueRepository.findAllByGoal(goal)
                 .orElse(new ArrayList<>());
 
-        // 댓글 조회(댓글방 조회 -> 댓글 조회, 댓글 최신순): 없으면 []
+        // 댓글 조회(댓글방 조회 -> 댓글 조회, 댓글 오래된순): 없으면 []
         CommentRoom commentRooms = commentRoomRepository.findByRoomTypeAndTargetId(Category.GOAL, goalId);
-        List<Comment> comments = commentRepository.findAllByCommentRoomOrderByIdDesc(commentRooms);
+        List<Comment> comments = commentRepository.findAllByCommentRoomOrderByIdAsc(commentRooms);
 
         // 조회한 요소들 DTO 변환
         return GoalConverter.toFullGoal(

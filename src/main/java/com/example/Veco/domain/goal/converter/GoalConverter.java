@@ -5,11 +5,15 @@ import com.example.Veco.domain.comment.entity.Comment;
 import com.example.Veco.domain.goal.dto.request.GoalReqDTO;
 import com.example.Veco.domain.goal.dto.response.GoalResDTO;
 import com.example.Veco.domain.goal.entity.Goal;
+import com.example.Veco.domain.goal.exception.GoalException;
+import com.example.Veco.domain.goal.exception.code.GoalErrorCode;
 import com.example.Veco.domain.issue.entity.Issue;
 import com.example.Veco.domain.mapping.entity.MemberTeam;
 import com.example.Veco.domain.team.entity.Team;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 public class GoalConverter {
@@ -20,12 +24,25 @@ public class GoalConverter {
             Team team,
             String name
     ){
+        LocalDate start = null;
+        LocalDate end = null;
+        try {
+            if (dto.deadline().start() != null) {
+                start = LocalDate.parse(dto.deadline().start());
+            }
+            if (dto.deadline().end() != null) {
+                end = LocalDate.parse(dto.deadline().end());
+            }
+        } catch (DateTimeParseException e) {
+            throw new GoalException(GoalErrorCode.DEADLINE_INVALID);
+        }
+
         return Goal.builder()
                 .state(dto.state())
                 .content(dto.content())
                 .title(dto.title())
-                .deadlineStart(dto.deadline().start())
-                .deadlineEnd(dto.deadline().end())
+                .deadlineStart(start)
+                .deadlineEnd(end)
                 .priority(dto.priority())
                 .team(team)
                 .name(name)
@@ -55,10 +72,12 @@ public class GoalConverter {
             List<GoalResDTO.CommentInfo> comment
     ){
         return GoalResDTO.FullGoal.builder()
+                .id(goal.getId())
                 .name(goal.getName())
                 .title(goal.getTitle())
                 .content(goal.getContent())
-                .priority(goal.getPriority().toString())
+                .state(goal.getState().name())
+                .priority(goal.getPriority().name())
                 .managers(toData(assignee))
                 .deadline(toDeadline(goal))
                 .issues(toData(issue))
@@ -156,6 +175,7 @@ public class GoalConverter {
             Comment comment
     ){
         return GoalResDTO.CommentInfo.builder()
+                .id(comment.getId())
                 .profileUrl(comment.getMember().getProfile().getProfileImageUrl())
                 .nickname(comment.getMember().getNickname())
                 .createdAt(comment.getCreatedAt())

@@ -15,15 +15,29 @@ public interface CustomIssueRepository {
             int size
     );
 
+    List<IssueResponseDTO.SimpleIssue> findUnassignedIssuesByTeamId(
+            Long teamId,
+            Predicate query,
+            int size
+    );
+
     Long findIssuesCountByFilter(
             Predicate query
     );
 
-    List<String> findIssuesAssigneeInTeam (
+    Long findUnassignedIssuesCountByTeamId(
             Long teamId
     );
 
-    List<IssueResponseDTO.GoalInfo> findGoalInfoByTeamId(
+    List<String> findIssuesAssigneeInTeam(
+            Long teamId
+    );
+
+    Long findNoGoalIssuesCountByTeamId(
+            Long teamId
+    );
+
+    List<String> findGoalsByTeamId(
             Long teamId
     );
 

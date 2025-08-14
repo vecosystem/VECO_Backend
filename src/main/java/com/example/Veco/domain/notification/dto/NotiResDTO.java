@@ -90,7 +90,7 @@ public class NotiResDTO {
         private Priority priority;
         private String goalTitle;
         private List<ManagerInfo> managerList;
-        private ExtServiceType externalTool;
+        private ExtServiceType extServiceType;
         private boolean isRead;
     }
 

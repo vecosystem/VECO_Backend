@@ -1,15 +1,16 @@
 package com.example.Veco.domain.issue.controller;
 
-import com.example.Veco.domain.goal.dto.request.GoalReqDTO;
-import com.example.Veco.domain.goal.dto.response.GoalResDTO;
-import com.example.Veco.domain.goal.exception.code.GoalSuccessCode;
 import com.example.Veco.domain.issue.dto.IssueReqDTO;
 import com.example.Veco.domain.issue.dto.IssueResponseDTO;
-
+import com.example.Veco.domain.issue.dto.IssueResponseDTO.Pageable;
+import com.example.Veco.domain.issue.dto.IssueResponseDTO.FilteringIssue;
+import com.example.Veco.domain.issue.dto.IssueResponseDTO.IssueWithManagers;
+import com.example.Veco.domain.issue.exception.code.IssueErrorCode;
 import com.example.Veco.domain.issue.exception.code.IssueSuccessCode;
 import com.example.Veco.domain.issue.service.IssueQueryService;
 import com.example.Veco.domain.issue.service.command.IssueCommandService;
 import com.example.Veco.global.apiPayload.ApiResponse;
+import com.example.Veco.global.apiPayload.code.BaseErrorStatus;
 import com.example.Veco.global.auth.user.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -98,16 +99,27 @@ public class IssueController {
                     "커서 기반 페이지네이션, 최신 순으로 정렬합니다."
     )
     @GetMapping("/teams/{teamId}/issues")
-    public ApiResponse<IssueResponseDTO.Pageable<IssueResponseDTO.FilteringIssue<IssueResponseDTO.IssueWithManagers>>> getTeamIssues (
-            @PathVariable Long teamId,
-            @RequestParam(defaultValue = "-1") @Min(value = -1, message = "커서는 -1보다 큰 정수여야 합니다.")
+    public ApiResponse<Pageable<FilteringIssue<IssueWithManagers>>> getTeamIssues (
+            @PathVariable
+            Long teamId,
+            @RequestParam(defaultValue = "-1")
             String cursor,
             @RequestParam(defaultValue = "1") @Min(value = 1, message = "불러올 데이터 수는 1 이상이어야 합니다.")
             Integer size,
             @RequestParam(required = false, defaultValue = "state")
             String query
     ) {
-        return ApiResponse.onSuccess(IssueSuccessCode.OK, issueQueryService.getIssuesByTeamId(teamId, cursor, size, query));
+        Pageable<FilteringIssue<IssueWithManagers>> result = issueQueryService.getIssuesByTeamId(teamId, cursor, size, query);
+        if (result != null) {
+            return ApiResponse.onSuccess(IssueSuccessCode.OK, result);
+        } else {
+            BaseErrorStatus status = IssueErrorCode.NOT_FOUND_IN_TEAM;
+            return ApiResponse.onFailure(
+                    status.getReasonHttpStatus().getCode(),
+                    status.getReasonHttpStatus().getMessage(),
+                    null
+            );
+        }
     }
 
     @Operation(
