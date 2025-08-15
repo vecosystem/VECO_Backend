@@ -40,7 +40,7 @@ public class External extends BaseEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     @Builder.Default
     private String description = "";
 

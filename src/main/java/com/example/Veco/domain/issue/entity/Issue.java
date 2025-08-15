@@ -33,7 +33,7 @@ public class Issue extends BaseEntity {
     @Column(name = "title", nullable = false)
     private  String title;
 
-    @Column(name = "content")
+    @Column(name = "content", columnDefinition = "TEXT")
     @Builder.Default
     private  String content = "";
 
