@@ -12,14 +12,17 @@ import com.example.Veco.domain.member.enums.Provider;
 import com.example.Veco.domain.member.repository.MemberRepository;
 import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.domain.team.repository.TeamRepository;
-import com.example.Veco.global.enums.*;
+import com.example.Veco.global.enums.Category;
+import com.example.Veco.global.enums.ExtServiceType;
+import com.example.Veco.global.enums.Priority;
+import com.example.Veco.global.enums.State;
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +46,7 @@ public class TestDataController {
     private AssigmentRepository assignmentRepository;
 
     @PostMapping("/insert-test-data")
+    @Hidden
     public String insertTestData() {
         try {
             // 1. Member 테스트 데이터
