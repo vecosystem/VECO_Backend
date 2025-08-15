@@ -83,7 +83,7 @@ public class External extends BaseEntity {
     @JoinColumn(name = "goal_id")
     private Goal goal;
 
-    @OneToMany(mappedBy = "external", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "external", cascade = CascadeType.ALL)
     @Builder.Default
     private List<Assignment> assignments = new ArrayList<>();
 
