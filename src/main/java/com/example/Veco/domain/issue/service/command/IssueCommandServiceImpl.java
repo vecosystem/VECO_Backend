@@ -1,8 +1,6 @@
 package com.example.Veco.domain.issue.service.command;
 
 import com.example.Veco.domain.goal.entity.Goal;
-import com.example.Veco.domain.goal.exception.GoalException;
-import com.example.Veco.domain.goal.exception.code.GoalErrorCode;
 import com.example.Veco.domain.goal.repository.GoalRepository;
 import com.example.Veco.domain.issue.converter.IssueConverter;
 import com.example.Veco.domain.issue.dto.IssueReqDTO;
@@ -128,8 +126,10 @@ public class IssueCommandServiceImpl implements IssueCommandService {
                 .orElseThrow(() -> new MemberHandler(MemberErrorStatus._FORBIDDEN));
 
         // 목표 존재 검증
-        Goal goal = goalRepository.findById(dto.goalId()).orElseThrow(()->
-                new GoalException(GoalErrorCode.NOT_FOUND));
+        Goal goal = null;
+        if (dto.goalId() != null) {
+            goal = goalRepository.findById(dto.goalId()).orElse(null);
+        }
 
         RLock lock = redissonClient.getLock("lock:issue:" + teamId);
         Long issueId;
