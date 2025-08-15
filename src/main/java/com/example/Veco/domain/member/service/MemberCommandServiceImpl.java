@@ -15,16 +15,10 @@ import com.example.Veco.global.aws.exception.code.S3ErrorCode;
 import com.example.Veco.global.aws.util.S3Util;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -54,7 +48,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         }
 
         // S3 업로드 및 URL 생성
-        String uploadedPath = s3Util.uploadFile(file, null);
+        String uploadedPath = s3Util.uploadFile(file, "profile/");
         String imageUrl = s3Util.getImageUrl(uploadedPath);
 
         // DB 업데이트
