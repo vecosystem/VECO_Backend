@@ -1,6 +1,5 @@
 package com.example.Veco.domain.workspace.service;
 
-import com.example.Veco.domain.mapping.entity.MemberTeam;
 import com.example.Veco.domain.mapping.repository.MemberTeamRepository;
 import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.member.repository.MemberRepository;
@@ -9,7 +8,6 @@ import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.domain.team.repository.TeamRepository;
 import com.example.Veco.domain.workspace.converter.WorkspaceConverter;
 import com.example.Veco.domain.workspace.dto.TeamMemberCountDto;
-import com.example.Veco.domain.workspace.dto.WorkspaceRequestDTO;
 import com.example.Veco.domain.workspace.dto.WorkspaceResponseDTO;
 import com.example.Veco.domain.workspace.entity.WorkSpace;
 import com.example.Veco.domain.workspace.error.WorkspaceErrorStatus;
@@ -17,9 +15,7 @@ import com.example.Veco.domain.workspace.error.WorkspaceHandler;
 import com.example.Veco.domain.workspace.repository.WorkspaceQueryDslRepository;
 import com.example.Veco.domain.workspace.repository.WorkspaceRepository;
 import com.example.Veco.domain.workspace.util.SlugGenerator;
-import com.example.Veco.global.apiPayload.exception.VecoException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -101,6 +97,6 @@ public class WorkspaceQueryServiceImpl implements WorkspaceQueryService {
     public String createPreviewUrl(String workspaceName) {
         String slug = slugGenerator.generate(workspaceName);
 
-        return "https://veco-eight.vercel.app/" + slug ;
+        return "https://web.vecoservice.shop/" + slug ;
     }
 }
