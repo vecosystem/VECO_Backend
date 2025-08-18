@@ -572,10 +572,10 @@ public class ExternalCursorRepository implements ExternalCustomRepository{
                         .title(dto.getTitle())
                         .state(dto.getState())
                         .priority(dto.getPriority() != null ? dto.getPriority().name() : "없음")
-                        .deadline(dto.getDeadlines() != null ? 
+                        .deadline(dto.getDeadline() != null ?
                             ExternalGroupedResponseDTO.DeadlineDTO.builder()
-                                .start(dto.getDeadlines().getStart() != null ? dto.getDeadlines().getStart().toString() : null)
-                                .end(dto.getDeadlines().getEnd() != null ? dto.getDeadlines().getEnd().toString() : null)
+                                .start(dto.getDeadline().getStart() != null ? dto.getDeadline().getStart().toString() : null)
+                                .end(dto.getDeadline().getEnd() != null ? dto.getDeadline().getEnd().toString() : null)
                                 .build() : null)
                         .managers(dto.getManagers() != null ?
                             ExternalGroupedResponseDTO.ManagersDTO.builder()

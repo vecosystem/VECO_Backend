@@ -56,12 +56,6 @@ public class ExternalResponseDTO {
         @Schema(description = "이슈 상태", example = "TODO")
         private State state;
 
-        @Schema(description = "시작일", example = "2024-01-01")
-        private LocalDate startDate;
-
-        @Schema(description = "마감일", example = "2024-01-31")
-        private LocalDate endDate;
-
         @Schema(description = "목표 ID", example = "1")
         private Long goalId;
 
@@ -74,7 +68,7 @@ public class ExternalResponseDTO {
 
         private AssigneeResponseDTO managers;
 
-        private DeadlineResponseDTO deadlines;
+        private DeadlineResponseDTO deadline;
 
         private ExternalCommentResponseDTO comments;
     }
@@ -108,12 +102,6 @@ public class ExternalResponseDTO {
         @Schema(description = "이슈 상태", example = "TODO")
         private State state;
 
-        @Schema(description = "시작일", example = "2024-01-01")
-        private LocalDate startDate;
-
-        @Schema(description = "마감일", example = "2024-01-31")
-        private LocalDate endDate;
-
         @Schema(description = "목표 ID", example = "1")
         private Long goalId;
 
@@ -128,7 +116,7 @@ public class ExternalResponseDTO {
 
         private AssigneeResponseDTO managers;
 
-        private DeadlineResponseDTO deadlines;
+        private DeadlineResponseDTO deadline;
     }
 
     @Getter
