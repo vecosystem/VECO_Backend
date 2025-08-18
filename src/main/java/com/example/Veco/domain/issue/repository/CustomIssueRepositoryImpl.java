@@ -37,6 +37,8 @@ public class CustomIssueRepositoryImpl implements CustomIssueRepository {
                 .from(issue)
                 .where(query)
                 .leftJoin(goal).on(goal.id.eq(issue.goal.id))
+                .leftJoin(assignee).on(assignee.type.eq(Category.ISSUE).and(assignee.targetId.eq(issue.id)))
+                .leftJoin(member).on(member.id.eq(assignee.memberTeam.member.id))
                 .orderBy(issue.id.desc())
                 .groupBy(issue.id)
                 .limit(size)
