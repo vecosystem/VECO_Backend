@@ -250,9 +250,8 @@ public class IssueQueryService {
 
                 // 담당자가 없는 이슈의 개수 조회
                 Long unassignedCount = issueRepository.findUnassignedIssuesCountByTeamId(teamId);
-                map.keySet().stream().sorted().toList();
-                map.put("담당자 없음", Math.toIntExact(unassignedCount));
                 List<String> sortedManagersList = map.keySet().stream().sorted().collect(Collectors.toList());
+                map.put("담당자 없음", Math.toIntExact(unassignedCount));
                 sortedManagersList.addFirst("담당자 없음");
 
                 // firstCursor가 담당자 리스트에 포함되어있는지 확인
