@@ -8,6 +8,7 @@ import com.example.Veco.global.apiPayload.ApiResponse;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,11 +19,12 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class GitHubRestController implements GitHubSwaggerDocs {
 
     private final GitHubService gitHubService;
     private final GitHubRepositoryService gitHubRepositoryService;
-    private static final String FRONTEND_URL = "http://localhost:5173";
+    private static final String FRONTEND_URL = "https://web.vecoservice.shop";
 
     @Hidden
     @GetMapping("/github/installation/callback")
@@ -44,13 +46,27 @@ public class GitHubRestController implements GitHubSwaggerDocs {
     }
 
     @GetMapping("/api/teams/{teamId}/github/repositories")
-    public Mono<ApiResponse<List<GitHubApiResponseDTO.GitHubRepositoryDTO>>> getRepositories(@PathVariable("teamId") Long teamId) {
+    public ApiResponse<List<GitHubApiResponseDTO.GitHubRepositoryDTO>> getRepositories(@PathVariable("teamId") Long teamId) {
 
-        // owner, repo 정보 추출해서 클라이언트에 제공
-        return gitHubService.getInstallationIdAsync(teamId)  // 비동기 DB 조회
-                .flatMap(gitHubRepositoryService::getInstallationRepositories)
-                .map(ApiResponse::onSuccess)
-                .onErrorReturn(ApiResponse.onFailure("REPO_FETCH_FAILED", "레포지토리 조회 실패", null));
+        try {
+            log.info("레포지토리 조회 시작: teamId={}", teamId);
+
+            // 1. Installation ID 조회 (동기)
+            Long installationId = gitHubService.getInstallationIdSync(teamId);
+            log.info("Installation ID 조회 완료: {}", installationId);
+
+            // 2. 레포지토리 목록 조회 (동기)
+            List<GitHubApiResponseDTO.GitHubRepositoryDTO> repositories =
+                    gitHubRepositoryService.getInstallationRepositoriesSync(installationId);
+
+            log.info("레포지토리 조회 완료: {} 개", repositories.size());
+
+            return ApiResponse.onSuccess(repositories);
+
+        } catch (Exception e) {
+            log.error("레포지토리 조회 실패: teamId={}", teamId, e);
+            return ApiResponse.onFailure("REPO_FETCH_FAILED", "레포지토리 조회 실패: " + e.getMessage(), null);
+        }
     }
 
     @GetMapping("/api/github/connect")
