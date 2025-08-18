@@ -10,8 +10,6 @@ import com.example.Veco.domain.external.dto.response.ExternalGroupedResponseDTO;
 import com.example.Veco.domain.github.dto.webhook.GitHubWebhookPayload;
 import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.goal.entity.Goal;
-import com.example.Veco.domain.goal.exception.GoalException;
-import com.example.Veco.domain.goal.exception.code.GoalErrorCode;
 import com.example.Veco.domain.mapping.Assignment;
 import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.team.entity.Team;
@@ -141,14 +139,12 @@ public class ExternalConverter {
         return ExternalResponseDTO.ExternalInfoDTO.builder()
                 .id(external.getId())
                 .content(external.getDescription())
-                .startDate(external.getStartDate())
-                .endDate(external.getEndDate())
                 .content(external.getDescription())
                 .name(external.getName())
                 .priority(external.getPriority())
                 .goalId(external.getGoal()!= null ? external.getGoal().getId() : null)
                 .goalTitle(external.getGoal()!= null ? external.getGoal().getTitle() : null)
-                .deadlines(deadline)
+                .deadline(deadline)
                 .title(external.getTitle())
                 .state(external.getState())
                 .comments(commentResponseDTO)
@@ -188,7 +184,7 @@ public class ExternalConverter {
                 .priority(external.getPriority())
                 .goalId(external.getGoal() != null ? external.getGoal().getId() : null)
                 .goalTitle(external.getGoal() != null ? external.getGoal().getTitle() : null)
-                .deadlines(deadline)
+                .deadline(deadline)
                 .title(external.getTitle())
                 .state(external.getState())
                 .managers(assigneeResponseDTO)

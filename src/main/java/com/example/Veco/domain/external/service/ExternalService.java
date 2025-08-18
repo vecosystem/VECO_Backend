@@ -95,13 +95,15 @@ public class ExternalService {
 
         List<Member> members = memberRepository.findAllByIdIn(request.getManagersId());
 
-        if(request.getManagersId().size() != members.size()){
-            throw new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND);
-        }
+        if (request.getManagersId() != null) {
+            if(request.getManagersId().size() != members.size()){
+                throw new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND);
+            }
 
-        List<MemberTeam> memberTeamList = memberTeamRepository.findAllByMemberIdInAndTeamId(request.getManagersId(), teamId);
-        if (memberTeamList.size() != request.getManagersId().size()) {
-            throw new MemberHandler(MemberErrorStatus._FORBIDDEN);
+            List<MemberTeam> memberTeamList = memberTeamRepository.findAllByMemberIdInAndTeamId(request.getManagersId(), teamId);
+            if (memberTeamList.size() != request.getManagersId().size()) {
+                throw new MemberHandler(MemberErrorStatus._FORBIDDEN);
+            }
         }
 
         Goal goal = null;
