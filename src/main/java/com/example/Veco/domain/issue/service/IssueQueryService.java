@@ -321,16 +321,18 @@ public class IssueQueryService {
 
                 // 목표가 없는 이슈의 개수 조회
                 Long noGoalCount = issueRepository.findNoGoalIssuesCountByTeamId(teamId);
+                List<String> sortedGoalsList = map.keySet().stream().sorted().collect(Collectors.toList());
                 map.put("목표 없음", Math.toIntExact(noGoalCount));
+                sortedGoalsList.addFirst("목표 없음");
 
                 // firstCursor가 목표 리스트에 포함되어있는지 확인
-                if (!goals.contains(firstCursor)) {
+                if (!sortedGoalsList.contains(firstCursor)) {
                     // 없으면 목표 없음부터
                     firstCursor = "목표 없음";
                 }
 
                 // 목표 별 데이터 분류
-                for (String filter : map.keySet().stream().sorted().toList()) {
+                for (String filter : sortedGoalsList) {
                     List<SimpleIssue> result = new ArrayList<>();
 
                     // firstCursor가 일치할 때, 조회 시작
