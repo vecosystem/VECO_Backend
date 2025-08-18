@@ -36,11 +36,9 @@ public class CustomIssueRepositoryImpl implements CustomIssueRepository {
         List<IssueResponseDTO.SimpleIssue> result = queryFactory
                 .from(issue)
                 .where(query)
-                .leftJoin(assignee).on(assignee.type.eq(Category.ISSUE).and(assignee.targetId.eq(issue.id)))
-                .leftJoin(member).on(member.id.eq(assignee.memberTeam.member.id))
                 .leftJoin(goal).on(goal.id.eq(issue.goal.id))
                 .orderBy(issue.id.desc())
-                .groupBy(issue.id, assignee.id)
+                .groupBy(issue.id)
                 .limit(size)
                 .transform(GroupBy.groupBy(issue.id).list(
                                 Projections.constructor(

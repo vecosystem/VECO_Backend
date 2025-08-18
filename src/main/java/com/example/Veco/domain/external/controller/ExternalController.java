@@ -95,6 +95,7 @@ public class ExternalController implements ExternalSwaggerDocs{
     @PatchMapping("/{externalId}")
     public ApiResponse<ExternalResponseDTO.UpdateResponseDTO> modifyExternal(
             @PathVariable Long externalId,
+            @PathVariable Long teamId,
             @Valid @RequestBody ExternalRequestDTO.ExternalUpdateRequestDTO requestDTO) {
 
         return ApiResponse.onSuccess(externalService.updateExternal(externalId, requestDTO));

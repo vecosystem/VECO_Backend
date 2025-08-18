@@ -60,18 +60,6 @@ public class CommentController {
             summary = "댓글 목록 조회 API",
             description = "특정 리소스(이슈, 목표, 외부 이슈)의 댓글 목록을 조회합니다. 최신순으로 정렬되어 반환됩니다."
     )
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "댓글 목록 조회 성공",
-                    content = @Content(schema = @Schema(implementation = CommentListResponseDTO.class))
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "404",
-                    description = "대상 리소스를 찾을 수 없음",
-                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
-            )
-    })
     @GetMapping
     public ApiResponse<CommentResponseDTO.CommentListDTO> getAllComments(
             @Parameter(description = "댓글을 조회할 대상 리소스의 ID", required = true, example = "1")

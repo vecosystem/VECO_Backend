@@ -147,6 +147,7 @@ public interface ExternalSwaggerDocs {
     })
     ApiResponse<ExternalResponseDTO.UpdateResponseDTO> modifyExternal(
             @Parameter(description = "외부이슈 ID", required = true) @PathVariable Long externalId,
+            @Parameter(description = "팀 ID")@PathVariable Long teamId,
             @Valid @RequestBody ExternalRequestDTO.ExternalUpdateRequestDTO requestDTO);
 
     @Operation(
