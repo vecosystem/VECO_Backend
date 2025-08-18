@@ -18,7 +18,7 @@ public interface GitHubSwaggerDocs {
             summary = "GitHub App이 접근 가능한 레포지토리 목록 조회",
             description = "해당 팀이 설치한 GitHub App 이 접근 가능한 레포지토리 목록을 조회합니다."
     )
-    Mono<ApiResponse<List<GitHubApiResponseDTO.GitHubRepositoryDTO>>> getRepositories(@PathVariable("teamId") Long teamId);
+    ApiResponse<List<GitHubApiResponseDTO.GitHubRepositoryDTO>> getRepositories(@PathVariable("teamId") Long teamId);
 
     @Operation(
             summary = "GitHub 연동을 위한 App 설치 페이지 URL 조회",

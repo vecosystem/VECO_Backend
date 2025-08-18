@@ -57,4 +57,8 @@ public class GitHubService {
                 .subscribeOn(Schedulers.boundedElastic()); // DB 조회를 별도 스레드에서 실행
     }
 
+    public Long getInstallationIdSync(Long teamId) {
+        return getInstallationId(teamId);
+    }
+
 }
