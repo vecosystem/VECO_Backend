@@ -68,7 +68,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             // Bearer이면 추출
             token = token.replace("Bearer ", "");
             // AccessToken 검증하기: 올바른 토큰이면
-            if (jwtUtil.isAccessTokenValid(token)) {
+            if (!jwtUtil.isAccessTokenValid(token)) {
+                log.error("JWT 토큰이 유효하지 않습니다: {}", token);
+                sendErrorResponse(response, JwtErrorCode.JWT_INVALID_TOKEN);
+                return;
+            } else if (jwtUtil.isTokenExpired(token)) {
+                log.error("JWT 토큰이 만료되었습니다: {}", token);
+                sendErrorResponse(response, JwtErrorCode.JWT_EXPIRED_TOKEN);
+                return;
+            } else {
                 // 토큰에서 이메일 추출
                 String uid = jwtUtil.getUsername(token);
                 UserDetails user = customUserDetailsService.loadUserByUsername(uid);
