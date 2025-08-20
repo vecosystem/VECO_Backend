@@ -11,7 +11,6 @@ import com.example.Veco.global.auth.jwt.service.JwtService;
 import com.example.Veco.global.auth.jwt.util.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +52,7 @@ public class JwtController {
                 ResponseCookie refreshTokenCookie = jwtUtil.createRefreshTokenCookie(newRefreshToken);
                 response.addHeader("Set-Cookie", refreshTokenCookie.toString());
             }
+            log.info("토큰 재발급 성공: {}", newAccessToken);
             return ApiResponse.onSuccess(TokenConverter.toTokenDTO(newAccessToken));
         } catch (CustomJwtException e) {
             log.error("토큰 재발급 실패: {}", e.getMessage());
