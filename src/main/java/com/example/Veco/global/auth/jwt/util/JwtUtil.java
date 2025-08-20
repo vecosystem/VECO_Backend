@@ -103,11 +103,13 @@ public class JwtUtil {
         try {
             // 토큰이 블랙리스트에 존재하는지 확인
             if (isBlackList(token)){
+                log.info("토큰이 블랙리스트에 존재합니다: {}", token);
                 return false;
             }
             getClaims(token);
             return true;
         } catch (CustomJwtException e) {
+            log.error("토큰 유효성 검사 실패: {}", e.getMessage());
             return false;
         }
     }

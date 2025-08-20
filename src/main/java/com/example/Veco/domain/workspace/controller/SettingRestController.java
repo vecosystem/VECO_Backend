@@ -158,7 +158,15 @@ public class SettingRestController {
         List<WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto> result =
                 workspaceQueryService.getWorkspaceMembers(member);
 
-        return ApiResponse.onSuccess(result);
+        List<WorkspaceResponseDTO.WorkspaceMemberWithTeamsDto> sorted = result.stream()
+                .sorted((m1, m2) -> {
+                    if (m1.getMemberId().equals(member.getId())) return -1;  //나 자신은 항상 상단
+                    if (m2.getMemberId().equals(member.getId())) return 1;
+                    return m1.getJoinedAt().compareTo(m2.getJoinedAt()); //참여일 순
+                })
+                .toList();
+
+        return ApiResponse.onSuccess(sorted);
     }
 
     /**

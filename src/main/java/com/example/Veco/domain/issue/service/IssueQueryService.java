@@ -250,17 +250,18 @@ public class IssueQueryService {
 
                 // 담당자가 없는 이슈의 개수 조회
                 Long unassignedCount = issueRepository.findUnassignedIssuesCountByTeamId(teamId);
+                List<String> sortedManagersList = map.keySet().stream().sorted().collect(Collectors.toList());
                 map.put("담당자 없음", Math.toIntExact(unassignedCount));
-                managers.add("담당자 없음");
+                sortedManagersList.addFirst("담당자 없음");
 
                 // firstCursor가 담당자 리스트에 포함되어있는지 확인
-                if (!managers.contains(firstCursor)) {
+                if (!sortedManagersList.contains(firstCursor)) {
                     // 없으면 담당자 없음부터
                     firstCursor = "담당자 없음";
                 }
 
                 // 담당자 별 데이터 분류
-                for (String filter : map.keySet().stream().sorted().toList()) {
+                for (String filter : sortedManagersList) {
                     List<SimpleIssue> result = new ArrayList<>();
 
                     // firstCursor가 일치할 때, 조회 시작
@@ -320,16 +321,18 @@ public class IssueQueryService {
 
                 // 목표가 없는 이슈의 개수 조회
                 Long noGoalCount = issueRepository.findNoGoalIssuesCountByTeamId(teamId);
+                List<String> sortedGoalsList = map.keySet().stream().sorted().collect(Collectors.toList());
                 map.put("목표 없음", Math.toIntExact(noGoalCount));
+                sortedGoalsList.addFirst("목표 없음");
 
                 // firstCursor가 목표 리스트에 포함되어있는지 확인
-                if (!goals.contains(firstCursor)) {
+                if (!sortedGoalsList.contains(firstCursor)) {
                     // 없으면 목표 없음부터
                     firstCursor = "목표 없음";
                 }
 
                 // 목표 별 데이터 분류
-                for (String filter : map.keySet().stream().sorted().toList()) {
+                for (String filter : sortedGoalsList) {
                     List<SimpleIssue> result = new ArrayList<>();
 
                     // firstCursor가 일치할 때, 조회 시작
