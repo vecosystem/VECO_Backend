@@ -41,7 +41,7 @@ public class GitHubService {
 
     public GitHubResponseDTO.GitHubAppInstallationDTO getInstallationInfo(Long teamId) {
 
-        GithubInstallation githubInstallation = gitHubInstallationRepository.findById(teamId)
+        GithubInstallation githubInstallation = gitHubInstallationRepository.findByTeamId(teamId)
                 .orElseThrow(() -> new GitHubException(GitHubErrorCode.INSTALLATION_INFO_NOT_FOUND));
 
         return GitHubConverter.toGitHubAppInstallationDTO(githubInstallation);
