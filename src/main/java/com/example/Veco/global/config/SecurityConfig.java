@@ -60,6 +60,7 @@ public class SecurityConfig {
                         .requestMatchers("/healthcheck", "/css/**", "/js/**", "/images/**").permitAll()
                         .anyRequest().authenticated()
                 )
+                .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("https://web.vecoservice.shop/onboarding")
                         .successHandler(oAuth2SuccessHandler)
