@@ -45,7 +45,7 @@ public class SlackController {
             @RequestParam String state
     ){
         Long teamId = slackCommandService.installApp(code, state);
-        String URL = "https://web.vecoservice.shop/slack/complete?teamId="+teamId;
+        String URL = "http://localhost:5173/slack/complete?teamId="+teamId;
         return new RedirectView(URL);
     }
 }
