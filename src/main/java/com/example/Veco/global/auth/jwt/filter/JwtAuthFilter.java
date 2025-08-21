@@ -87,6 +87,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 );
                 // 인증 완료 후 SecurityContextHolder에 넣기
                 SecurityContextHolder.getContext().setAuthentication(auth);
+                log.info("[ 인증 객체 생성 완료 ]: {}", LocalDateTime.now());
             }
             filterChain.doFilter(request, response);
         } catch (ExpiredJwtException e) {
