@@ -18,12 +18,8 @@ import com.example.Veco.domain.github.service.GitHubIssueService;
 import com.example.Veco.domain.goal.entity.Goal;
 import com.example.Veco.domain.goal.repository.GoalRepository;
 import com.example.Veco.domain.mapping.Assignment;
-import com.example.Veco.domain.mapping.converter.AssignmentConverter;
-import com.example.Veco.domain.mapping.entity.MemberTeam;
 import com.example.Veco.domain.mapping.repository.*;
 import com.example.Veco.domain.member.entity.Member;
-import com.example.Veco.domain.member.error.MemberErrorStatus;
-import com.example.Veco.domain.member.error.MemberHandler;
 import com.example.Veco.domain.member.repository.MemberRepository;
 import com.example.Veco.domain.slack.service.SlackCommandService;
 import com.example.Veco.domain.team.dto.NumberSequenceResponseDTO;
@@ -72,53 +68,21 @@ public class ExternalService {
     private final CommentRepository commentRepository;
     private final SlackCommandService slackCommandService;
 
-    @Transactional
-    public ExternalResponseDTO.CreateResponseDTO createExternal(Long teamId,
-                                                                ExternalRequestDTO.ExternalCreateRequestDTO request,
-                                                                AuthUser user) {
+    // 서비스
+    private final ExternalTransactionalService externalTransactionalService;
 
-        Member author = memberRepository.findBySocialUid(user.getSocialUid())
-                .orElseThrow(() -> new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND));
+    public ExternalResponseDTO.CreateResponseDTO createExternal(
+            Long teamId,
+            ExternalRequestDTO.ExternalCreateRequestDTO request,
+            AuthUser user
+    ) {
 
-        Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new TeamException(TeamErrorCode._NOT_FOUND));
-
-        NumberSequenceResponseDTO sequenceDTO = numberSequenceService
-                .allocateNextNumber(team.getWorkSpace().getName(), teamId, Category.EXTERNAL);
-
-
-        List<Member> members = memberRepository.findAllByIdIn(request.getManagersId());
-
-        if (request.getManagersId() != null) {
-            if(request.getManagersId().size() != members.size()){
-                throw new MemberHandler(MemberErrorStatus._MEMBER_NOT_FOUND);
-            }
-
-            List<MemberTeam> memberTeamList = memberTeamRepository.findAllByMemberIdInAndTeamId(request.getManagersId(), teamId);
-            if (memberTeamList.size() != request.getManagersId().size()) {
-                throw new MemberHandler(MemberErrorStatus._FORBIDDEN);
-            }
-        }
-
-        Goal goal = null;
-
-        if(request.getGoalId() != null){
-            goal = findGoalById(request.getGoalId());
-        }
-
-        External external = ExternalConverter.toExternal(team, goal, request, sequenceDTO.getNextCode(), author);
-
-        members.forEach(member -> {
-            Assignment assignment = AssignmentConverter.toAssignment(member, external, Category.EXTERNAL);
-            external.addAssignment(assignment);
-        });
-
-        externalRepository.save(external);
+        External external = externalTransactionalService.createExternal(user, teamId, request);
 
         if(request.getExtServiceType() == ExtServiceType.GITHUB){
             gitHubIssueService.createGitHubIssue(request);
         } else if (request.getExtServiceType() == ExtServiceType.SLACK){
-            slackCommandService.sendSlackMessage(team, external);
+            slackCommandService.sendSlackMessage(external.getTeam(), external);
         }
 
         return ExternalConverter.createResponseDTO(external);
