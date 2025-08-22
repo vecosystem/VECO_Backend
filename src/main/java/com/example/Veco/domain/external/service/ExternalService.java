@@ -15,9 +15,6 @@ import com.example.Veco.domain.external.exception.code.ExternalErrorCode;
 import com.example.Veco.domain.external.repository.ExternalCustomRepository;
 import com.example.Veco.domain.external.repository.ExternalRepository;
 import com.example.Veco.domain.github.service.GitHubIssueService;
-import com.example.Veco.domain.goal.converter.GoalConverter;
-import com.example.Veco.domain.goal.dto.request.GoalReqDTO;
-import com.example.Veco.domain.goal.dto.response.GoalResDTO;
 import com.example.Veco.domain.goal.entity.Goal;
 import com.example.Veco.domain.goal.repository.GoalRepository;
 import com.example.Veco.domain.mapping.Assignment;
@@ -28,9 +25,7 @@ import com.example.Veco.domain.member.entity.Member;
 import com.example.Veco.domain.member.error.MemberErrorStatus;
 import com.example.Veco.domain.member.error.MemberHandler;
 import com.example.Veco.domain.member.repository.MemberRepository;
-import com.example.Veco.domain.slack.exception.SlackException;
-import com.example.Veco.domain.slack.exception.code.SlackErrorCode;
-import com.example.Veco.domain.slack.util.SlackUtil;
+import com.example.Veco.domain.slack.service.SlackCommandService;
 import com.example.Veco.domain.team.dto.NumberSequenceResponseDTO;
 import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.domain.team.exception.TeamException;
@@ -51,7 +46,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -72,11 +66,11 @@ public class ExternalService {
     private final AssigneeRepository assigneeRepository;
 
     // 유틸
-    private final SlackUtil slackUtil;
     private final CommentRoomRepository commentRoomRepository;
     private final GitHubIssueService gitHubIssueService;
     private final GitHubInstallationRepository githubInstallationRepository;
     private final CommentRepository commentRepository;
+    private final SlackCommandService slackCommandService;
 
     @Transactional
     public ExternalResponseDTO.CreateResponseDTO createExternal(Long teamId,
@@ -124,22 +118,7 @@ public class ExternalService {
         if(request.getExtServiceType() == ExtServiceType.GITHUB){
             gitHubIssueService.createGitHubIssue(request);
         } else if (request.getExtServiceType() == ExtServiceType.SLACK){
-            // accessToken, DefaultChannelId, message
-            // 연동 정보 조회
-            com.example.Veco.domain.external.entity.ExternalService externalService =
-                    linkRepository.findLinkByWorkspaceAndExternalService_ServiceType(
-                    team.getWorkSpace(), ExtServiceType.SLACK)
-                    .orElseThrow(() -> new SlackException(SlackErrorCode.NOT_LINKED))
-                    .getExternalService();
-
-            String message = team.getName() + "에서 " +
-                    external.getTitle() + "을(를) 생성했습니다.";
-
-            slackUtil.PostSlackMessage(
-                    externalService.getAccessToken(),
-                    externalService.getSlackDefaultChannelId(),
-                    message
-            );
+            slackCommandService.sendSlackMessage(team, external);
         }
 
         return ExternalConverter.createResponseDTO(external);
