@@ -64,7 +64,7 @@ public class SlackUtil {
                 .block();
     }
 
-    // 메시지 전송
+    // 메시지 전송: Service에 따로 지정 -> 비동기
     public SlackResDTO.PostSlackMessage PostSlackMessage(
             String accessToken, String slackDefaultChannelId, String content
     ){

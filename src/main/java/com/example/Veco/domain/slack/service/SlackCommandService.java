@@ -1,6 +1,7 @@
 package com.example.Veco.domain.slack.service;
 
 import com.example.Veco.domain.external.converter.ExternalServiceConverter;
+import com.example.Veco.domain.external.entity.External;
 import com.example.Veco.domain.external.entity.ExternalService;
 import com.example.Veco.domain.external.repository.ExternalServiceRepository;
 import com.example.Veco.domain.mapping.converter.LinkConverter;
@@ -14,6 +15,7 @@ import com.example.Veco.domain.slack.dto.SlackResDTO;
 import com.example.Veco.domain.slack.exception.SlackException;
 import com.example.Veco.domain.slack.exception.code.SlackErrorCode;
 import com.example.Veco.domain.slack.util.SlackUtil;
+import com.example.Veco.domain.team.entity.Team;
 import com.example.Veco.domain.workspace.entity.WorkSpace;
 import com.example.Veco.global.auth.jwt.util.JwtUtil;
 import com.example.Veco.global.enums.ExtServiceType;
@@ -162,5 +164,35 @@ public class SlackCommandService {
 
         // 기본 팀 ID로 리다이렉트
         return workspace.getTeams().getFirst().getId();
+    }
+
+    // Slack 메시지 전송
+    public void sendSlackMessage(
+            Team team,
+            External external
+    ) {
+        // accessToken, DefaultChannelId, message
+        // 연동 정보 조회
+        com.example.Veco.domain.external.entity.ExternalService externalService =
+                linkRepository.findLinkByWorkspaceAndExternalService_ServiceType(
+                                team.getWorkSpace(), ExtServiceType.SLACK)
+                        .orElseThrow(() -> new SlackException(SlackErrorCode.NOT_LINKED))
+                        .getExternalService();
+
+        String message = team.getName() + "에서 " +
+                external.getTitle() + "을(를) 생성했습니다.";
+
+        SlackResDTO.PostSlackMessage result = slackUtil.PostSlackMessage(
+                externalService.getAccessToken(),
+                externalService.getSlackDefaultChannelId(),
+                message
+        );
+
+        if (!result.ok()){
+
+            // 로그
+            log.error(result.error());
+            throw new SlackException(SlackErrorCode.MESSAGE_POST_FAILED);
+        }
     }
 }
