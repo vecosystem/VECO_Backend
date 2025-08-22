@@ -71,6 +71,7 @@ public class ExternalService {
     // 서비스
     private final ExternalTransactionalService externalTransactionalService;
 
+    @Transactional
     public ExternalResponseDTO.CreateResponseDTO createExternal(
             Long teamId,
             ExternalRequestDTO.ExternalCreateRequestDTO request,
